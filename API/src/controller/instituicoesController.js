@@ -1,7 +1,7 @@
 import * as service from '../sevice/instituicoesService.js';
 import { Router } from 'express';
 
-const endpoins = Router();
+const endpoints = Router();
 
 endpoints.get('/api/instituicoes', async (req, resp) => {
     try {

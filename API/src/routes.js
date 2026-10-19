@@ -1,4 +1,5 @@
 import { con } from './repository/connection.js';
+import grupos from './controller/gruposController.js';
 
 export function addRoutes(api) {
     
@@ -9,5 +10,5 @@ export function addRoutes(api) {
         });
     });
 
-    api.use(instituicoesController);
+    api.use(grupos);
 }

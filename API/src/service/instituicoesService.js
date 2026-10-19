@@ -10,7 +10,7 @@ function validarId(valor) {
     const id = Number(valor);
 
     if (
-        valor == null || typeof valor === 'bolean' ||
+        valor == null || typeof valor === 'boolean' ||
         !Number.isSafeInteger(id) || id <= 0
     ) {
         throw erroHttp('ID inválido');
@@ -66,8 +66,16 @@ function validarDados(dados) {
     return resultado;
 }
 
+export async function listarInstituicoes(cidade) {
+    if (cidade !== undefined && typeof cidade !== 'string') {
+        throw erroHttp('Filtro cidade inválido');
+    }
+
+    return repository.listarInstituicoes(cidade?.trim());
+}
+
 export async function buscarInstituicao(id) {
-    const instituicao = await repostitory.buscarInstituicao(
+    const instituicao = await repository.buscarInstituicao(
         validarId(id)
     );
 
@@ -78,7 +86,7 @@ export async function buscarInstituicao(id) {
     return instituicao;
 }
 
-export async function cadastarInstituicao(dados) {
+export async function cadastrarInstituicao(dados) {
     const id_usuario = validarId(dados?.id_usuario);
     const campos = validarDados(dados);
 
@@ -100,7 +108,7 @@ export async function cadastarInstituicao(dados) {
         ...campos
     });
 
-    return repostory.buscarInstituicao(id);
+    return repository.buscarInstituicao(id);
 }
 
 export async function atualizarInstituicao(id, dados) {
@@ -109,7 +117,7 @@ export async function atualizarInstituicao(id, dados) {
 
     await buscarInstituicao(idValidado);
 
-    const alterados = await repostory.atualizarInstituicao(
+    const alterados = await repository.atualizarInstituicao(
         idValidado, campos
     );
 

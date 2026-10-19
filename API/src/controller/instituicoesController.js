@@ -30,7 +30,7 @@ function tratarErro(resp, erro) {
 }
 
 // Mostrar instituições
-endpoints.get('/api/instituicoes', async (req, resp) => {
+endpoints.get('/instituicoes', async (req, resp) => {
     try {
         const cidade = req.query.cidade;
 
@@ -45,7 +45,7 @@ endpoints.get('/api/instituicoes', async (req, resp) => {
 
 
 //Buscar instituições
-endpoints.get('/api/instituicoes:id', async (req, resp) => {
+endpoints.get('/instituicoes:id', async (req, resp) => {
     try {
         const instituicao = 
             await service.buscarInstituicao(req.params.id);
@@ -57,7 +57,7 @@ endpoints.get('/api/instituicoes:id', async (req, resp) => {
 });
 
 // Cadastar instituições
-endpoints.post('/api/instituicoes', async (req, resp) => {
+endpoints.post('/instituicoes', async (req, resp) => {
     try {
         const instituicao = 
             await service.cadastarInstituicao(req.body);
@@ -69,7 +69,7 @@ endpoints.post('/api/instituicoes', async (req, resp) => {
 });
 
 // Atualizar institução
-endpoints.put('/api/instituicoes/:id', async (req, resp) => {
+endpoints.put('/instituicoes/:id', async (req, resp) => {
     try {
         const instituicao =
             await service.atualizarInstituicao(
@@ -84,7 +84,7 @@ endpoints.put('/api/instituicoes/:id', async (req, resp) => {
 });
 
 //Excluir instituição
-endpoints.delet('/api/instituicoes/:id', async (req, resp) => {
+endpoints.delete('/instituicoes/:id', async (req, resp) => {
     try {
         await service.excluirInstituicao(req.params.id);
 

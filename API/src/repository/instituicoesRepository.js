@@ -8,8 +8,8 @@ export async function listarInstituicoes(cidade) {
     const parametros = [];
 
     if (cidade) {
-        sql += 'WHERE cidade LIKE ?';
-        parametros.push(`%${cidade}`);
+        sql += ' WHERE cidade LIKE ?';
+        parametros.push(`%${cidade}%`);
     }
 
     sql += 'ORDER BY nome_hemo';
@@ -21,11 +21,11 @@ export async function listarInstituicoes(cidade) {
 
 export async function buscarInstituicao(id) {
     const sql = `
-        SELECT * FROM hemocentro
+        SELECT * FROM hemocentros
         WHERE id_hemocentro = ?
     `;
 
-    const [registro] = await con.executo(sql, [id]);
+    const [registros] = await con.execute(sql, [id]);
 
     return registros[0] ?? null;
 }
@@ -36,6 +36,10 @@ export async function buscarUsuario(id) {
         FROM usuarios
         WHERE id_usuario = ?
         `;
+
+    const [registros] = await con.execute(sql, [id]);
+
+    return registros[0] ?? null;
 }
 
 export async function inserirInstituicao(dados) {
@@ -55,7 +59,7 @@ export async function inserirInstituicao(dados) {
         dados.telefone_centro
     ];
 
-    const [resultado] = await con.execute(sql, valor);
+    const [resultado] = await con.execute(sql, valores);
 
     return resultado.insertId;
 }
@@ -65,9 +69,9 @@ export async function atualizarInstituicao(id, dados) {
         UPDATE hemocentros
         SET nome_hemo = ?,
             cep = ?,
-            endereço = ?,
+            endereco = ?,
             cidade = ?,
-            estado = ?
+            estado = ?,
             telefone_centro = ?
         WHERE id_hemocentro = ?
         `;
@@ -89,7 +93,7 @@ export async function atualizarInstituicao(id, dados) {
 
 export async function excluirInstituicao(id) {
     const sql = `
-        DELETES FROM hemocentros
+        DELETE FROM hemocentros
         WHERE id_hemocentro = ?
     `;
 

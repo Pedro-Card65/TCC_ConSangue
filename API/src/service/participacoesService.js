@@ -124,3 +124,60 @@ export async function criarParticipacao(dados) {
 
     return repository.buscarParticipacao(id);
 }
+
+export async function listarParticipacoes(filtros = {}) {
+    const validados = {};
+
+    if (filtros.id_usuario !== undefined) {
+        validados.id_usuario = validarId (filtros.id_usuario, 'ID do usuário');
+    }
+
+    if (filtros.id_campanha !== undefined) {
+        validados.id_camoanha = validarId (filtros.id_campanha, 'ID da campanha');
+    }
+
+    return repository.listarParticipacoes(validados);
+}
+
+export async function buscarParticipacao(id) {
+    const participacao = await repository.buscarParticipacao(
+        validarId(id)
+    );
+
+    if (!participacao) {
+        throw erroHttp('Participação não encontrada', 404);
+    }
+
+    return participacao;
+}
+
+export async function atualizarParticipacao(id, dados) {
+    const idValidado = validarId(id);
+    const atual = await buscarParticipacao(idValidado);
+
+    if (dados && ( 'id_usuario' in dados || 'id_campanha' in dados)) {
+        throw erroHttp('Não é permitido trocar usuário ou campanha');
+    }
+
+    const campos = validarDados(dados);
+
+    await validarVinculo(
+        atual.id_usuario,
+        atual.id_campanha,
+        campos.id_grupo_campanha
+    );
+
+    await repository.atualizarParticipacao(idValidado);
+}
+
+export async function excluirParticipacoes(id) {
+    const idValidado = validarId(id);
+
+    const excluidos = await repository.excluirParticipacoes(
+        idValidado
+    );
+
+    if (!excluidos) {
+        throw erroHttp('Participação não encontrada', 404);
+    }
+}

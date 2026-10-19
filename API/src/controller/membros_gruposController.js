@@ -1,4 +1,4 @@
-import * as service from '../sevice/membros_gruposService.js';
+import * as service from '../service/membros_gruposService.js';
 
 
 export default endpoints;

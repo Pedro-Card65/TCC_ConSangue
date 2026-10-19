@@ -1,4 +1,4 @@
-import * as service from '../sevice/instituicoesService.js';
+import * as service from '../service/instituicoesService.js';
 import { Router } from 'express';
 
 const endpoints = Router();

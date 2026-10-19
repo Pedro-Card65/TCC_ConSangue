@@ -1,4 +1,4 @@
-import * as service from '../sevice/campanhasService.js';
+import * as service from '../service/campanhasService.js';
 
 
 export default endpoints;

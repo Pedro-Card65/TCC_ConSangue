@@ -1,23 +1,96 @@
 import * as service from '../sevice/instituicoesService.js';
 import { Router } from 'express';
 
-const endpoins = Router();
+const endpoints = Router();
 
+function tratarErro(resp, erro) {
+    if (erro.code === 'ER_DUP_ENTRY') {
+        return resp.status(409).json({
+            erro: 'Usuário já possui uma instituição cadastrada'
+        });
+    }
+
+    if (erro.code === 'ER_ROW_ISS_REFERENCED_2') {
+        return resp.status(409).json({
+            erro: 'Instituição possui registros vinculados'
+        });
+    }
+
+    if (erro.status) {
+        return resp.status(erro.status).json({
+            erro: erro.message
+        });
+    }
+
+    console.error(erro);
+
+    return resp.status(500).json({
+        erro: 'Erro interno do servidor'
+    });
+}
+
+// Mostrar instituições
 endpoints.get('/api/instituicoes', async (req, resp) => {
     try {
-        let cidade = req.query.cidade;
+        const cidade = req.query.cidade;
 
-        let instituicoes = await service.listarInstituicoes(cidade);
+        const instituicoes = 
+            await service.listarInsituicoes(cidade);
 
-        resp.status(200).send(instituicoes);
+        resp.status(200).json(insituicoes);
+    } catch (erro) {
+        tratarErro(resp, erro);
     }
-    
-    catch (erro) {
-        console.erro(erro);
+});
 
-        resp.status(500).send({
-            erro: 'Erro ao consultar instituições'
-        });
+
+//Buscar instituições
+endpoints.get('/api/instituicoes:id', async (req, resp) => {
+    try {
+        const instituicao = 
+            await service.buscarInstituicao(req.params.id);
+
+        resp.status(200).jsoon(instituicao);
+    } catch (erro) {
+        tratarErro(resp, erro);
+    }
+});
+
+// Cadastar instituições
+endpoints.post('/api/instituicoes', async (req, resp) => {
+    try {
+        const instituicao = 
+            await service.cadastarInstituicao(req.body);
+
+        resp.status(201).json(instituicao);
+    } catch (erro) {
+        tratarErro(resp, erro);
+    }
+});
+
+// Atualizar institução
+endpoints.put('/api/instituicoes/:id', async (req, resp) => {
+    try {
+        const instituicao =
+            await service.atualizarInstituicao(
+                    req.params.id,
+                    req.body
+            );
+
+        resp.status(200).json(instituicao);
+    } catch (erro) {
+        tratarErro(resp, erro);
+    }
+});
+
+//Excluir instituição
+endpoints.delet('/api/instituicoes/:id', async (req, resp) => {
+    try {
+        await service.excluirInstituicao(req.params.id);
+
+        resp.status(204).send();
+    } catch (erro) {
+        tratarErro(resp, erro);
     }
 });
 

@@ -2,6 +2,8 @@ import { con } from './repository/connection.js';
 import grupos from './controller/gruposController.js';
 import instituicoes from './controller/instituicoesController.js';
 import participacoes from './controller/participacoesController.js';
+import usuario from './controller/usuariosController.js'; // </3
+
 
 export function addRoutes(api) {
     
@@ -15,4 +17,5 @@ export function addRoutes(api) {
     api.use(grupos);
     api.use(instituicoes);
     api.use(participacoes);
+    api.use(usuario);
 }

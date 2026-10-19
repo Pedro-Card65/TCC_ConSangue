@@ -84,7 +84,7 @@ endpoints.put('/instituicoes/:id', async (req, resp) => {
 });
 
 //Excluir instituição
-endpoints.delete('/instituicoes/:id', async (req, resp) => {
+endpoints.delete('/api/instituicoes/:id', async (req, resp) => {
     try {
         await service.excluirInstituicao(req.params.id);
 

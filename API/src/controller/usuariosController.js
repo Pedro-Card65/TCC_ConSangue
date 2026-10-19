@@ -1,4 +1,4 @@
-import * as service from '../sevice/usuariosService.js';
+import * as service from '../service/usuariosService.js';
 
 
 export default endpoints;

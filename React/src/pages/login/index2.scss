@@ -1,0 +1,19 @@
+.Cadastro {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    background-color: white;
+    border: 2rem;
+    padding: 0.2rem;
+    
+    .box {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        color: #AD2626;
+
+        width: 100%;
+        padding: 0.2rem;
+    }
+}

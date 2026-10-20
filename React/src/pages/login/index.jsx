@@ -58,9 +58,10 @@ if (def === 'Login'){
           <button type="submit" className="Entrar" onClick={teste}>Entrar</button>
         </form>
 
-        <div className="Cadastro"><p>É a sua primeira vez por aqui?<p className='Troca' onClick={troca}>Faça o seu Cadastro!</p></p></div>
+        <div className="Cadastro"><p>É a sua primeira vez por aqui?<p className='Troca' onClick={troca}>Faça o seu Cadastro!</p></p>
+        <p>Gostaria de cadastrar um hemocentro?<p className='Troca' onClick={troca}>Clique aqui!</p></p>
+        </div>
       </main>
-
     </div>
   )
 }

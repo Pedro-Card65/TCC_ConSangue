@@ -1,6 +1,6 @@
 import * as dbCampanhas from '../repository/campanhasRepository.js';
 
-//
+//Finalizado
 
 export async function criarCampanhaService(campanha){
     if(!campanha.id_hemocentro || !campanha.nome_campanha || !campanha.data_inicio || !campanha.data_fim || !campanha.status_campanha){

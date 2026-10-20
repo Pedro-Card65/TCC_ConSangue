@@ -2,7 +2,7 @@ import * as service from '../service/campanhasService.js';
 import { Router } from "express";
 const endpoints = Router();
 
-//
+//Finalizado
 
 endpoints.post('/campanhas', async (req, resp) => {
     try {

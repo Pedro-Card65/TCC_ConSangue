@@ -1,6 +1,6 @@
 import { con } from './connection.js';
 
-//
+//Finalizado
 
 export async function criarCampanha(campanha){
     const command = `

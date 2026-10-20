@@ -2,13 +2,13 @@ import * as service from '../service/campanhasService.js';
 import { Router } from "express";
 const endpoints = Router();
 
-//
+//Finalizado
 
 endpoints.post('/campanhas', async (req, resp) => {
     try {
         let campanha = req.body;
 
-        let id_campanha = await service.criarCampanha(campanha);
+        let id_campanha = await service.criarCampanhaService(campanha);
         resp.send({ id_campanha });
     } 
     catch (error) {
@@ -20,7 +20,7 @@ endpoints.post('/campanhas', async (req, resp) => {
 
 endpoints.get('/campanhas', async (req, resp) => {
     try {
-        let campanhas = await service.listarCampanhas();
+        let campanhas = await service.listarCampanhaService();
         resp.send({ campanhas });
     }
     catch (error) {
@@ -34,7 +34,7 @@ endpoints.get('/campanhas', async (req, resp) => {
     try {
         let nomeCampanha = req.query.nome; 
 
-        let campanhas = await service.listarCampanhasPorNome(nomeCampanha);
+        let campanhas = await service.listarCampanhasPorNomeService(nomeCampanha);
         resp.send({ campanhas });
     }
     catch (error) {
@@ -47,7 +47,7 @@ endpoints.get('/campanhas', async (req, resp) => {
 endpoints.get('/campanhas/hemocentro/:id', async (req, resp) => {
     try {
         let id_hemocentro = req.params.id;
-        let campanhas = await service.listarCampanhasPorHemocentro(id_hemocentro);
+        let campanhas = await service.listarCampanhasPorHemocentroService(id_hemocentro);
         resp.send({ campanhas });
     }
     catch (error) {
@@ -62,7 +62,7 @@ endpoints.put('/campanhas/:id', async (req, resp) => {
         let campanha = req.body;
         let id_campanha = req.params.id;
 
-        let linhas = await service.editarCampanha(campanha, id_campanha);
+        let linhas = await service.editarCampanhaService(campanha, id_campanha);
         resp.send({ linhas });
     }
     catch (error) {
@@ -76,7 +76,7 @@ endpoints.delete('/campanhas/:id', async (req, resp) => {
     try {
         let id_campanha = req.params.id;
 
-        let linhas = await service.apagarCampanha(id_campanha);
+        let linhas = await service.apagarCampanhaService(id_campanha);
         resp.send({ linhas });
     }
     catch (error) {

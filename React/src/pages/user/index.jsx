@@ -20,7 +20,7 @@ export default function User() {
       <div className='pesquisa'>
 
       <img src="/assets/icons/LupaPesquisa.png" alt="Lupa" />
-      <input type="text" placeholder="Pesquisar..." />
+      <input type="text" placeholder="Pesquisar campanhas, hemocentros ou grupos..." />
 
       </div>
 
@@ -130,6 +130,41 @@ export default function User() {
             </div>
 
           </div>
+        </div>
+        <div className="historico-campanhas">
+          
+
+          <div className='titulo-historica-campanhas'>
+
+            <h3>Histórico de Campanhas</h3>
+
+          </div>
+
+          <div className="conteudo-historico-campanhas">
+
+            <div className='informacoes-historico-campanhas'>
+
+              <div className='nomes-historico-campanhas'>
+                <h2>nome da campanha -</h2>
+
+              </div>
+
+              <div className='hemocentros-historico-campanhas'>
+
+                <h2>Nome do Hospital/Hemocentro *</h2>
+
+              </div>
+
+              <div className='confirmacao-interesse-historico-campanhas'>
+
+                <h2>Compareceu / Interesse</h2>
+
+              </div>
+
+            </div>
+
+          </div>
+
         </div>
 
       </section>

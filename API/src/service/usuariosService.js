@@ -6,6 +6,8 @@ function criarErro(mensagem, status = 400) {
     return erro;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
+
 export async function fazerCadastro(
     usuario, nascimento, cpf, telefone,
     email, senha, cidade, tipo_sangue, tipo_usuario
@@ -124,6 +126,7 @@ export async function fazerCadastro(
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
 
 export async function buscarPorID(id) {
     id = Number(id);
@@ -142,3 +145,129 @@ export async function buscarPorID(id) {
     return usuario;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+
+export async function buscarPorUser(nome) {
+
+    if (!nome || typeof nome !== 'string') {
+        const erro = new Error("Nome obrigatório");
+        erro.status = 400;
+        throw erro;
+    }
+
+    nome = nome.trim();
+
+    if (nome.length < 2) {
+        const erro = new Error("Digite pelo menos 2 caracteres");
+        erro.status = 400;
+        throw erro;
+    }
+
+    const usuarios = await repository.buscarPorUser(nome);
+
+    return usuarios;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+
+export async function deletarPorID(id) {
+    id = Number(id);
+    if (!Number.isInteger(id) || id <= 0) {
+        const erro = new Error("ID inválido");
+        erro.status = 400;
+        throw erro;
+    }
+    const del = await repository.deletarPorID(id);
+    if (del === 0) {
+        const erro = new Error("Usuário não encontrado");
+        erro.status = 404;
+        throw erro;
+    }
+
+    return del;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+
+export async function trocarTelefone(id, novotel, senha) {
+    id = Number(id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+        const erro = new Error("ID inválido");
+        erro.status = 400;
+        throw erro;
+    }
+
+    if (!novotel || !senha) {
+        const erro = new Error("Telefone e senha são obrigatórios");
+        erro.status = 400;
+        throw erro;
+    }
+
+    const usuario = await repository.buscarPorID(id);
+
+    if (!usuario) {
+        const erro = new Error("Usuário não encontrado");
+        erro.status = 404;
+        throw erro;
+    }
+
+    if (usuario.senha_hash !== senha) {
+        const erro = new Error("Senha incorreta");
+        erro.status = 401;
+        throw erro;
+    }
+
+    return await repository.trocarTelefone(id, novotel);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+
+export async function trocarEmail(id, novoemail, senha) {
+    id = Number(id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+        const erro = new Error("ID inválido");
+        erro.status = 400;
+        throw erro;
+    }
+
+    if (typeof novoemail !== 'string' ||
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(novoemail.trim())) {
+        const erro = new Error("Email inválido");
+        erro.status = 400;
+        throw erro;
+    }
+
+    if (!senha) {
+        const erro = new Error("Senha obrigatória");
+        erro.status = 400;
+        throw erro;
+    }
+
+    const usuario = await repository.buscarPorID(id);
+
+    if (!usuario) {
+        const erro = new Error("Usuário não encontrado");
+        erro.status = 404;
+        throw erro;
+    }
+
+    if (usuario.senha_hash !== senha) {
+        const erro = new Error("Senha incorreta");
+        erro.status = 401;
+        throw erro;
+    }
+
+    try {
+        return await repository.trocarEmail(id, novoemail.trim());
+    }
+    catch (erro) {
+        if (erro.code === 'ER_DUP_ENTRY') {
+            erro.status = 409;
+            erro.message = "Email já cadastrado";
+        }
+
+        throw erro;
+    }
+}

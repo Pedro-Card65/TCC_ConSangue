@@ -1,5 +1,7 @@
 import { con } from './connection.js';
 
+//Finalizado
+
 export async function criarCampanha(campanha){
     const command = `
     insert into campanhas (id_hemocentro, nome_campanha, descricao, data_inicio, data_fim, horario_inicio, horario_fim, status_campanha)
@@ -54,6 +56,28 @@ export async function listarCampanhasPorNome(nome){
 
     const [result] = await con.query(command, [
         `%${nome}%`
+    ]);
+
+    return result;
+};
+
+export async function listarCampanhasPorHemocentro(id_hemocentro){
+    const command = `
+    select
+        id_campanha,
+        id_hemocentro,
+        nome_campanha,
+        descricao,
+        data_inicio,
+        data_fim,
+        horario_inicio,
+        horario_fim,
+        status_campanha
+    from campanhas
+    where id_hemocentro = ? `
+
+    const [result] = await con.query(command, [
+        id_hemocentro
     ]);
 
     return result;

@@ -52,7 +52,7 @@ CREATE TABLE campanhas (
     horario_inicio TIME,
     horario_fim TIME,
     status_campanha ENUM('ativa', 'encerrada')
-        DEFAULT 'ativa',
+        DEFAULT 'ativa' NOT NULL,
     data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (id_hemocentro)

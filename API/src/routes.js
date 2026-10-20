@@ -3,6 +3,7 @@ import grupos from './controller/gruposController.js';
 import instituicoes from './controller/instituicoesController.js';
 import participacoes from './controller/participacoesController.js';
 import usuario from './controller/usuariosController.js'; // </3
+import campanhas from './controller/campanhasController.js';
 
 
 export function addRoutes(api) {
@@ -18,4 +19,5 @@ export function addRoutes(api) {
     api.use(instituicoes);
     api.use(participacoes);
     api.use(usuario);
+    api.use(campanhas);
 }

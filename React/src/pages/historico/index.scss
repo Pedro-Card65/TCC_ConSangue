@@ -1,0 +1,61 @@
+// Cores para a estilização do site
+$vermelho: #b02222;
+$vermelho-botao: #ae2424;
+$rosa-borda: #f0c9c9;
+$rosa-data: #e8c4c4;
+$verde-selo: #c9f7c5;
+$azul-selo: #c4efff;
+$cinza-fundo: #f3f3f3;
+$cinza-texto: #9a9a9a;
+$cinza-icone: #c4c4c4;
+$branco: #ffffff;
+
+
+// confere no Figma (selecionando o texto) qual fonte é a certa
+$fonte-texto: 'Inter', sans-serif;
+$fonte-logo: 'Lexend', sans-serif;
+
+// Toda a página
+.pagina-historico {
+  background-color: $cinza-fundo; 
+
+
+  // ---------- logo ----------
+  .consangue {
+    top: 22px;
+    left: 4%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 2;
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      img {
+        width: 3.5rem;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+    }
+
+    .marca {
+      h2 {
+        font-family: $fonte-logo;
+        font-size: 22px;
+        font-weight: 500;
+        color: #000;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+
+      p {
+        font-size: 8px;
+        line-height: 1.2;
+        color: #000;
+      }
+    }
+  }
+}

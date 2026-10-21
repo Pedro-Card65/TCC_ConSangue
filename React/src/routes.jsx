@@ -5,7 +5,7 @@ import Cadastro from './pages/cadastro/index.jsx';
 
 import Login from './pages/login/index.jsx';
 
-import Home from './pages/home/home.jsx';
+import Home from './pages/home/index.jsx';
 
 import User from './pages/user/index.jsx';
 

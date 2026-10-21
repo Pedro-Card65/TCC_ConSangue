@@ -1,9 +1,13 @@
 import './index.scss';
+import LogoSlogan from '../../componentes/logo-slogan/logo-slogan.jsx';
 
 export default function User() {
   return (
     <div className="pagina-user">
-      <div className="consangue">
+
+      <LogoSlogan />
+
+      {/* <div className="consangue">
 
         <div className="logo">
 
@@ -15,7 +19,7 @@ export default function User() {
           <h2>ConSangue</h2>
           <p>Mobilização Coletiva para<br />Doação de Sangue</p>
         </div>
-      </div>
+      </div> */}
 
       <div className='pesquisa'>
 

@@ -2,7 +2,7 @@ import './barra-navegacao.scss';
 import { NavLink } from 'react-router-dom';
 
 const itens = [
-  { id: 1, rota: '/participacoes', nome: 'Participações', icone: 'participacoes' },
+  { id: 1, rota: '/participacoesHistorico', nome: 'Participações Histórico', icone: 'participacoes' },
   { id: 2, rota: '/grupos', nome: 'Grupos', icone: 'grupos' },
   { id: 3, rota: '/home', nome: 'Home', icone: 'home' },
   { id: 4, rota: '/campanhas', nome: 'Campanhas', icone: 'campanhas' },

@@ -15,9 +15,7 @@ import Campanhas from './pages/campanhas/index.jsx';
 
 import Grupos from './pages/grupos/index.jsx';
 
-import Participacoes from './pages/participacoes/index.jsx';
-
-import Historico from './pages/historico/index.jsx';
+import ParticipacoesHistorico from './pages/participacoesHistorico/index.jsx';
 
 import Error from './pages/error404/index.jsx'
 
@@ -31,10 +29,9 @@ export default function Router(){
                     <Route path = '/home' element = {<Home/>} />
                     <Route path = '/campanhas' element = {<Campanhas/>} />
                     <Route path = '/grupos' element = {<Grupos/>} />
-                    <Route path = '/participacoes' element = {<Participacoes/>} />
+                    <Route path = '/participacoesHistorico' element = {<ParticipacoesHistorico/>} />
                 </Route>
                 <Route path = '/perfil' element = {<Perfil/>} />;
-                <Route path = '/historico' element = {<Historico/>} />;
                 <Route path = '*' element = {<Error/>}/>
             </Routes>
         </BrowserRouter>

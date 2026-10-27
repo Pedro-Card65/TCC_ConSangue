@@ -1,0 +1,10 @@
+.layout-principal {
+  display: grid;
+  grid-template-columns: 323px 1fr 323px; // 291px do cartão + 16px de padding de cada lado
+  min-height: 100vh;
+  background: #f3f3f3;
+
+  .coluna-centro {
+    min-width: 0;
+  }
+}

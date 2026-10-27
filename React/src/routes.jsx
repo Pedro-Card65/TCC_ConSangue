@@ -1,17 +1,21 @@
 // Página de rotas para ligar as páginas
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import LayoutPrincipal from './componentes/layout-principal/layout-principal.jsx';
+
 import Cadastro from './pages/cadastro/index.jsx';
 
 import Login from './pages/login/index.jsx';
 
 import Home from './pages/home/index.jsx';
 
-import User from './pages/user/index.jsx';
+import Perfil from './pages/perfil/index.jsx';
 
-import Hemocentro from './pages/hemocentro/index.jsx';
+import Campanhas from './pages/campanhas/index.jsx';
 
 import Grupos from './pages/grupos/index.jsx';
+
+import Participacoes from './pages/participacoes/index.jsx';
 
 import Historico from './pages/historico/index.jsx';
 
@@ -23,10 +27,13 @@ export default function Router(){
             <Routes>
                 <Route path = '/' element = {<Login/>} />;
                 <Route path = '/cadastro' element = {<Cadastro/>} />;
-                <Route path = '/home' element = {<Home/>} />;
-                <Route path = '/user' element = {<User/>} />;
-                <Route path = '/hemocentro' element = {<Hemocentro/>} />;
-                <Route path = '/grupos' element = {<Grupos/>} />;
+                <Route element = {<LayoutPrincipal/>}>
+                    <Route path = '/home' element = {<Home/>} />
+                    <Route path = '/campanhas' element = {<Campanhas/>} />
+                    <Route path = '/grupos' element = {<Grupos/>} />
+                    <Route path = '/participacoes' element = {<Participacoes/>} />
+                </Route>
+                <Route path = '/perfil' element = {<Perfil/>} />;
                 <Route path = '/historico' element = {<Historico/>} />;
                 <Route path = '*' element = {<Error/>}/>
             </Routes>

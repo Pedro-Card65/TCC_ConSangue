@@ -1,5 +1,7 @@
 import { con } from './connection.js';
 
+//Finalizado
+
 export async function criarGrupoCampanha(grupo) {
     const command = `
         INSERT INTO grupos (id_grupo, id_capanha, meta_participacoes, data_entrada)

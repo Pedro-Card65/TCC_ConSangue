@@ -1,389 +1,305 @@
-$vermelho: #b02222;
-$vermelho-botao: #ae2424;
-$rosa-borda: #f0c9c9;
-$rosa-data: #e8c4c4;
-$verde-selo: #c9f7c5;
-$azul-selo: #c4efff;
-$cinza-fundo: #f3f3f3;
-$cinza-texto: #9a9a9a;
-$cinza-icone: #c4c4c4;
-$branco: #ffffff;
+$vermelho: #a3262f;
+$vermelho-botao: #a52024;
+$borda: #f1cfd3;
+$texto: #2b2b2b;
+$cinza-texto: #8a8a8a;
+$verde-etiqueta: #c9f7c4;
+$azul-etiqueta: #c3ecff;
+$rosa-data: #e9c6c8;
 
-// confere no Figma (selecionando o texto) qual fonte é a certa
-$fonte-texto: 'Inter', sans-serif;
-$fonte-logo: 'Lexend', sans-serif;
-
-.pagina-user {
-  position: relative;
-  background-color: $cinza-fundo;
-  min-height: 100vh;
-  padding: 30px 20px 100px; // 100px embaixo: espaço pra barra de navegação
-  box-sizing: border-box;
-  font-family: $fonte-texto;
-  font-size: 12px;
-  line-height: 1.3;
-  color: $vermelho;
-
-  p,
-  h2,
-  h3 {
-    margin: 0;
-  }
-
-  button,
-  input {
-    font-family: inherit;
-  }
-}
-
-// ---------- logo ----------
-.consangue {
-  position: absolute;
-  top: 22px;
-  left: 4%;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  z-index: 2;
-
-  .logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    img {
-      width: 3.5rem;
-      -webkit-user-select: none;
-      user-select: none;
-    }
-  }
-
-  .marca {
-    h2 {
-      font-family: $fonte-logo;
-      font-size: 22px;
-      font-weight: 500;
-      color: #000;
-      -webkit-user-select: none;
-      user-select: none;
-    }
-
-    p {
-      font-size: 8px;
-      line-height: 1.2;
-      color: #000;
-    }
-  }
-}
-
-// ---------- barra de pesquisa ----------
-.pesquisa {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  max-width: 580px;
-  margin: 0 auto 24px;
-  padding: 11px 16px;
-  background-color: $branco;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-
-  img {
-    width: 18px;
-  }
-
-  input {
-    flex: 1;
-    border: none;
-    outline: none;
-    font-size: 13px;
-    background: transparent;
-  }
-}
-
-// ---------- card branco central ----------
-.user {
-  max-width: 580px;
-  margin: 0 auto;
-  padding: 30px 20px;
-  background-color: $branco;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-// ---------- caixas com borda rosa ----------
-.informacoes-usuario,
-.grupos-comunidades,
-.proxima-campanha,
-.historico-campanhas {
-  border: 1px solid $rosa-borda;
+@mixin secao {
+  border: 1px solid $borda;
   border-radius: 4px;
   overflow: hidden;
 }
 
-.titulo-informacoes-usuario,
-.titulo-grupos-comunidades,
-.titulo-proxima-campanha,
-.titulo-historico-campanhas,
-.titulo-historica-campanhas {
-  padding: 5px 18px;
-  border-bottom: 1px solid $rosa-borda;
+@mixin titulo-secao {
+  padding: 6px 14px;
+  border-bottom: 1px solid $borda;
 
   h3 {
+    margin: 0;
     font-size: 12px;
     font-weight: 400;
+    color: $vermelho;
   }
 }
 
-// ---------- suas informacoes ----------
-.conteudo-informacoes-usuario {
-  display: grid;
-  grid-template-columns: 50px 1fr 1fr; // foto | coluna 1 | coluna 2
-  align-items: center;
-  column-gap: 16px;
-  padding: 14px 18px;
-
-  img {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-}
-
-.coluna-user-1,
-.coluna-user-2 {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.coluna-user-2 {
-  align-self: start;
-}
-
-// ---------- grupos e comunidades ----------
-.conteudo-grupos-comunidades {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 16px 18px;
-}
-
-.campanhas-participadas,
-.grupos-participados,
-.interesse-participacao {
-  flex: 0 1 27%;
+.pagina-user {
+  position: relative;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  text-align: center;
-  min-height: 64px;
-  padding: 10px 6px;
-  border: 1px solid $rosa-borda;
-  border-radius: 6px;
-  font-size: 10px;
-}
+  min-height: 100vh;
+  padding: 42px 16px 110px;
+  background: #f3f3f3;
+  font-family: 'Lexend', sans-serif;
 
-// icone + numero (linha de cima do card)
-.numero-grupos {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-
-  svg {
-    font-size: 16px;
-  }
-}
-
-// ---------- proxima campanha ----------
-.conteudo-proxima-campanha {
-  padding: 12px 14px;
-  background-color: #fcfcfc;
-}
-
-.informacoes-proxima-campanha {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 14px;
-}
-
-.data-proxima-campanha {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 90px;
-  height: 45px;
-  background-color: $rosa-data;
-  border-radius: 4px;
-
+  p,
   h2 {
-    font-size: 12px;
-    font-weight: 400;
-  }
-}
-
-.informacoes-encontro-proxima-campanha {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-
-  h2 {
-    font-size: 12px;
+    margin: 0;
     font-weight: 400;
   }
 
-  p {
-    font-size: 10px;
-    color: $cinza-texto;
-  }
-}
-
-.confirmacao {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 16px;
-  background-color: $verde-selo;
-  border-radius: 6px;
-
-  h2 {
-    font-size: 12px;
-    font-weight: 400;
-    color: #1d5c1d;
-  }
-}
-
-.acessar-proxima-campanha {
-  button {
+  .pesquisa {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 12px;
     width: 100%;
-    padding: 8px;
-    background-color: $vermelho-botao;
-    color: $branco;
-    font-size: 11px;
-    border: none;
+    max-width: 464px;
+    height: 34px;
+    padding: 0 14px;
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+
+    img {
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
+    }
+
+    input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 12px;
+      color: $texto;
+
+      &::placeholder {
+        color: $cinza-texto;
+      }
+    }
+  }
+
+  .user {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    max-width: 464px;
+    margin-top: 20px;
+    padding: 16px;
+    background: #fff;
+    border: 1px solid #ececec;
     border-radius: 4px;
+  }
+
+  .informacoes-usuario,
+  .grupos-comunidades,
+  .proxima-campanha,
+  .historico-campanhas {
+    @include secao;
+  }
+
+  .titulo-informacoes-usuario,
+  .titulo-grupos-comunidades,
+  .titulo-proxima-campanha,
+  .titulo-historico-campanhas {
+    @include titulo-secao;
+  }
+
+  .conteudo-informacoes-usuario {
+    display: grid;
+    grid-template-columns: 50px 172px 1fr;
+    column-gap: 14px;
+    align-items: start;
+    padding: 12px 14px;
+
+    > img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      align-self: center;
+    }
+
+    p {
+      font-size: 12px;
+      line-height: 1.7;
+      color: $vermelho;
+    }
+
+    .coluna-user-2 p img {
+      width: 10px;
+      height: 10px;
+      margin-left: 2px;
+      vertical-align: middle;
+    }
+  }
+
+  .conteudo-grupos-comunidades {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 14px;
+  }
+
+  .estatistica {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 60px;
+    padding: 8px;
+    border: 1px solid $borda;
+    border-radius: 4px;
+    text-align: center;
+
+    .valor-estatistica {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      img {
+        width: 14px;
+        height: 14px;
+        object-fit: contain;
+      }
+
+      span {
+        font-size: 12px;
+        color: $vermelho;
+      }
+    }
+
+    p {
+      font-size: 10px;
+      color: $vermelho;
+    }
+  }
+
+  .conteudo-proxima-campanha {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+
+    > p {
+      font-size: 12px;
+      color: $cinza-texto;
+    }
+  }
+
+  .informacoes-proxima-campanha {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .data-proxima-campanha {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 78px;
+    height: 36px;
+    background: $rosa-data;
+    border-radius: 4px;
+
+    h2 {
+      font-size: 12px;
+      color: $vermelho;
+    }
+  }
+
+  .informacoes-encontro-proxima-campanha {
+    flex: 1;
+    min-width: 0;
+
+    h2 {
+      font-size: 12px;
+      color: $vermelho;
+    }
+
+    p {
+      font-size: 10px;
+      line-height: 1.5;
+      color: $cinza-texto;
+    }
+  }
+
+  .confirmacao {
+    padding: 8px 14px;
+    background: $verde-etiqueta;
+    border-radius: 4px;
+
+    h2 {
+      font-size: 11px;
+      color: $texto;
+    }
+  }
+
+  .acessar-proxima-campanha button {
+    width: 100%;
+    height: 24px;
+    border: none;
+    border-radius: 3px;
+    background: $vermelho-botao;
+    font-family: inherit;
+    font-size: 10px;
+    color: #fff;
     cursor: pointer;
 
     &:hover {
       filter: brightness(0.9);
     }
   }
-}
 
-// ---------- historico de campanhas ----------
-.conteudo-historico-campanhas {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-height: 130px;
-  padding: 14px;
-  background-color: #fcfcfc;
-}
+  .conteudo-historico-campanhas {
+    min-height: 100px;
+    padding: 10px 12px;
 
-.informacoes-historico-campanhas {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+    > p {
+      font-size: 12px;
+      color: $cinza-texto;
+    }
 
-  h2 {
-    font-size: 12px;
-    font-weight: 400;
-  }
-}
-
-.nomes-historico-campanhas,
-.hemocentros-historico-campanhas {
-  display: flex;
-  align-items: center;
-}
-
-.confirmacao-interesse-historico-campanhas {
-  margin-left: auto; // empurra o selo pra direita
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 78px;
-  padding: 3px 10px;
-  border-radius: 4px;
-
-  h2 {
-    font-size: 10px;
-  }
-
-  &.compareceu {
-    background-color: $verde-selo;
-
-    h2 {
-      color: #1d5c1d;
+    ul {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
     }
   }
 
-  &.interesse {
-    background-color: $azul-selo;
-
-    h2 {
-      color: #0b4a73;
-    }
-  }
-}
-
-// ---------- barra de navegacao (rodape) ----------
-.barra-navegacao {
-  position: fixed;
-  left: 10px;
-  right: 10px;
-  bottom: 10px;
-  height: 52px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 26px;
-  background-color: $branco;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-
-  .item-nav {
+  .informacoes-historico-campanhas {
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    padding: 0;
-    border: none;
-    border-radius: 50%;
-    background: none;
-    color: $cinza-icone;
-    font-size: 20px;
-    cursor: pointer;
+    justify-content: space-between;
+    gap: 10px;
 
-    &.ativo {
-      background-color: $vermelho;
-      color: $branco;
+    p {
+      flex: 1;
+      min-width: 0;
+      font-size: 10px;
+      line-height: 1.5;
+      color: $vermelho;
     }
   }
 
-  .menu-hamburguer {
-    margin-left: 60px;
-    color: $vermelho;
-  }
-}
+  .status-historico {
+    min-width: 52px;
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 9px;
+    text-align: center;
+    white-space: nowrap;
+    color: $texto;
 
-// ---------- telas menores: logo sai de cima da pesquisa ----------
-@media (max-width: 900px) {
-  .consangue {
-    position: static;
-    justify-content: center;
-    margin-bottom: 20px;
+    &.compareceu {
+      background: $verde-etiqueta;
+    }
+
+    &.interesse {
+      background: $azul-etiqueta;
+    }
   }
 }

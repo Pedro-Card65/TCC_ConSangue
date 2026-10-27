@@ -14,8 +14,8 @@ export async function listarGruposCampanhasService() {
     return dbGrupos_campanhas.listarGruposCampanha();
 };
 
-export async function listarGruposPorNomeService(nome) {
-    return dbGrupos_campanhas.listarGruposCampanhaPorId(nome);
+export async function listarGruposCampanhaPorIdService(id) {
+    return dbGrupos_campanhas.listarGruposCampanhaPorId(id);
 };
 
 export async function editarGrupoCampanhasService(grupo, id) {

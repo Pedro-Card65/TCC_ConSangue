@@ -1,6 +1,6 @@
 import * as dbGrupos_campanhas from '../repository/grupos_campanhasRepository.js';
 
-//
+//Finalizado
 
 export async function criarGrupoCampanhasService(grupo) {
     if (!grupos_campanhas.id_grupo.trim() || !grupo_campanhas.id_campanha.trim() || !grupo_campanhas.meta_participacoes.trim() || !grupo_campanhas.data_entrada.trim()) {

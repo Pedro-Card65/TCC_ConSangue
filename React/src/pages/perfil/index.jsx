@@ -7,23 +7,9 @@ export default function User() {
 
       <LogoSlogan />
 
-      {/* <div className="consangue">
-
-        <div className="logo">
-
-          <img src="/assets/images/Logo.png" alt="Logo" />
-        </div>
-
-        <div className="marca">
-
-          <h2>ConSangue</h2>
-          <p>Mobilização Coletiva para<br />Doação de Sangue</p>
-        </div>
-      </div> */}
-
       <div className='pesquisa'>
 
-      <img src="/assets/icons/LupaPesquisa.png" alt="Lupa" />
+      <img src="/assets/icons/LupaPesquisa.png" alt="" />
       <input type="text" placeholder="Pesquisar campanhas, hemocentros ou grupos..." />
 
       </div>
@@ -40,7 +26,7 @@ export default function User() {
 
           <div className="conteudo-informacoes-usuario">
 
-          <img src="/assets/images/User.png" alt="User" />
+          <img src="/assets/images/User.png" alt="Foto do Usuário" />
 
           <div className='coluna-user-1'>
 
@@ -172,6 +158,8 @@ export default function User() {
         </div>
 
       </section>
+
+      
 
     </div>
   );

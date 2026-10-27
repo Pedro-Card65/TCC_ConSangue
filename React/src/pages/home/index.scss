@@ -19,43 +19,5 @@ $fonte-logo: 'Lexend', sans-serif;
 .pagina-home {
   background-color: $cinza-fundo; 
 
-
-  // ---------- logo ----------
-  .consangue {
-    top: 22px;
-    left: 4%;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    z-index: 2;
-
-    .logo {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      img {
-        width: 3.5rem;
-        -webkit-user-select: none;
-        user-select: none;
-      }
-    }
-
-    .marca {
-      h2 {
-        font-family: $fonte-logo;
-        font-size: 22px;
-        font-weight: 500;
-        color: #000;
-        -webkit-user-select: none;
-        user-select: none;
-      }
-
-      p {
-        font-size: 8px;
-        line-height: 1.2;
-        color: #000;
-      }
-    }
-  }
+  
 }

@@ -1,0 +1,112 @@
+$vermelho: #a3262f;
+$borda: #f1cfd3;
+$texto: #2b2b2b;
+
+.informacoes-laterais {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 32px 16px;
+  background: #f3f3f3;
+  font-family: 'Lexend', sans-serif;
+
+  .logo-slogan {
+    position: static;
+  }
+
+  .cartao {
+    width: 291px;
+    box-sizing: border-box;
+    padding: 16px 14px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    h3,
+    p {
+      margin: 0;
+      font-weight: 400;
+    }
+
+    .foto-nome-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      img {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      h3 {
+        font-size: 18px;
+        color: $vermelho;
+      }
+    }
+
+    .suas-informacoes {
+      border: 1px solid $borda;
+      border-radius: 8px;
+      overflow: hidden;
+
+      > div:first-child {
+        padding: 8px 12px;
+        border-bottom: 1px solid $borda;
+      }
+
+      h3 {
+        font-size: 12px;
+        color: $vermelho;
+      }
+
+      .dados-usuario {
+        padding: 8px 12px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+
+        p {
+          font-size: 12px;
+          color: $vermelho;
+        }
+      }
+    }
+
+    .participacoes-planejadas,
+    .grupo-atual {
+      > div:first-child {
+        border: 1px solid $borda;
+        border-radius: 8px;
+        padding: 9px 12px;
+      }
+
+      h3 {
+        font-size: 12px;
+        color: $texto;
+      }
+
+      p {
+        position: relative;
+        margin-top: 12px;
+        padding-left: 14px;
+        font-size: 12px;
+        color: $texto;
+
+        &::before {
+          content: '•';
+          position: absolute;
+          left: 2px;
+        }
+      }
+    }
+
+    .grupo-atual > div:first-child {
+      width: 86%;
+      box-sizing: border-box;
+    }
+  }
+}

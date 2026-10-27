@@ -14,12 +14,13 @@ $texto: #2b2b2b;
     position: static;
   }
 
-  .cartao {
+    .cartao {
     width: 100%;
     max-width: 291px;
     box-sizing: border-box;
     padding: 16px 14px;
     background: #fff;
+    border-radius: 8px;
     display: flex;
     flex-direction: column;
     gap: 14px;

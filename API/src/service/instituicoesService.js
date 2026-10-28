@@ -7,15 +7,18 @@ function erroHttp(mensagem, status = 400) {
 }
 
 function validarId(valor) {
-    const id = Number(valor);
-
     if (
-        valor == null || typeof valor === 'boolean' ||
-        !Number.isSafeInteger(id) || id <= 0
+        (typeof valor !== 'string' && typeof valor !== 'number') ||
+        !/^[1-9]\d*$/.test(String(valor))
     ) {
         throw erroHttp('ID inválido');
     }
 
+    const id = Number(valor);
+
+    if (!Number.isSafeInteger(id)) {
+        throw erroHttp('ID inválido');
+    }
     return id;
 }
 

@@ -10,7 +10,7 @@ function tratarErro(resp, erro) {
         });
     }
 
-    if (erro.code === 'ER_ROW_ISS_REFERENCED_2') {
+    if (erro.code === 'ER_ROW_IS_REFERENCED_2') {
         return resp.status(409).json({
             erro: 'Instituição possui registros vinculados'
         });
@@ -30,14 +30,14 @@ function tratarErro(resp, erro) {
 }
 
 // Mostrar instituições
-endpoints.get('/instituicoes', async (req, resp) => {
+endpoints.get('/api/instituicoes', async (req, resp) => {
     try {
         const cidade = req.query.cidade;
 
         const instituicoes = 
-            await service.listarInsituicoes(cidade);
+            await service.listarInstituicoes(cidade);
 
-        resp.status(200).json(insituicoes);
+        resp.status(200).json(instituicoes);
     } catch (erro) {
         tratarErro(resp, erro);
     }
@@ -45,22 +45,22 @@ endpoints.get('/instituicoes', async (req, resp) => {
 
 
 //Buscar instituições
-endpoints.get('/instituicoes:id', async (req, resp) => {
+endpoints.get('/api/instituicoes:id', async (req, resp) => {
     try {
         const instituicao = 
             await service.buscarInstituicao(req.params.id);
 
-        resp.status(200).jsoon(instituicao);
+        resp.status(200).json(instituicao);
     } catch (erro) {
         tratarErro(resp, erro);
     }
 });
 
 // Cadastar instituições
-endpoints.post('/instituicoes', async (req, resp) => {
+endpoints.post('/api/instituicoes', async (req, resp) => {
     try {
         const instituicao = 
-            await service.cadastarInstituicao(req.body);
+            await service.cadastrarInstituicao(req.body);
 
         resp.status(201).json(instituicao);
     } catch (erro) {
@@ -69,7 +69,7 @@ endpoints.post('/instituicoes', async (req, resp) => {
 });
 
 // Atualizar institução
-endpoints.put('/instituicoes/:id', async (req, resp) => {
+endpoints.put('/api/instituicoes/:id', async (req, resp) => {
     try {
         const instituicao =
             await service.atualizarInstituicao(

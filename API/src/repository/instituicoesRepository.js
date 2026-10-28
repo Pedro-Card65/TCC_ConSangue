@@ -12,7 +12,7 @@ export async function listarInstituicoes(cidade) {
         parametros.push(`%${cidade}%`);
     }
 
-    sql += 'ORDER BY nome_hemo';
+    sql += ' ORDER BY nome_hemo';
 
     const [registros] = await con.execute(sql, parametros);
 
@@ -77,13 +77,13 @@ export async function atualizarInstituicao(id, dados) {
         `;
 
     const valores = [
-        dados.id_usuario,
         dados.nome_hemo,
         dados.cep,
         dados.endereco,
         dados.cidade,
         dados.estado,
-        dados.telefone_centro
+        dados.telefone_centro,
+        id
     ];
 
     const [resultado] = await con.execute(sql, valores);

@@ -1,10 +1,42 @@
 import * as repository from '../repository/usuariosRepository.js';
+import bcrypt from 'bcrypt';
+
 
 function criarErro(mensagem, status = 400) {
     const erro = new Error(mensagem);
     erro.status = status;
     return erro;
 }
+
+
+function validarCPF(cpf) {
+    if (typeof cpf !== 'string') return false;
+
+    cpf = cpf.replace(/\D/g, '');
+
+    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) {
+        return false;
+    }
+
+    for (let tamanho = 9; tamanho < 11; tamanho++) {
+        let soma = 0;
+
+        for (let i = 0; i < tamanho; i++) {
+            soma += Number(cpf[i]) * (tamanho + 1 - i);
+        }
+
+        let digito = (soma * 10) % 11;
+
+        if (digito === 10) digito = 0;
+
+        if (digito !== Number(cpf[tamanho])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -39,9 +71,9 @@ export async function fazerCadastro(
     // Valida CPF
     cpf = cpf.replace(/\D/g, '');
 
-    if (cpf.length !== 11) {
-        throw criarErro('CPF inválido.');
-    }
+   if (!validarCPF(cpf)) {
+    throw criarErro('CPF inválido.');
+}
 
     // Valida telefone
     telefone = telefone.replace(/\D/g, '');
@@ -109,12 +141,14 @@ export async function fazerCadastro(
         tipo_usuario !== 'instituicao') {
         throw criarErro('Tipo de usuário inválido.');
     }
-
+   
     // Envia para o Repository
     try {
+        const senhaHash = await bcrypt.hash(senha, 12);
+
         return await repository.fazerCadastro(
             usuario, nascimento, cpf, telefone,
-            email, senha, cidade, tipo_sangue, tipo_usuario
+            email, senhaHash, cidade, tipo_sangue, tipo_usuario
         );
     }
     catch (erro) {
@@ -125,7 +159,6 @@ export async function fazerCadastro(
         throw erro;
     }
 }
-
 ////////////////////////////////////////////////////////////////////////////////////////
 
 export async function buscarPorID(id) {
@@ -193,29 +226,33 @@ export async function trocarTelefone(id, novotel, senha) {
     id = Number(id);
 
     if (!Number.isInteger(id) || id <= 0) {
-        const erro = new Error("ID inválido");
-        erro.status = 400;
-        throw erro;
+        throw criarErro('ID inválido');
     }
 
-    if (!novotel || !senha) {
-        const erro = new Error("Telefone e senha são obrigatórios");
-        erro.status = 400;
-        throw erro;
+    if (typeof senha !== 'string' || !senha ||
+        (typeof novotel !== 'string' && typeof novotel !== 'number')) {
+        throw criarErro('Telefone e senha são obrigatórios');
     }
 
-    const usuario = await repository.buscarPorID(id);
+    novotel = String(novotel).replace(/\D/g, '');
+
+    if (novotel.length < 10 || novotel.length > 11) {
+        throw criarErro('Telefone inválido');
+    }
+
+    const usuario = await repository.buscarCredenciaisPorID(id);
 
     if (!usuario) {
-        const erro = new Error("Usuário não encontrado");
-        erro.status = 404;
-        throw erro;
+        throw criarErro('Usuário não encontrado', 404);
     }
 
-    if (usuario.senha_hash !== senha) {
-        const erro = new Error("Senha incorreta");
-        erro.status = 401;
-        throw erro;
+    const senhaCorreta = await bcrypt.compare(
+        senha,
+        usuario.senha_hash
+    );
+
+    if (!senhaCorreta) {
+        throw criarErro('Senha incorreta', 401);
     }
 
     return await repository.trocarTelefone(id, novotel);
@@ -223,49 +260,47 @@ export async function trocarTelefone(id, novotel, senha) {
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
+
 export async function trocarEmail(id, novoemail, senha) {
     id = Number(id);
 
     if (!Number.isInteger(id) || id <= 0) {
-        const erro = new Error("ID inválido");
-        erro.status = 400;
-        throw erro;
+        throw criarErro('ID inválido');
     }
 
     if (typeof novoemail !== 'string' ||
-        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(novoemail.trim())) {
-        const erro = new Error("Email inválido");
-        erro.status = 400;
-        throw erro;
+        typeof senha !== 'string' || !senha) {
+        throw criarErro('Email e senha são obrigatórios');
     }
 
-    if (!senha) {
-        const erro = new Error("Senha obrigatória");
-        erro.status = 400;
-        throw erro;
-    }
+    novoemail = novoemail.trim().toLowerCase();
 
-    const usuario = await repository.buscarPorID(id);
+    if (novoemail.length > 100 ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(novoemail)) {
+    throw criarErro('Email inválido');
+}
+
+    const usuario = await repository.buscarCredenciaisPorID(id);
 
     if (!usuario) {
-        const erro = new Error("Usuário não encontrado");
-        erro.status = 404;
-        throw erro;
+        throw criarErro('Usuário não encontrado', 404);
     }
 
-    if (usuario.senha_hash !== senha) {
-        const erro = new Error("Senha incorreta");
-        erro.status = 401;
-        throw erro;
+    const senhaCorreta = await bcrypt.compare(
+        senha,
+        usuario.senha_hash
+    );
+
+    if (!senhaCorreta) {
+        throw criarErro('Senha incorreta', 401);
     }
 
     try {
-        return await repository.trocarEmail(id, novoemail.trim());
+        return await repository.trocarEmail(id, novoemail);
     }
     catch (erro) {
         if (erro.code === 'ER_DUP_ENTRY') {
-            erro.status = 409;
-            erro.message = "Email já cadastrado";
+            throw criarErro('Email já cadastrado', 409);
         }
 
         throw erro;

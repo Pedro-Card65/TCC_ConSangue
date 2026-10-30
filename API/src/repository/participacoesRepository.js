@@ -2,7 +2,7 @@ import { con } from './connection.js';
 
 export async function criarParticipacao(dados) {
     const sql = `
-        INSER INTO participacoes
+        INSERT INTO participacoes
         (id_usuario, 
         id_campanha, 
         id_grupo_campanha,
@@ -27,7 +27,7 @@ export async function criarParticipacao(dados) {
 }
 
 export async function listarParticipacoes(filtros) {
-    let sql = 'SELET * FROM participacoes where 1 = 1';
+    let sql = 'SELECT * FROM participacoes where 1 = 1';
 
     const valores = [];
 
@@ -50,8 +50,9 @@ export async function listarParticipacoes(filtros) {
 
 export async function buscarParticipacao(id) {
     const sql = `
-        SELECT * FROM participacoes
-        WHERE id_participacao = ?
+        SELECT id_usuario, tipo_usuario
+        FROM usuarios
+        WHERE id_registro = ?
     `;
 
     const [registros] = await con.execute(sql, [id]);
@@ -73,7 +74,7 @@ export async function buscarGrupoCampanha(id) {
 
 export async function verificarMembro(idUsuario, idGrupo) {
     const sql = `
-        SELECT id_membro FROM membros_grupos
+        SELECT id_membro FROM membros_grupo
         WHERE id_usuario = ? AND id_grupo = ?
     `;
 
@@ -101,6 +102,17 @@ export async function atualizarParticipacao(id, dados) {
     ];
 
     const [resultado] = await con.execute(sql, valores);
+
+    return resultado.affectedRows;
+}
+
+export async function excluirParticipacao(id) {
+    const sql = `
+        DELETE FROM participacoes
+        WHERE id_registro = ?
+    `;
+
+    const [resultado] = await con.execute(sql, [id]);
 
     return resultado.affectedRows;
 }

@@ -45,7 +45,7 @@ endpoints.get('/api/instituicoes', async (req, resp) => {
 
 
 //Buscar instituições
-endpoints.get('/api/instituicoes:id', async (req, resp) => {
+endpoints.get('/api/instituicoes/:id', async (req, resp) => {
     try {
         const instituicao = 
             await service.buscarInstituicao(req.params.id);

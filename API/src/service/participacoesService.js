@@ -7,19 +7,24 @@ function erroHttp(mensagem, status = 400) {
 }
 
 function validarId(valor, campo = 'ID') {
-    const id = Number(valor);
 
     if (
-        valor == null || typeof valor === 'boolean' ||
-        !Number.isSafeInteger(id) || id <= 0
+        (typeof valor !== 'string' && typeof valor !== 'number') ||
+        !/^[1-9]\d*$/.test(String(valor))
     ) {
+        throw erroHttp(`${campo} inválido`);
+    }
+
+    const id = Number(valor);
+
+    if (!Number.isSafeInteger(id)) {
         throw erroHttp(`${campo} inválido`);
     }
 
     return id;
 }
 
-function validarDados(data) {
+function validarData(data) {
     if (data == null) return null;
 
     if (typeof data !== 'string' ||
@@ -30,7 +35,7 @@ function validarDados(data) {
     const dataConvertida = new Date(`${data}T00:00:00Z`);
 
     if (Number.isNaN(dataConvertida.getTime()) ||
-    dataConvertida.toISOString().skuce(0, 10) !== data) {
+    dataConvertida.toISOString().slice(0, 10) !== data) {
         throw erroHttp('Data prevista inválida');
     }
 
@@ -105,9 +110,27 @@ export async function criarParticipacao(dados) {
 
     const campos = validarDados(dados);
 
-    const usuario = await repository.buscarCamapanha(idCampanha);
+    const usuario = await repository.buscarUsuario(idUsuario);
+
+    if (!usuario) {
+        throw erroHttp('Usuário não encontrado', 404);
+    }
+
+    if (usuario.tipo_usuario !== 'candidato') {
+        throw erroHttp(
+            'Somente candidatos podem registrar participação', 
+            422
+        );
+    }
+    
+    const campanha = await repository.buscarGrupoCampanha(idCampanha);
+
     if (!campanha) {
         throw erroHttp('Campanha não encontrada', 404);
+    }
+
+    if (campanha.status_campanha !== 'ativa') {
+        throw erroHttp('Campanha não está ativa', 422);
     }
 
     await validarVinculo(
@@ -133,7 +156,7 @@ export async function listarParticipacoes(filtros = {}) {
     }
 
     if (filtros.id_campanha !== undefined) {
-        validados.id_camoanha = validarId (filtros.id_campanha, 'ID da campanha');
+        validados.id_campanha = validarId (filtros.id_campanha, 'ID da campanha');
     }
 
     return repository.listarParticipacoes(validados);
@@ -153,13 +176,39 @@ export async function buscarParticipacao(id) {
 
 export async function atualizarParticipacao(id, dados) {
     const idValidado = validarId(id);
-    const atual = await buscarParticipacao(idValidado);
 
-    if (dados && ( 'id_usuario' in dados || 'id_campanha' in dados)) {
+    if (!dados || typeof dados !== 'object' || Array.isArray(dados)) {
+        throw erroHttp('Dados inválidos');
+    }
+
+    if('id_usuario' in dados || 'id_campanha' in dados) {
         throw erroHttp('Não é permitido trocar usuário ou campanha');
     }
 
-    const campos = validarDados(dados);
+    const atual = await buscarParticipacao(idValidado);
+
+    const campos = validarDados({
+        id_grupo_campanha:
+            dados.id_grupo_campanha === undefined
+            ? atual.status_participacao : dados.status_participacao,
+
+        status_participacao:
+            dados.status_participacao === undefined
+                ? atual.status_participacao
+                : dados.status_participacao,
+
+        data_prevista:
+            dados.data_prevista === undefined
+                ? (atual.data_prevista instanceof Date
+                    ? atual.data_prevista.toISOString().slice(0, 10)
+                    : atual.data_prevista)
+                : dados.data_prevista,
+
+        horario_previsto:
+            dados.horario_previsto === undefined
+                ? atual.horario_previsto
+                : dados.horario_previsto
+    });
 
     await validarVinculo(
         atual.id_usuario,
@@ -167,13 +216,18 @@ export async function atualizarParticipacao(id, dados) {
         campos.id_grupo_campanha
     );
 
-    await repository.atualizarParticipacao(idValidado);
+    await repository.atualizarParticipacao(
+        idValidado,
+        campos
+    );
+
+    return buscarParticipacao(idValidado);
 }
 
-export async function excluirParticipacoes(id) {
+export async function excluirParticipacao(id) {
     const idValidado = validarId(id);
 
-    const excluidos = await repository.excluirParticipacoes(
+    const excluidos = await repository.excluirParticipacao(
         idValidado
     );
 

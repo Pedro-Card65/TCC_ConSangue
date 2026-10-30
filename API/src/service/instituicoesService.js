@@ -62,15 +62,31 @@ function validarDados(dados) {
         throw erroHttp('CEP inválido');
     }
 
-    if (!/^[A-Z]{2}$/.test(resultado.estado)) {
-        throw erroHttp('Estado deve conter uma UF de 2 letras');
+    const estadosValidos = [
+        'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF',
+        'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA',
+        'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS',
+        'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
+    ];
+
+    if (!estadosValidos.includes(resultado.estado)) {
+        throw erroHttp('Estado inválido');
     }
+
+    const telefone = resultado.telefone_centro.replace(/\D/g, '');
+
+    if (!/^[\d\s()+-]+$/.test(resultado.telefone_centro) ||
+        (telefone.length !== 10 && telefone.length !== 11)) {
+            throw erroHttp('Telefone inválido');
+        }
 
     return resultado;
 }
 
 export async function listarInstituicoes(cidade) {
-    if (cidade !== undefined && typeof cidade !== 'string') {
+    if (cidade !== undefined && (typeof cidade !== 'string' ||
+        cidade.trim().length > 100)
+        )    {
         throw erroHttp('Filtro cidade inválido');
     }
 
@@ -117,6 +133,12 @@ export async function cadastrarInstituicao(dados) {
 export async function atualizarInstituicao(id, dados) {
     const idValidado = validarId(id);
     const campos = validarDados(dados);
+
+    if ('id_usuario' in dados) {
+        throw erroHttp(
+            'Não é permitido alterar o usuário vinculado'
+        );
+    }
 
     await buscarInstituicao(idValidado);
 

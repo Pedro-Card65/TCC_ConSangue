@@ -191,7 +191,7 @@ export async function atualizarParticipacao(id, dados) {
         id_grupo_campanha:
             dados.id_grupo_campanha === undefined
             ? atual.id_grupo_campanha 
-            : dados.id.id_grupo_campanha,
+            : dados.id_grupo_campanha,
 
         status_participacao:
             dados.status_participacao === undefined

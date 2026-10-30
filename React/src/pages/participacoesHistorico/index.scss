@@ -1,0 +1,33 @@
+// Cores para a estilização do site
+$vermelho: #b02222;
+$vermelho-botao: #ae2424;
+$rosa-borda: #f0c9c9;
+$rosa-data: #e8c4c4;
+$verde-selo: #c9f7c5;
+$azul-selo: #c4efff;
+$cinza-fundo: #f3f3f3;
+$cinza-texto: #9a9a9a;
+$cinza-icone: #c4c4c4;
+$branco: #ffffff;
+
+
+// confere no Figma (selecionando o texto) qual fonte é a certa
+$fonte-texto: 'Inter', sans-serif;
+$fonte-logo: 'Lexend', sans-serif;
+
+.pagina-participacaoHistorico{
+    display: flex;
+    flex-direction: column;
+    padding: 1em;
+    gap: 10em;
+    margin-top: 32px;
+    background-color: $branco;
+    box-sizing: border-box;
+    border-radius: 2em;
+    box-shadow: 0px 0px 15px $cinza-texto;
+    
+    h1{
+        color: $vermelho;
+        font: $fonte-texto;
+    }
+}

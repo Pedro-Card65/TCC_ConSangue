@@ -54,25 +54,25 @@ endpoints.get('/api/participacoes', async (req, resp) => {
 });
 
 //Buscar participações pelo ID
-endpoints.get('/api/participacoes:id', async (req, resp) => {
+endpoints.get('/api/participacoes/:id', async (req, resp) => {
     try {
         const participacao = 
             await service.buscarParticipacao(req.params.id);
 
         resp.status(200).json(participacao);
-    } catch {
+    } catch (erro) {
         tratarErro(resp, erro);
     }
 });
 
 //Atualizar participação
-endpoints.put('/api/participacoes/:id', async (req, reps) => {
+endpoints.put('/api/participacoes/:id', async (req, resp) => {
     try {
         const participacao =
             await service.atualizarParticipacao(req.params.id, req.body);
 
         resp.status(200).json(participacao);
-    } catch {
+    } catch (erro) {
         tratarErro(resp, erro);
     }
 });
@@ -80,7 +80,7 @@ endpoints.put('/api/participacoes/:id', async (req, reps) => {
 //Excluir participações
 endpoints.delete('/api/participacoes/:id', async (req, resp) => {
     try {
-        await service.excluirParticipacoes(req.params.id);
+        await service.excluirParticipacao(req.params.id);
 
         resp.status(204).send();
     } catch (erro) {

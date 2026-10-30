@@ -50,9 +50,32 @@ export async function listarParticipacoes(filtros) {
 
 export async function buscarParticipacao(id) {
     const sql = `
+        SELECT * FROM participacoes
+        WHERE id_registro = ?
+    `;
+
+    const [registros] = await con.execute(sql, [id]);
+
+    return registros[0] ?? null;
+}
+
+export async function buscarUsuario(id) {
+    const sql = `
         SELECT id_usuario, tipo_usuario
         FROM usuarios
-        WHERE id_registro = ?
+        WHERE id_usuario = ?
+    `;
+
+    const [registros] = await con.execute(sql, [id]);
+
+    return registros[0] ?? null;
+}
+
+export async function buscarCampanha(id) {
+    const sql = `
+        SELECT id_campanha, status_campanha
+        FROM campanhas
+        WHERE id_campanha = ?
     `;
 
     const [registros] = await con.execute(sql, [id]);

@@ -123,7 +123,7 @@ export async function criarParticipacao(dados) {
         );
     }
     
-    const campanha = await repository.buscarGrupoCampanha(idCampanha);
+    const campanha = await repository.buscarCampanha(idCampanha);
 
     if (!campanha) {
         throw erroHttp('Campanha não encontrada', 404);
@@ -190,7 +190,8 @@ export async function atualizarParticipacao(id, dados) {
     const campos = validarDados({
         id_grupo_campanha:
             dados.id_grupo_campanha === undefined
-            ? atual.status_participacao : dados.status_participacao,
+            ? atual.id_grupo_campanha 
+            : dados.id.id_grupo_campanha,
 
         status_participacao:
             dados.status_participacao === undefined

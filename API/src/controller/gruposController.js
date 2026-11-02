@@ -1,10 +1,12 @@
+import { getAuthentication } from '../utils/jwt.js';
+import { inserirMeuId, somenteCriadorGrupo } from '../utils/permissoes.js';
 import * as service from '../service/gruposService.js';
 import { Router } from "express";
 const endpoints = Router();
 
 //Finalizado
 
-endpoints.post('/grupo', async (req, resp) => {
+endpoints.post('/grupo', getAuthentication(), inserirMeuId('id_criador'), async (req, resp) => {
     try {
         let grupo = req.body;
 
@@ -44,7 +46,7 @@ endpoints.get('/grupos/:nome', async (req, resp) => {
     }
 });
 
-endpoints.put('/grupo/:id', async (req, resp) => {
+endpoints.put('/grupo/:id', getAuthentication(), somenteCriadorGrupo, async (req, resp) => {
     try {
         let grupo = req.body;
         let id = req.params.id;
@@ -60,7 +62,7 @@ endpoints.put('/grupo/:id', async (req, resp) => {
     }
 });
 
-endpoints.delete('/grupo/:id', async (req, resp) => {
+endpoints.delete('/grupo/:id', getAuthentication(), somenteCriadorGrupo, async (req, resp) => {
     try {
         let id = req.params.id;
 

@@ -1,3 +1,6 @@
+import gruposCampanhas from './controller/grupos_campanhasController.js';
+import membros from './controller/membros_grupoController.js';
+import auth from './controller/authController.js';
 import { con } from './repository/connection.js';
 import grupos from './controller/gruposController.js';
 import instituicoes from './controller/instituicoesController.js';
@@ -16,8 +19,11 @@ export function addRoutes(api) {
     });
 
     api.use(grupos);
+    api.use(membros);
+    api.use(gruposCampanhas);
     api.use(instituicoes);
     api.use(participacoes);
+    api.use(auth);
     api.use(usuario);
     api.use(campanhas);
 }

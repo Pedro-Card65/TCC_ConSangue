@@ -1,3 +1,5 @@
+import { getAuthentication } from '../utils/jwt.js';
+import { somenteMeuId } from '../utils/permissoes.js';
 import * as service from '../service/usuariosService.js';
 import { Router } from 'express';
 
@@ -38,7 +40,7 @@ endpoints.post('/api/usuarios/cadastro', async (req, resp) => {
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
-endpoints.get('/api/usuarios/busca/:id', async (req, resp) => {
+endpoints.get('/api/usuarios/busca/:id', getAuthentication(), somenteMeuId(), async (req, resp) => {
     try {
         let id = req.params.id;
         const usuario = await service.buscarPorID(id);
@@ -55,7 +57,7 @@ endpoints.get('/api/usuarios/busca/:id', async (req, resp) => {
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
-endpoints.get('/api/usuarios/busca/nome/:nome', async (req, resp) => {
+endpoints.get('/api/usuarios/busca/nome/:nome', getAuthentication(), async (req, resp) => {
   try {
         let nome = req.params.nome;
         const usuarios = await service.buscarPorUser(nome);
@@ -74,7 +76,7 @@ endpoints.get('/api/usuarios/busca/nome/:nome', async (req, resp) => {
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
-endpoints.delete('/api/usuarios/deletar/certeza/:id', async (req, resp) => {
+endpoints.delete('/api/usuarios/deletar/certeza/:id', getAuthentication(), somenteMeuId(), async (req, resp) => {
     try{ 
         let id = req.params.id;
         const del = await service.deletarPorID(id)
@@ -92,7 +94,7 @@ endpoints.delete('/api/usuarios/deletar/certeza/:id', async (req, resp) => {
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
-endpoints.put('/api/usuarios/modificar/telefone/:id', async (req, resp) => {
+endpoints.put('/api/usuarios/modificar/telefone/:id', getAuthentication(), somenteMeuId(), async (req, resp) => {
     try {
         let id = req.params.id;
         let novotel = req.body.novotel;
@@ -114,7 +116,7 @@ endpoints.put('/api/usuarios/modificar/telefone/:id', async (req, resp) => {
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
-endpoints.put('/api/usuarios/modificar/email/:id', async (req, resp) => {
+endpoints.put('/api/usuarios/modificar/email/:id', getAuthentication(), somenteMeuId(), async (req, resp) => {
     try{
         let id = req.params.id
         let novoemail = req.body.novoemail

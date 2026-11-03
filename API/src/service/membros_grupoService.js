@@ -1,4 +1,4 @@
-import * as dbMembro from '../repository/membro_grupoRepository.js';
+import * as dbMembro from '../repository/membros_grupoRepository.js';
 
 const PAPEIS = ['administrador', 'membro'];
 

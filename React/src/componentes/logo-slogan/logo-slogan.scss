@@ -6,15 +6,19 @@
   align-items: center;
   gap: 10px;
   z-index: 2;
+  text-decoration: none;
+  color: black;
   .logo {
     display: flex;
     align-items: center;
     justify-content: center;
+    text-decoration: none;
   }
   .logo img {
     width: 5rem;
     -webkit-user-select: none;
     user-select: none;
+    text-decoration: none;
   }
 
   .marca {
@@ -24,6 +28,7 @@
       margin: 0;
       -webkit-user-select: none;
       user-select: none;
+      text-decoration: none;
     }
 
     p {
@@ -32,6 +37,10 @@
       margin: 0;
       -webkit-user-select: none;
       user-select: none;
+      text-decoration: none;
+    }
+    Link {
+      text-decoration: none;
     }
   }
 }

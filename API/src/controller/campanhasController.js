@@ -1,10 +1,12 @@
+import { getAuthentication } from '../utils/jwt.js';
+import { somenteMinhaInstituicaoNoBody, somenteDonoCampanha } from '../utils/permissoes.js';
 import * as service from '../service/campanhasService.js';
 import { Router } from "express";
 const endpoints = Router();
 
 //Finalizado
 
-endpoints.post('/campanhas', async (req, resp) => {
+endpoints.post('/campanhas', getAuthentication(u => u.tipo_usuario === 'instituicao'), somenteMinhaInstituicaoNoBody, async (req, resp) => {
     try {
         let campanha = req.body;
 
@@ -20,21 +22,9 @@ endpoints.post('/campanhas', async (req, resp) => {
 
 endpoints.get('/campanhas', async (req, resp) => {
     try {
-        let campanhas = await service.listarCampanhaService();
-        resp.send({ campanhas });
-    }
-    catch (error) {
-        resp.status(400).send({
-            erro: error.message
-        });
-    }
-});
-
-endpoints.get('/campanhas', async (req, resp) => {
-    try {
-        let nomeCampanha = req.query.nome; 
-
-        let campanhas = await service.listarCampanhasPorNomeService(nomeCampanha);
+        let campanhas = req.query.nome
+            ? await service.listarCampanhasPorNomeService(req.query.nome)
+            : await service.listarCampanhaService();
         resp.send({ campanhas });
     }
     catch (error) {
@@ -57,7 +47,7 @@ endpoints.get('/campanhas/hemocentro/:id', async (req, resp) => {
     }
 });
 
-endpoints.put('/campanhas/:id', async (req, resp) => {
+endpoints.put('/campanhas/:id', getAuthentication(u => u.tipo_usuario === 'instituicao'), somenteDonoCampanha, async (req, resp) => {
     try {
         let campanha = req.body;
         let id_campanha = req.params.id;
@@ -72,7 +62,7 @@ endpoints.put('/campanhas/:id', async (req, resp) => {
     }
 });
 
-endpoints.delete('/campanhas/:id', async (req, resp) => {
+endpoints.delete('/campanhas/:id', getAuthentication(u => u.tipo_usuario === 'instituicao'), somenteDonoCampanha, async (req, resp) => {
     try {
         let id_campanha = req.params.id;
 

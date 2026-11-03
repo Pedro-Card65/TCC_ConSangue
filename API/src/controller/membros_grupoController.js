@@ -1,4 +1,6 @@
-import * as service from '../service/membro_grupoService.js';
+import { getAuthentication } from '../utils/jwt.js';
+import { inserirMeuId, somenteMeuId, permissaoMembro } from '../utils/permissoes.js';
+import * as service from '../service/membros_grupoService.js';
 import { Router } from 'express';
 
 const endpoints = Router();
@@ -22,7 +24,7 @@ function tratarErro(resp, error) {
 }
 
 // Entrar em um grupo / adicionar membro
-endpoints.post('/membro', async (req, resp) => {
+endpoints.post('/membro', getAuthentication(), inserirMeuId('id_usuario'), (req, resp, next) => { req.body.papel = 'membro'; next(); }, async (req, resp) => {
     try {
         let membro = req.body;
 
@@ -35,7 +37,7 @@ endpoints.post('/membro', async (req, resp) => {
 });
 
 // Listar membros de um grupo
-endpoints.get('/membros/grupo/:id_grupo', async (req, resp) => {
+endpoints.get('/membros/grupo/:id_grupo', getAuthentication(), async (req, resp) => {
     try {
         let membros = await service.listarMembrosPorGrupoService(req.params.id_grupo);
         resp.send({ membros });
@@ -46,7 +48,7 @@ endpoints.get('/membros/grupo/:id_grupo', async (req, resp) => {
 });
 
 // Listar grupos de um usuário
-endpoints.get('/grupos/usuario/:id_usuario', async (req, resp) => {
+endpoints.get('/grupos/usuario/:id_usuario', getAuthentication(), somenteMeuId('id_usuario'), async (req, resp) => {
     try {
         let grupos = await service.listarGruposPorUsuarioService(req.params.id_usuario);
         resp.send({ grupos });
@@ -57,7 +59,7 @@ endpoints.get('/grupos/usuario/:id_usuario', async (req, resp) => {
 });
 
 // Mudar papel (administrador / membro)
-endpoints.put('/membro/:id', async (req, resp) => {
+endpoints.put('/membro/:id', getAuthentication(), permissaoMembro(), async (req, resp) => {
     try {
         let id = req.params.id;
         let papel = req.body.papel;
@@ -71,7 +73,7 @@ endpoints.put('/membro/:id', async (req, resp) => {
 });
 
 // Sair do grupo / remover membro
-endpoints.delete('/membro/:id', async (req, resp) => {
+endpoints.delete('/membro/:id', getAuthentication(), permissaoMembro(true), async (req, resp) => {
     try {
         const linhasAfetadas = await service.removerMembroService(req.params.id);
         resp.send({ linhasAfetadas });

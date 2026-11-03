@@ -1,9 +1,10 @@
 import './logo-slogan.scss';
-
+import { Link } from 'react-router-dom';
 
 export default function LogoSlogan(props) {
   return (
-    <div className="logo-slogan">
+    <Link to="/home">
+        <div className="logo-slogan">
 
       <div className="logo">
 
@@ -18,6 +19,6 @@ export default function LogoSlogan(props) {
 
       </div>
 
-    </div>
+    </div></Link>
   );
 }

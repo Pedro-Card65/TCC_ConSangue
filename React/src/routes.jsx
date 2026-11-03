@@ -1,5 +1,5 @@
 // paginas de rotas para ligar 
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, /* Navigate */ } from 'react-router-dom';
 /* import Bloqueio from './componentes/bloqueio.jsx'; */
 import LayoutComBarra from './layouts/layout-barra-navegacao/layout-barra-navegacao.jsx';
 import LayoutPrincipal from './layouts/layout-principal/layout-principal.jsx';
@@ -19,7 +19,7 @@ import Cadastro from './pages/cadastro/index.jsx';
                 <Route path="/" element={<Login />} />
                     <Route path="/cadastro" element={<Navigate to="/" replace />}/>
                     <Route>
-                        {/* tudo que estiver aqui dentro é as coisa que só pode entrar com login 👍 */}
+                        { tudo que estiver aqui dentro é as coisa que só pode entrar com login 👍 }
                         <Route element={<LayoutComBarra />}>
                         <Route element={<LayoutPrincipal />}>
                         <Route path="/grupos" element={<Grupos />} />

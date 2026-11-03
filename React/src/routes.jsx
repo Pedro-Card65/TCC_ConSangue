@@ -18,7 +18,7 @@ export default function Router() {
                 <Route path="/" element={<Login />} />
                   <Route path="/cadastro" element={<Navigate to="/" replace />}/>
                     <Route element={<Bloqueio />}>
-                    [ tudo que estiver aqui dentro é as coisa que só pode entrar com login 👍 ]
+                     {/* tudo que estiver aqui dentro é as coisa que só pode entrar com login 👍  */}
                       <Route element={<LayoutComBarra />}>
                       <Route element={<LayoutPrincipal />}>
                       

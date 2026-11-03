@@ -5,15 +5,17 @@ export default function ParticipacoesHistorico() {
     <div className="pagina-participacaoHistorico">
 
       <h1>Participações</h1>
-
+      
+      <h1>Próxima participação</h1>
       <div className="participacoes">
-        <h1>Próxima participação</h1>
-
+        <h2>Compania Mais Amor - Hospital Abidas</h2>
+        <p>Praça da Luz, 500 • São Paulo, SP</p>
+        <p>22 de Novembro de 2026 </p>
       </div>
 
+      <h1>Histórico</h1>
       <div className="historico">
-        <h1>Histórico</h1>
-
+        
       </div>
     </div>
 

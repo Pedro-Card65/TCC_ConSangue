@@ -1,79 +1,43 @@
 import { con } from './connection.js';
 
-//Finalizado
-
-export async function criarGrupoCampanha(grupo) {
-    const command = `
-        INSERT INTO grupos (id_grupo, id_capanha, meta_participacoes, data_entrada)
-        VALUES (?, ?, ?, ?)
-    `
-    const [result] = await con.query(command, [
-        grupo.id_grupo,
-        grupo.id_capanha,
-        grupo.meta_participacoes,
-        grupo.data_entrada
-    ]);
-
+export async function criarGrupoCampanha(dados) {
+    const [result] = await con.execute(
+        `INSERT INTO grupos_campanhas (id_grupo, id_campanha, meta_participacoes)
+         VALUES (?, ?, ?)`,
+        [dados.id_grupo, dados.id_campanha, dados.meta_participacoes]
+    );
     return result.insertId;
-};
+}
 
 export async function listarGruposCampanha() {
-    const command = `
-        SELECT  id_grupo, 
-                id_capanha, 
-                meta_participacoes, 
-                data_entrada
-        FROM    grupos_campanhas;
-    `
-    const [linhas] = await con.query(command, []);
+    const [linhas] = await con.execute(
+        `SELECT id_grupo_campanha, id_grupo, id_campanha, meta_participacoes, data_entrada
+         FROM grupos_campanhas ORDER BY data_entrada DESC`
+    );
     return linhas;
-};
+}
 
 export async function listarGruposCampanhaPorId(id) {
-    const command = `
-        SELECT  id_grupo, 
-                id_capanha, 
-                meta_participacoes, 
-                data_entrada
-        FROM    grupos_campanhas
-        WHERE nome_grupo LIKE ?
-    `
-    const [linhas] = await con.query(command, [
-        `%${id}%`
-    ])
-    return linhas;
-};
+    const [linhas] = await con.execute(
+        `SELECT id_grupo_campanha, id_grupo, id_campanha, meta_participacoes, data_entrada
+         FROM grupos_campanhas WHERE id_grupo_campanha = ?`,
+        [id]
+    );
+    return linhas[0] ?? null;
+}
 
-export async function editarGrupocampanha(grupo, id) {
-    const command = `
-        UPDATE  grupos_campanhas
-        SET     id_capanha = ?,
-                meta_participacoes = ?,
-                data_entrada = ?
-        WHERE   id_grupo_campanha = ?
-    `
-
-    const [linhas] = await con.query(command, [
-        grupo.id_capanha,
-        grupo.meta_participacoes,
-        grupo.data_entrada,
-        id
-    ])
-
-    let linhasAfetadas = linhas.affectedRows;
-    return linhasAfetadas;
-};
+export async function editarGrupocampanha(meta, id) {
+    const [result] = await con.execute(
+        `UPDATE grupos_campanhas SET meta_participacoes = ?
+         WHERE id_grupo_campanha = ?`,
+        [meta, id]
+    );
+    return result.affectedRows;
+}
 
 export async function apagarGrupoCampanha(id) {
-    const command = `
-        DELETE FROM grupos_campanhas
-            WHERE id_grupo_campanha = ?
-    `
-
-    const [linhas] = await con.query(command, [
-        id
-    ])
-
-    let linhasAfetadas = linhas.affectedRows;
-    return linhasAfetadas;
-};
+    const [result] = await con.execute(
+        `DELETE FROM grupos_campanhas WHERE id_grupo_campanha = ?`, [id]
+    );
+    return result.affectedRows;
+}

@@ -13,7 +13,7 @@ export async function criarCampanha(campanha){
         campanha.descricao,
         campanha.data_inicio,
         campanha.data_fim,
-        campanha.horario_inincio,
+        campanha.horario_inicio,
         campanha.horario_fim,
         campanha.status_campanha
     ]);

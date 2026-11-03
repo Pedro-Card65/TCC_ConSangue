@@ -1,3 +1,5 @@
+import { getAuthentication } from '../utils/jwt.js';
+import { inserirMeuId, somenteDonoParticipacao } from '../utils/permissoes.js';
 import * as service from '../service/participacoesService.js';
 import { Router } from 'express';
 
@@ -30,7 +32,7 @@ function tratarErro(resp, erro) {
 }
 
 //Registrar participação
-endpoints.post('/api/participacoes', async (req, resp) => {
+endpoints.post('/api/participacoes', getAuthentication(u => u.tipo_usuario === 'candidato'), inserirMeuId('id_usuario'), async (req, resp) => {
     try {
         const participacao = 
             await service.criarParticipacao(req.body);
@@ -42,10 +44,10 @@ endpoints.post('/api/participacoes', async (req, resp) => {
 });
 
 //Listar participações
-endpoints.get('/api/participacoes', async (req, resp) => {
+endpoints.get('/api/participacoes', getAuthentication(u => u.tipo_usuario === 'candidato'), async (req, resp) => {
     try {
         const participacoes =
-            await service.listarParticipacoes(req.query);
+            await service.listarParticipacoes({ ...req.query, id_usuario: req.user.id_usuario });
 
         resp.status(200).json(participacoes);
     } catch (erro) {
@@ -54,7 +56,7 @@ endpoints.get('/api/participacoes', async (req, resp) => {
 });
 
 //Buscar participações pelo ID
-endpoints.get('/api/participacoes/:id', async (req, resp) => {
+endpoints.get('/api/participacoes/:id', getAuthentication(u => u.tipo_usuario === 'candidato'), somenteDonoParticipacao, async (req, resp) => {
     try {
         const participacao = 
             await service.buscarParticipacao(req.params.id);
@@ -66,7 +68,7 @@ endpoints.get('/api/participacoes/:id', async (req, resp) => {
 });
 
 //Atualizar participação
-endpoints.put('/api/participacoes/:id', async (req, resp) => {
+endpoints.put('/api/participacoes/:id', getAuthentication(u => u.tipo_usuario === 'candidato'), somenteDonoParticipacao, async (req, resp) => {
     try {
         const participacao =
             await service.atualizarParticipacao(req.params.id, req.body);
@@ -78,7 +80,7 @@ endpoints.put('/api/participacoes/:id', async (req, resp) => {
 });
 
 //Excluir participações
-endpoints.delete('/api/participacoes/:id', async (req, resp) => {
+endpoints.delete('/api/participacoes/:id', getAuthentication(u => u.tipo_usuario === 'candidato'), somenteDonoParticipacao, async (req, resp) => {
     try {
         await service.excluirParticipacao(req.params.id);
 

@@ -1,3 +1,5 @@
+import { getAuthentication } from '../utils/jwt.js';
+import { inserirMeuId, somenteDonoInstituicao } from '../utils/permissoes.js';
 import * as service from '../service/instituicoesService.js';
 import { Router } from 'express';
 
@@ -57,7 +59,7 @@ endpoints.get('/api/instituicoes/:id', async (req, resp) => {
 });
 
 // Cadastar instituições
-endpoints.post('/api/instituicoes', async (req, resp) => {
+endpoints.post('/api/instituicoes', getAuthentication(u => u.tipo_usuario === 'instituicao'), inserirMeuId('id_usuario'), async (req, resp) => {
     try {
         const instituicao = 
             await service.cadastrarInstituicao(req.body);
@@ -69,7 +71,7 @@ endpoints.post('/api/instituicoes', async (req, resp) => {
 });
 
 // Atualizar institução
-endpoints.put('/api/instituicoes/:id', async (req, resp) => {
+endpoints.put('/api/instituicoes/:id', getAuthentication(u => u.tipo_usuario === 'instituicao'), somenteDonoInstituicao, async (req, resp) => {
     try {
         const instituicao =
             await service.atualizarInstituicao(
@@ -84,7 +86,7 @@ endpoints.put('/api/instituicoes/:id', async (req, resp) => {
 });
 
 //Excluir instituição
-endpoints.delete('/api/instituicoes/:id', async (req, resp) => {
+endpoints.delete('/api/instituicoes/:id', getAuthentication(u => u.tipo_usuario === 'instituicao'), somenteDonoInstituicao, async (req, resp) => {
     try {
         await service.excluirInstituicao(req.params.id);
 

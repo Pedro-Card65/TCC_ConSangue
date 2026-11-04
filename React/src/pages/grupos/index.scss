@@ -1,0 +1,90 @@
+.bloco {
+    display: flex;
+    flex-direction: column;
+    background-color: aqua;
+
+    .botoes {
+        display: flex;
+        gap: 1rem;
+
+        button {
+            border-radius: 0.625rem;
+        }
+
+        button#criar{
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+        gap: 0.2rem;
+
+        width: 15.0625rem;
+        height: 3.1875rem;
+
+        background-color: #AD2626;
+        color: white;
+        border: none;
+        /* border-radius: ; */
+
+        }
+
+        button#entrar {
+            display: flex;
+
+        align-items: center;
+        justify-content: center;
+        gap: 0.2rem;
+
+        width: 13.125rem;
+        height: 3.1875rem;
+
+        background-color: white;
+        color: #AD2626;
+        border-color: #AD2626;
+        }
+    }
+
+    img {
+            width: 2.125rem;
+            height: 1.625rem;
+        }
+
+    .grupos {
+        display: flex;
+
+        .gru {
+            display: flex;
+            flex-direction: column;
+            width: 22.3125rem;
+            height: 9.1875rem;
+
+            background-color: pink;
+            border-radius: 0.625rem;
+            
+            align-items: center;
+            padding: 0.8rem;
+
+            img {
+                width: 3.1875rem;
+                height: 3rem;
+            }
+
+            img#gota {
+                width: 1.1875rem;
+                height: 1.4375rem;
+            }
+            
+            .titulo {
+                display: flex;
+
+                .text {
+                display: flex;
+                flex-direction: column;
+                }
+
+            }
+
+            
+        }
+    }
+}

@@ -1,6 +1,6 @@
 /* import { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import axios from 'axios';
+import { api } from '../services/api';
 
 export default function RotaProtegida() {
     const [estado, setEstado] = useState('verificando');
@@ -17,8 +17,8 @@ export default function RotaProtegida() {
 
         async function verificarLogin() {
             try {
-                await axios.get(
-                    'http://localhost:3001/api/usuarios/me',
+                await api.get(
+                '/api/usuarios/me',
                     {
                         headers: {
                             Authorization: `Bearer ${token}`

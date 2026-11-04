@@ -11,9 +11,9 @@ const usuario = {
 };
 
 const estatisticas = [
-  { id: 1, icone: '/assets/icons/check-vermelho.webp', valor: 5, rotulo: 'Campanhas participadas' },
+  { id: 1, icone: '/assets/icons/check-vermelho.png', valor: 5, rotulo: 'Campanhas participadas' },
   { id: 2, icone: '/assets/icons/grupos-vermelho.webp', valor: 3, rotulo: 'Grupos' },
-  { id: 3, icone: '/assets/icons/coracao-vermelho.webp', valor: 3, rotulo: 'Interesse de participação' }
+  { id: 3, icone: '/assets/icons/coracao-vermelho.png', valor: 3, rotulo: 'Interesse de participação' }
 ];
 
 const proximaCampanha = {

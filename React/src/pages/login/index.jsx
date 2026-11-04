@@ -2,7 +2,7 @@
 import './index.scss';
 import './index2.scss';
 import { useState } from 'react'
-import axios from 'axios';
+import { api } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -33,8 +33,8 @@ async function fazerLogin(e) {
     setCarregando(true);
 
     try {
-        const resposta = await axios.post(
-            'http://localhost:3001/api/usuarios/login',
+        const resposta = await api.post(
+            '/api/usuarios/login',
             {
                 cpf: Cap,
                 senha: Senha
@@ -164,8 +164,8 @@ async function fazerCadastro(e) {
     setCarregando(true);
 
     try {
-        const resposta = await axios.post(
-            'http://localhost:3001/api/usuarios/cadastro',
+        const resposta = await api.post(
+            '/api/usuarios/cadastro',
             {
                 ...cadastro,
                 cpf: cadastro.cpf.replace(/\D/g, ''),

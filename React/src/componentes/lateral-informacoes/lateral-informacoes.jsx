@@ -31,7 +31,7 @@ export default function InformacoesLaterais() {
             <div className="cartao">
 
                 <div className="foto-nome-user">
-                    <img src="/assets/images/User.png" alt="Foto do usuário" />
+                    <img src="/assets/icons/banido.png" alt="Foto do usuário" />
                     <h3>{nomeCurto}</h3>
                 </div>
 

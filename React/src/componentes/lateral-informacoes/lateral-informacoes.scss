@@ -1,6 +1,7 @@
 $vermelho: #a3262f;
 $borda: #f1cfd3;
 $texto: #2b2b2b;
+$secundario: #6b6264;
 
 .informacoes-laterais {
   display: flex;
@@ -14,7 +15,7 @@ $texto: #2b2b2b;
     position: static;
   }
 
-    .cartao {
+  .cartao {
     width: 100%;
     max-width: 291px;
     box-sizing: border-box;
@@ -23,10 +24,9 @@ $texto: #2b2b2b;
     border-radius: 8px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 16px;
 
-    h3,
-    p {
+    h3, p {
       margin: 0;
       font-weight: 400;
     }
@@ -34,17 +34,31 @@ $texto: #2b2b2b;
     .foto-nome-user {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+      min-height: 46px;
 
-      img {
-        width: 34px;
-        height: 34px;
+      .foto-perfil-reservada {
+        width: 46px;
+        height: 46px;
+        flex: 0 0 46px;
         border-radius: 50%;
-        object-fit: cover;
+        overflow: hidden;
+        display: grid;
+        place-items: center;
+
+        img {
+          display: block;
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
       }
 
       h3 {
+        min-width: 0;
+        overflow-wrap: anywhere;
         font-size: 18px;
+        line-height: 1.3;
         color: $vermelho;
       }
     }
@@ -54,8 +68,8 @@ $texto: #2b2b2b;
       border-radius: 8px;
       overflow: hidden;
 
-      > div:first-child {
-        padding: 8px 12px;
+      .cabecalho-informacoes {
+        padding: 10px 12px;
         border-bottom: 1px solid $borda;
       }
 
@@ -65,49 +79,137 @@ $texto: #2b2b2b;
       }
 
       .dados-usuario {
-        padding: 8px 12px 10px;
+        padding: 12px;
         display: flex;
         flex-direction: column;
-        gap: 9px;
+        gap: 10px;
 
         p {
-          font-size: 12px;
           color: $vermelho;
+          font-size: 12px;
+          line-height: 1.4;
+          overflow-wrap: anywhere;
         }
       }
     }
 
-    .participacoes-planejadas,
-    .grupo-atual {
-      > div:first-child {
-        border: 1px solid $borda;
-        border-radius: 8px;
-        padding: 9px 12px;
+    .secao-lateral {
+      border: 1px solid $borda;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .cabecalho-secao {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      border-bottom: 1px solid $borda;
+
+      img {
+        width: 18px;
+        height: 18px;
+        object-fit: contain;
+        flex-shrink: 0;
       }
 
       h3 {
         font-size: 12px;
-        color: $texto;
-      }
-
-      p {
-        position: relative;
-        margin-top: 12px;
-        padding-left: 14px;
-        font-size: 12px;
-        color: $texto;
-
-        &::before {
-          content: '•';
-          position: absolute;
-          left: 2px;
-        }
+        line-height: 1.4;
+        font-weight: 600;
+        color: $vermelho;
+        flex: 1;
       }
     }
 
-    .grupo-atual > div:first-child {
-      width: 86%;
+    .contador-campanhas {
+      min-width: 21px;
+      height: 21px;
+      padding: 0 4px;
       box-sizing: border-box;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #f9e9eb;
+      color: $vermelho;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .lista-campanhas {
+      list-style: none;
+      padding: 4px 12px;
+      margin: 0;
+
+      li {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        padding: 12px 0;
+
+        & + li {
+          border-top: 1px solid #f1eeee;
+        }
+      }
+
+      strong {
+        color: $texto;
+        font-size: 12px;
+        font-weight: 600;
+        overflow-wrap: anywhere;
+      }
+
+      span {
+        color: $secundario;
+        font-size: 11px;
+      }
+    }
+
+    .grupo-conteudo {
+      padding: 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+
+      strong {
+        color: $texto;
+        font-size: 13px;
+        font-weight: 600;
+        overflow-wrap: anywhere;
+      }
+
+      span {
+        font-size: 11px;
+        color: $secundario;
+      }
+    }
+
+    .estado-vazio {
+      padding: 14px 12px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: $secundario;
+    }
+
+    .aviso-lateral {
+      font-size: 12px;
+      line-height: 1.5;
+      color: $secundario;
+    }
+
+    .erro-lateral {
+      color: $vermelho;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    width: 100%;
+    padding: 16px;
+    box-sizing: border-box;
+    align-items: center;
+
+    .cartao {
+      max-width: 600px;
     }
   }
 }

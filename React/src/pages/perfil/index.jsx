@@ -56,7 +56,7 @@ export default function User() {
 
           <div className="conteudo-informacoes-usuario">
 
-            <img src="/assets/images/User.png" alt="Foto do usuário" />
+            <img src="/assets/icons/banido.png" alt="Foto do usuário" />
 
             <div className="coluna-user-1">
               <p>{usuario.nome}</p>

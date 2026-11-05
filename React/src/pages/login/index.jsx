@@ -4,6 +4,7 @@ import './index2.scss';
 import { useState } from 'react'
 import { api } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
+import LogoSlogan from '../../componentes/logo-slogan/logo-slogan';
 
 
 export default function Login() {
@@ -94,16 +95,7 @@ const [cadastro, setCadastro] = useState({
 if (def === 'Login'){
   return (
     <div className="Background">
-      <div className="Consangue">
-        <div className="Logo">
-          <img src="/assets/images/Logo.png" alt="Logo" />
-        </div>
-
-        <div className="Marca">
-          <h2>ConSangue</h2>
-          <p>Mobilização Coletiva para<br />Doação de Sangue</p>
-        </div>
-      </div>
+      <LogoSlogan/>
 
       <main className="Login">
         <h1>Fazer Login na sua Conta</h1>
@@ -205,16 +197,7 @@ async function fazerCadastro(e) {
 // Tela de cadastro
     return (
       <div className="Background">
-        <div className="Consangue">
-          <div className="Logo">
-            <img src="/assets/images/Logo.png" alt="Logo" />
-          </div>
-  
-          <div className="Marca">
-            <h2>ConSangue</h2>
-            <p>Mobilização Coletiva para <br/> Doação de Sangue</p>
-          </div>
-        </div>
+        <LogoSlogan/>
   
         <main className="Cadastro">
           <h1>Realizar Cadastro</h1>

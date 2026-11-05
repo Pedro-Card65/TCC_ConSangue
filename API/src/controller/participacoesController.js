@@ -8,7 +8,7 @@ const endpoints = Router();
 function tratarErro(resp, erro) {
     if (erro.code === 'ER_DUP_ENTRY') {
         return resp.status(409).json({
-            erro: 'Usuário já possui participação nestas campanha'
+            erro: 'Usuário já possui participação nesta campanha.'
         });
     }
 

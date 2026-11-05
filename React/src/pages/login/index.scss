@@ -1,3 +1,6 @@
+* {
+  font-family: 'Lexend';
+}
 
 .Background {
   width: 100%;
@@ -17,11 +20,13 @@
   align-items: center;
   gap: 10px;
   z-index: 2;
+
   .Logo {
     display: flex;
     align-items: center;
     justify-content: center;
   }
+
   .Logo img {
     width: 5rem;
     user-select: none;
@@ -93,6 +98,7 @@
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.2s;
+
     &:hover {
       background-color: #8e1c20;
     }
@@ -104,10 +110,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-color: white;
   gap: 5px;
-  .Troca{
+
+  .Troca {
     cursor: pointer;
+    color: #e42027;
+
   }
+
   p {
     font-size: 16px;
     margin: 0;
@@ -126,6 +137,7 @@
     font-size: 15px;
     text-decoration: none;
     transition: background-color 0.2s;
+
     &:hover {
       background-color: #8e1c20;
     }

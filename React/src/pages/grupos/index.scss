@@ -1,46 +1,60 @@
 .bloco {
     display: flex;
     flex-direction: column;
-    background-color: aqua;
 
-    .botoes {
-        display: flex;
-        gap: 1rem;
+    width: 39rem;
+    gap: 2.5rem;
 
-        button {
-            border-radius: 0.625rem;
-        }
+    
+    .b2{
 
-        button#criar{
-        display: flex;
-
-        align-items: center;
-        justify-content: center;
-        gap: 0.2rem;
-
-        width: 15.0625rem;
-        height: 3.1875rem;
-
-        background-color: #AD2626;
-        color: white;
-        border: none;
-        /* border-radius: ; */
-
-        }
-
-        button#entrar {
+        h1 {
             display: flex;
 
-        align-items: center;
-        justify-content: center;
-        gap: 0.2rem;
+            margin-bottom: 2rem;
+            font-weight: 400;
+            color: #AD2626;
+        }
+        
+        .botoes {
+            display: flex;
+            gap: 1rem;
 
-        width: 13.125rem;
-        height: 3.1875rem;
+            button {
+                border-radius: 0.625rem;
+            }
 
-        background-color: white;
-        color: #AD2626;
-        border-color: #AD2626;
+            button#criar{
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+            gap: 0.2rem;
+
+            width: 15.0625rem;
+            height: 3.1875rem;
+
+            background-color: #AD2626;
+            color: white;
+            border: none;
+            /* border-radius: ; */
+
+            }
+
+            button#entrar {
+                display: flex;
+
+            align-items: center;
+            justify-content: center;
+            gap: 0.2rem;
+
+            width: 13.125rem;
+            height: 3.1875rem;
+
+            background-color: white;
+            color: #AD2626;
+            border: solid 2px #AD2626;
+            }
         }
     }
 
@@ -51,18 +65,35 @@
 
     .grupos {
         display: flex;
+        flex-direction: column;
+
+
+        gap: 2rem;
+        
 
         .gru {
             display: flex;
             flex-direction: column;
-            width: 22.3125rem;
-            height: 9.1875rem;
+            width: 50rem;
+            height: auto;
 
-            background-color: pink;
+
             border-radius: 0.625rem;
+            border: solid 2px #D9D9D9;
+            background-color: white;
             
-            align-items: center;
-            padding: 0.8rem;
+            align-items: start;
+            padding: 1rem;
+            gap: 1rem;
+
+            p#desc {
+                color: #AD2626;
+            }
+
+
+            h2 {
+                font-weight: 400;
+            }
 
             img {
                 width: 3.1875rem;
@@ -76,15 +107,34 @@
             
             .titulo {
                 display: flex;
+                gap: 1rem;
+                align-items: center;
+                
 
                 .text {
                 display: flex;
                 flex-direction: column;
+                
+                margin-right: 8rem;
+
                 }
 
             }
 
-            
+            button {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                width: 8.25rem;
+                height: 1.6875rem;
+                
+                background-color: #AD2626;
+                color: white;
+
+                border: none;
+                border-radius: 0.625rem;
+            }
         }
     }
 }

@@ -194,7 +194,7 @@ async function fazerCadastro(e) {
 }
 // Tela de cadastro
     return (
-      <div className="Background">
+    <div className="Background">
         <LogoSlogan/>
   
         <main className="Cadastro">
@@ -272,7 +272,7 @@ async function fazerCadastro(e) {
             required
         />
     </div>
-/* sem scss por questões de classificação, mas vou dar uma arrumada dps
+ {/* sem scss por questões de classificação, mas vou dar uma arrumada dps */}
     <div className="box">
         <p>Tipo Sanguíneo</p>
         <select
@@ -291,7 +291,7 @@ async function fazerCadastro(e) {
             <option value="O-">O-</option>
         </select>
     </div>
-/* sem scss por questões de classificação, mas vou dar uma arrumada dps
+ {/* sem scss por questões de classificação, mas vou dar uma arrumada dps */}
     <div className="box">
         <p>Tipo de Usuário *</p>
         <select

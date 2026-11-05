@@ -3,18 +3,23 @@ import './index.scss';
 export default function Grupos() {
   return (
     <div className="bloco">
-        <h1>MEUS GRUPOS</h1>
 
-        <div className="botoes">
+        <div className="b2">
+          
+          <h1>MEUS GRUPOS</h1>
 
-          <button id='criar'>
-            Criar novo grupo
-            <img src="/assets/icons/add.png" alt="" />
-          </button>
+          <div className="botoes">
 
-          <button id='entrar'>
-            Entrar com Código
-          </button>
+            <button id='criar'>
+              Criar novo grupo
+              <img src="/assets/icons/add.png" alt="" />
+            </button>
+
+            <button id='entrar'>
+              Entrar com Código
+            </button>
+
+          </div>
 
         </div>
 
@@ -24,7 +29,7 @@ export default function Grupos() {
 
             <div className="titulo">
               
-              <img src="/assets/icons/mao.png" alt="" />
+              <img src="/assets/grupo/mao.png" alt="" />
                 
                 <div className="text">
                   
@@ -37,8 +42,55 @@ export default function Grupos() {
 
             </div>
 
-            <p>・Campanha + Amor - Hospital Abidas</p>
+            <p id='desc'>・Campanha + Amor - Hospital Abidas</p>
+            <button>Ver Grupo</button>
+
           </div>
+
+          <div className="gru">
+
+            <div className="titulo">
+              
+              <img src="/assets/grupo/group.png" alt="" />
+                
+                <div className="text">
+                  
+                  <h2>Nome</h2>
+                  <p>Membros</p>
+                
+                </div>
+
+                <img src="/assets/icons/gotaAdd.png" alt="" id='gota'/>
+
+            </div>
+
+            <p id='desc'>・Campanha + Amor - Hospital Abidas</p>
+            <button>Ver Grupo</button>
+
+          </div>
+
+          <div className="gru">
+
+            <div className="titulo">
+              
+              <img src="/assets/grupo/heart.png" alt="" />
+                
+                <div className="text">
+                  
+                  <h2>Nome</h2>
+                  <p>Membros</p>
+                
+                </div>
+    
+                <img src="/assets/icons/gotaAdd.png" alt="" id='gota'/>
+
+            </div>
+
+            <p id='desc'>・Campanha + Amor - Hospital Abidas</p>
+            <button>Ver Grupo</button>
+
+          </div>
+
 
           
         </div>

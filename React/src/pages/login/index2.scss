@@ -1,6 +1,7 @@
 .Cadastro {
     display: flex;
     flex-direction: column;
+    width: auto;
     gap: 0.5rem;
     border: 2rem;
     padding: 0.7rem;
@@ -71,15 +72,12 @@
             padding: 0.8rem;
             border: solid 0.18rem rgb(236, 236, 236);
             border-radius: 0.4rem;
-            min-width: 36rem;
         }
 
         select {
             padding: 0.8rem;
             border: solid 0.18rem rgb(236, 236, 236);
             border-radius: 0.4rem;
-                        min-width: 36rem;
-
         }
 
 

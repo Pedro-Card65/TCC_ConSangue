@@ -130,9 +130,7 @@ if (def === 'Login'){
 
 </form>
 
-        <div className="Cadastro"><p>É a sua primeira vez por aqui?<p className='Troca' onClick={troca}>Faça o seu Cadastro!</p></p>
-        <p>Gostaria de cadastrar um hemocentro?<p className='Troca' onClick={troca}>Clique aqui!</p></p>
-        </div>
+        <div className="Cadastro"><p>É a sua primeira vez por aqui?<p className='Troca' onClick={troca}>Faça o seu Cadastro!</p></p></div>
       </main>
     </div>
   )
@@ -274,7 +272,7 @@ async function fazerCadastro(e) {
             required
         />
     </div>
-
+/* sem scss por questões de classificação, mas vou dar uma arrumada dps
     <div className="box">
         <p>Tipo Sanguíneo</p>
         <select
@@ -293,7 +291,7 @@ async function fazerCadastro(e) {
             <option value="O-">O-</option>
         </select>
     </div>
-
+/* sem scss por questões de classificação, mas vou dar uma arrumada dps
     <div className="box">
         <p>Tipo de Usuário *</p>
         <select
@@ -343,7 +341,7 @@ async function fazerCadastro(e) {
 
 </form>
       
-          <div className="Cadastro"><p>É a sua primeira vez por aqui? <p className='Troca' onClick={troca}>Faça o seu Cadastro!</p></p></div>
+          <div className="Cadastro"><p className='Troca' onClick={troca}>Voltar para a tela de Login</p></div>
         </main>
   
       </div>

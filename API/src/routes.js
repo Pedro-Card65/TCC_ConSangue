@@ -18,12 +18,12 @@ export function addRoutes(api) {
         });
     });
 
-    api.use(grupos);
-    api.use(membros);
-    api.use(gruposCampanhas);
+    api.use('/api', grupos);
+    api.use('/api', membros);
+    api.use('/api', gruposCampanhas);
     api.use(instituicoes);
     api.use(participacoes);
     api.use(auth);
     api.use(usuario);
-    api.use(campanhas);
+    api.use('/api', campanhas);
 }

@@ -49,3 +49,54 @@
         background-color: #8e1c20;
     }
 }
+.Cadastro {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    border: 2rem;
+    padding: 0.7rem;
+    border-radius: 0.7rem;
+
+
+    .box {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        color: #AD2626;
+        width: 30rem;
+        padding: 0.2rem;
+
+        input {
+            padding: 0.8rem;
+            border: solid 0.18rem rgb(236, 236, 236);
+            border-radius: 0.4rem;
+            box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+        }
+
+        select {
+            padding: 0.8rem;
+            border: solid 0.18rem rgb(236, 236, 236);
+            border-radius: 0.4rem;
+        }
+
+
+    }
+}
+
+.Entrar {
+    width: 154px;
+    height: 44px;
+    margin-top: 4px;
+    background-color: #af2326;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+        background-color: #8e1c20;
+    }
+}

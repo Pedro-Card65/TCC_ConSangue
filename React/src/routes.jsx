@@ -10,7 +10,6 @@ import Campanhas from './pages/campanhas/index.jsx';
 import Grupos from './pages/grupos/index.jsx';
 import ParticipacoesHistorico from './pages/participacoesHistorico/index.jsx';
 import Error from './pages/error404/index.jsx';
-import Cadastro from './pages/cadastro/index.jsx';
 
 /* export default function Router() {
     return (
@@ -45,7 +44,6 @@ export default function Router() {
     <BrowserRouter>
         <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/cadastro" element={<Cadastro />} />
         <Route element={<LayoutComBarra />}>
             <Route element={<LayoutPrincipal />}>
             <Route path="/home" element={<Home />} />

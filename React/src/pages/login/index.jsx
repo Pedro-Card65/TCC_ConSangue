@@ -4,6 +4,7 @@ import './index2.scss';
 import { useState } from 'react'
 import { api } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
+import LogoSlogan from '../../componentes/logo-slogan/logo-slogan';
 
 
 export default function Login() {
@@ -94,16 +95,7 @@ const [cadastro, setCadastro] = useState({
 if (def === 'Login'){
   return (
     <div className="Background">
-      <div className="Consangue">
-        <div className="Logo">
-          <img src="/assets/images/Logo.png" alt="Logo" />
-        </div>
-
-        <div className="Marca">
-          <h2>ConSangue</h2>
-          <p>Mobilização Coletiva para<br />Doação de Sangue</p>
-        </div>
-      </div>
+      <LogoSlogan/>
 
       <main className="Login">
         <h1>Fazer Login na sua Conta</h1>
@@ -138,9 +130,7 @@ if (def === 'Login'){
 
 </form>
 
-        <div className="Cadastro"><p>É a sua primeira vez por aqui?<p className='Troca' onClick={troca}>Faça o seu Cadastro!</p></p>
-        <p>Gostaria de cadastrar um hemocentro?<p className='Troca' onClick={troca}>Clique aqui!</p></p>
-        </div>
+        <div className="Cadastro"><p>É a sua primeira vez por aqui?<p className='Troca' onClick={troca}>Faça o seu Cadastro!</p></p></div>
       </main>
     </div>
   )
@@ -205,16 +195,7 @@ async function fazerCadastro(e) {
 // Tela de cadastro
     return (
       <div className="Background">
-        <div className="Consangue">
-          <div className="Logo">
-            <img src="/assets/images/Logo.png" alt="Logo" />
-          </div>
-  
-          <div className="Marca">
-            <h2>ConSangue</h2>
-            <p>Mobilização Coletiva para <br/> Doação de Sangue</p>
-          </div>
-        </div>
+        <LogoSlogan/>
   
         <main className="Cadastro">
           <h1>Realizar Cadastro</h1>
@@ -291,7 +272,7 @@ async function fazerCadastro(e) {
             required
         />
     </div>
-
+/* sem scss por questões de classificação, mas vou dar uma arrumada dps
     <div className="box">
         <p>Tipo Sanguíneo</p>
         <select
@@ -310,7 +291,7 @@ async function fazerCadastro(e) {
             <option value="O-">O-</option>
         </select>
     </div>
-
+/* sem scss por questões de classificação, mas vou dar uma arrumada dps
     <div className="box">
         <p>Tipo de Usuário *</p>
         <select
@@ -360,7 +341,7 @@ async function fazerCadastro(e) {
 
 </form>
       
-          <div className="Cadastro"><p>É a sua primeira vez por aqui? <p className='Troca' onClick={troca}>Faça o seu Cadastro!</p></p></div>
+          <div className="Cadastro"><p className='Troca' onClick={troca}>Voltar para a tela de Login</p></div>
         </main>
   
       </div>

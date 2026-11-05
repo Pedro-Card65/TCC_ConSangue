@@ -17,7 +17,7 @@ endpoints.post('/api/usuarios/login', async (req, resp) => {
     }
 });
 
-// Endpoint útil para testar se o JWT enviado está funcionando.
+// endpoint para testar se o JWT enviado está funcionando
 endpoints.get('/api/usuarios/me', getAuthentication(), (req, resp) => {
     resp.json({ id_usuario: req.user.id_usuario, tipo_usuario: req.user.tipo_usuario });
 });

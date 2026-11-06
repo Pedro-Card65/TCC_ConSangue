@@ -2,8 +2,14 @@
     display: flex;
     flex-direction: column;
 
-    width: 39rem;
+    width: 100%;
+    max-width: 50rem;
+    box-sizing: border-box;
     gap: 2.5rem;
+
+    button {
+        cursor: pointer;
+    }
 
     
     .b2{
@@ -22,6 +28,7 @@
 
             button {
                 border-radius: 0.625rem;
+                
             }
 
             button#criar{
@@ -63,6 +70,12 @@
             height: 1.625rem;
         }
 
+
+    .grupos .gru {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
     .grupos {
         display: flex;
         flex-direction: column;
@@ -74,7 +87,6 @@
         .gru {
             display: flex;
             flex-direction: column;
-            width: 50rem;
             height: auto;
 
 
@@ -86,7 +98,7 @@
             padding: 1rem;
             gap: 1rem;
 
-            p#desc {
+            p.desc {
                 color: #AD2626;
             }
 

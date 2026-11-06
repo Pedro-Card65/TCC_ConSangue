@@ -42,7 +42,7 @@ export default function Grupos() {
 
             </div>
 
-            <p id='desc'>・Campanha + Amor - Hospital Abidas</p>
+            <p classname='desc'>・Campanha + Amor - Hospital Abidas</p>
             <button>Ver Grupo</button>
 
           </div>
@@ -64,7 +64,7 @@ export default function Grupos() {
 
             </div>
 
-            <p id='desc'>・Campanha + Amor - Hospital Abidas</p>
+            <p classname='desc'>・Campanha + Amor - Hospital Abidas</p>
             <button>Ver Grupo</button>
 
           </div>
@@ -86,7 +86,7 @@ export default function Grupos() {
 
             </div>
 
-            <p id='desc'>・Campanha + Amor - Hospital Abidas</p>
+            <p classname='desc'>・Campanha + Amor - Hospital Abidas</p>
             <button>Ver Grupo</button>
 
           </div>

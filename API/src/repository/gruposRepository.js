@@ -3,17 +3,46 @@ import { con } from './connection.js';
 //Finalizado
 
 export async function criarGrupo(grupo) {
-    const command = `
-        INSERT INTO grupos (nome_grupo, descricao, id_criador)
-        VALUES (?, ?, ?)
-    `
-    const [result] = await con.query(command, [
-        grupo.nome_grupo,
-        grupo.descricao,
-        grupo.id_criador
-    ]);
+    const conexao = await con.getConnection();
 
-    return result.insertId;
+    try {
+        await conexao.beginTransaction();
+
+        const [resultado] = await conexao.execute(
+            `INSERT INTO grupos
+            (nome_grupo, descricao, id_criador)
+            VALUES (?, ?, ?)`,
+            [
+                grupo.nome_grupo,
+                grupo.descricao,
+                grupo.id_criador
+            ]
+        );
+
+        const idGrupo = resultado.insertId;
+
+        await conexao.execute(
+            `INSERT INTO membros_grupo
+            (id_usuario, id_grupo, papel)
+            VALUES (?, ?, ?)`,
+            [
+                grupo.id_criador,
+                idGrupo,
+                'administrador'
+            ]
+        );
+
+        await conexao.commit();
+        
+        return idGrupo;
+    
+    } catch (erro) {
+        await conexao.rollback();
+        throw erro;
+        
+    } finally {
+        conexao.release();
+    }
 }
 
 export async function listarGrupos() {

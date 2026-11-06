@@ -1,20 +1,22 @@
 import './lateral-hemocentros.scss';
 
 const hemocentros = [
-  { id: 1, nome: 'Hospital Abidas', seguidores: 700, endereco: 'Praça da Luz, 500 - Luz, São Paulo - SP', cep: '01120-010' },
+  { id: 1, nome: 'Hospital Guloso', seguidores: 700, endereco: 'Praça da Luz, 500 - Luz, São Paulo - SP', cep: '01120-010' },
   { id: 2, nome: 'Hospital Abidas', seguidores: 700, endereco: 'Praça da Luz, 500 - Luz, São Paulo - SP', cep: '01120-010' },
   { id: 3, nome: 'Hospital Abidas', seguidores: 700, endereco: 'Praça da Luz, 500 - Luz, São Paulo - SP', cep: '01120-010' },
-  { id: 4, nome: 'Hospital Abidas', seguidores: 700, endereco: 'Praça da Luz, 500 - Luz, São Paulo - SP', cep: '01120-010' }
+  { id: 4, nome: 'Hospital Abidas', seguidores: 700, endereco: 'Praça da Luz, 500 - Luz, São Paulo - SP', cep: '01120-010' },
+  { id: 5, nome: 'Hospital Carvalho', seguidores: 700, endereco: 'Praça da Luz, 500 - Luz, São Paulo - SP', cep: '01120-010'},
+  { id: 6, nome: 'Hospital Carvalho', seguidores: 700, endereco: 'Praça da Luz, 500 - Luz, São Paulo - SP', cep: '01120-010'},
+  { id: 7, nome: 'Hospital Carvalho', seguidores: 700, endereco: 'Praça da Luz, 500 - Luz, São Paulo - SP', cep: '01120-010'},
+  { id: 8, nome: 'Hospital Carvalho', seguidores: 700, endereco: 'Praça da Luz, 500 - Luz, São Paulo - SP', cep: '01120-010'},
+  { id: 9, nome: 'Hospital Carvalho', seguidores: 700, endereco: 'Praça da Luz, 500 - Luz, São Paulo - SP', cep: '01120-010'}
 ];
 
 export default function HemocentrosLaterais() {
   return (
     <section className="hemocentros-laterais">
-
       <img className="icone-topo" src="/assets/icons/dois-quadrados.webp" alt="" />
-
       <h2 className="titulo">Encontre Hemocentros parceiros</h2>
-
       <ul className="lista-hemocentros">
         {hemocentros.map((h) => (
           <li className="cartao-hemocentro" key={h.id}>

@@ -20,7 +20,7 @@ $fonte-logo: 'Lexend', sans-serif;
     flex-direction: column;
     margin-top: 20%;
     padding: 1em;
-    gap: 10em;
+    gap: 2em;
     background-color: $branco;
     box-sizing: border-box;
     border-radius: 2em;
@@ -29,5 +29,22 @@ $fonte-logo: 'Lexend', sans-serif;
     h1{
         color: $vermelho;
         font: $fonte-texto;
+    }
+
+    .partBaixo{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+
+        button{
+            color: $vermelho-botao;
+            box-sizing: border-box;
+            background-color: $branco;
+            border-color: $vermelho-botao;
+            border-radius: 0.5em;
+            border: 0.2em 0.2em 0.2em solid $vermelho-botao;
+            padding: 0.3em;
+        }
     }
 }

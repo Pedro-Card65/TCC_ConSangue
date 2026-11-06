@@ -1,19 +1,32 @@
-import { con } from './connection.js';
+import { con, abrirConexao } from './connection.js';
 
 //Finalizado
 
 export async function criarGrupo(grupo) {
-    const command = `
-        INSERT INTO grupos (nome_grupo, descricao, id_criador)
-        VALUES (?, ?, ?)
-    `
-    const [result] = await con.query(command, [
-        grupo.nome_grupo,
-        grupo.descricao,
-        grupo.id_criador
-    ]);
-
-    return result.insertId;
+    const conexao = await abrirConexao();
+    try {
+        await conexao.beginTransaction();
+        const [result] = await conexao.execute(
+            `INSERT INTO grupos (nome_grupo, descricao, id_criador) VALUES (?, ?, ?)`,
+            [grupo.nome_grupo, grupo.descricao, grupo.id_criador]
+        );
+        await conexao.execute(
+            `INSERT INTO membros_grupo (id_usuario, id_grupo, papel) VALUES (?, ?, ?)`,
+            [grupo.id_criador, result.insertId, 'administrador']
+        );
+        await conexao.commit();
+        return result.insertId;
+    } catch (erro) {
+        try {
+            await conexao.rollback();
+        } catch {
+            // Descarte a sessão e preserve o erro original.
+        }
+        throw erro;
+    } finally {
+        // Não reutilizar a conexão, inclusive se o rollback falhar.
+        conexao.destroy();
+    }
 }
 
 export async function listarGrupos() {

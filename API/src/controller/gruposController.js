@@ -14,8 +14,8 @@ endpoints.post('/grupo', getAuthentication(), inserirMeuId('id_criador'), async 
         resp.send({ id });
     }
     catch (error) {
-        resp.status(400).send({
-            erro: error.message
+        resp.status(error.status === 400 ? 400 : 500).send({
+            erro: error.status === 400 ? error.message : 'Não foi possível criar o grupo.'
         });
     }
 });

@@ -1,21 +1,233 @@
-// Cores para a estilização do site
-$vermelho: #b02222;
-$vermelho-botao: #ae2424;
-$rosa-borda: #f0c9c9;
-$rosa-data: #e8c4c4;
-$verde-selo: #c9f7c5;
-$azul-selo: #c4efff;
-$cinza-fundo: #f3f3f3;
-$cinza-texto: #9a9a9a;
-$cinza-icone: #c4c4c4;
-$branco: #ffffff;
+$vermelho: #a3262f;
+$borda-cartao: #e4e4e4;
+$texto: #1d1d1d;
 
-
-// confere no Figma (selecionando o texto) qual fonte é a certa
-$fonte-texto: 'Inter', sans-serif;
-$fonte-logo: 'Lexend', sans-serif;
-
-// Toda a página
 .pagina-home {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 672px;
+  margin: 0 auto;
+  font-family: 'Lexend', sans-serif;
+  color: $texto;
 
+  h2,
+  p {
+    margin: 0;
+    font-weight: 400;
+  }
+
+  .pesquisa {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    height: 48px;
+    padding: 0 24px;
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+
+    img {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+    }
+
+    input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 14px;
+      color: $texto;
+
+      &::placeholder {
+        color: #8a8a8a;
+      }
+    }
+  }
+
+  .cartao-campanha {
+    background: #fff;
+    border: 1px solid $borda-cartao;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .cartao-topo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 24px 28px;
+  }
+
+  .cartao-logo {
+    box-sizing: border-box;
+    width: 46px;
+    height: 46px;
+    padding: 11px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    object-fit: contain;
+  }
+
+  .cartao-identificacao {
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 16px;
+
+      img {
+        width: 14px;
+        height: 14px;
+        object-fit: contain;
+      }
+    }
+
+    p {
+      font-size: 10px;
+      line-height: 1.4;
+    }
+  }
+
+  .cartao-imagem {
+    position: relative;
+
+    > img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+    }
+  }
+
+  .cartao-periodo {
+    position: absolute;
+    right: 18px;
+    bottom: 18px;
+    padding: 10px 20px;
+    background: #fff;
+    border-radius: 6px;
+    font-size: 14px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  }
+
+  .cartao-acoes {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 24px;
+  }
+
+  .cartao-interacoes {
+    display: flex;
+    gap: 48px;
+    margin: 0;
+    padding: 0 0 0 80px;
+    list-style: none;
+
+    li {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+    }
+
+    span {
+      font-size: 12px;
+    }
+  }
+
+  .cartao-saiba-mais {
+    padding: 12px 28px;
+    background: #fff;
+    border: 1px solid $borda-cartao;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    color: $texto;
+    cursor: pointer;
+
+    &:hover {
+      background: #f7f7f7;
+    }
+  }
+
+  .cartao-descricao {
+    padding: 4px 24px 22px;
+    font-size: 14px;
+    line-height: 1.4;
+
+    strong {
+      font-weight: 600;
+    }
+  }
+
+  .home-aviso {
+    padding: 24px;
+    background: #fff;
+    border: 1px solid $borda-cartao;
+    border-radius: 6px;
+    text-align: center;
+    color: #666;
+
+    button {
+      margin-top: 12px;
+      padding: 10px 16px;
+      background: $vermelho;
+      color: #fff;
+      border: 0;
+      border-radius: 6px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+  }
+
+  .home-esqueleto {
+    height: 280px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #eaeaea 25%, #f5f5f5 50%, #eaeaea 75%);
+    background-size: 200% 100%;
+    animation: home-brilho 1.2s infinite;
+  }
+
+  @media (max-width: 600px) {
+    .cartao-topo,
+    .cartao-acoes {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+
+    .cartao-descricao {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+
+    .cartao-interacoes {
+      gap: 24px;
+      padding-left: 0;
+    }
+
+    .cartao-saiba-mais {
+      padding: 10px 16px;
+    }
+  }
+}
+
+@keyframes home-brilho {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
 }

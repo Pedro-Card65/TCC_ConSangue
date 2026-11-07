@@ -28,6 +28,7 @@ export async function buscarPorID(id) {
         SELECT
             id_usuario,
             nome,
+            email,
             data_nascimento,
             cidade,
             tipo_sanguineo,
@@ -98,10 +99,16 @@ export async function trocarEmail(id, novoemail) {
 
     return result.affectedRows;
 }
-// Consulta privada: o hash só é utilizado internamente no login e nas validações de senha.
+
 export async function buscarLoginPorCPF(cpf) {
     const [linhas] = await con.execute(
-        `SELECT id_usuario, nome, tipo_usuario, senha_hash FROM usuarios WHERE cpf = ? LIMIT 1`,
+        `SELECT id_usuario, 
+        nome, 
+        tipo_usuario, 
+        senha_hash 
+        FROM usuarios 
+        WHERE cpf = ? 
+        LIMIT 1`,
         [cpf]
     );
     return linhas[0] ?? null;
@@ -109,7 +116,11 @@ export async function buscarLoginPorCPF(cpf) {
 
 export async function buscarCredenciaisPorID(id) {
     const [linhas] = await con.execute(
-        `SELECT id_usuario, senha_hash FROM usuarios WHERE id_usuario = ? LIMIT 1`,
+        `SELECT id_usuario, 
+        senha_hash 
+        FROM usuarios 
+        WHERE id_usuario = ? 
+        LIMIT 1`,
         [id]
     );
     return linhas[0] ?? null;

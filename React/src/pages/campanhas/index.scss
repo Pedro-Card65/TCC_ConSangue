@@ -1,3 +1,31 @@
+.pagina-campanhas .lista-campanhas {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 2rem;
+
+    .cartao-campanha {
+        padding: 1.5rem;
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0px 0px 15px rgb(233, 233, 233);
+
+        h2 {
+            margin-bottom: 0.5rem;
+            color: #AD2626;
+        }
+
+        p {
+            margin-top: 0.5rem;
+            overflow-wrap: anywhere;
+        }
+    }
+
+    .erro-campanhas {
+        color: #AD2626;
+    }
+}
+
 h1 {
     padding-bottom: 2rem;
     font-weight: 400;
@@ -29,6 +57,10 @@ h1 {
             border: solid 0.15rem rgb(228, 228, 228);
             width: 100%;
             border-radius: 0.5rem;
+
+            &:focus-within {
+                border-color: #AD2626;
+            }
             
             img {
                 width: 1.5rem;
@@ -43,6 +75,7 @@ h1 {
                 padding: 0.5rem;
                 border-radius: 0.5rem;
                 border: none;
+                outline: none;
             }
         }
 
@@ -77,6 +110,11 @@ h1 {
                 border: solid 0.15rem rgb(228, 228, 228);
                 background-color: white;
                 cursor: pointer;
+
+                &:focus {
+                    outline: none;
+                    border-color: #AD2626;
+                }
             }
         }
     }
@@ -94,6 +132,11 @@ h1 {
             border-radius: 0.5rem;
             border: solid 0.15rem rgb(228, 228, 228);
             cursor: pointer;
+
+            &:focus {
+                    outline: none;
+                    border-color: #AD2626;
+                }
         }
     }
 

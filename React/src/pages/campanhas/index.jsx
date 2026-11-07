@@ -1,20 +1,41 @@
 import './index.scss';
 import { useState, useEffect } from 'react';
-import { api } from '../../services/api.js'
+import { api } from '../../services/api.js';
 
 export default function Campanhas() {
   const [campanhas, setCampanhas] = useState([]);
-  /*useEffect(() => {
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState('');
+
+  useEffect(() => {
+    let ativo = true;
 
     async function buscarCampanhas() {
-      const resposta = await api.get('/api/campanhas');
+      try {
+        const resposta = await api.get('/api/campanhas');
 
-      setCampanhas(resposta.data.campanhas)
+        if (ativo) {
+          setCampanhas(resposta.data.campanhas);
+        }
+      }
+      catch (error) {
+        if (ativo) {
+          setErro(error.response?.data?.erro || 'Não foi possível carregar as campanhas. Tente novamente mais tarde.');
+        }
+      }
+      finally {
+        if (ativo) {
+          setCarregando(false);
+        }
+      }
     }
 
     buscarCampanhas();
 
-  }, []);*/
+    return () => {
+      ativo = false;
+    };
+  }, []);
 
   return (
     <div className="pagina-campanhas">
@@ -78,6 +99,28 @@ export default function Campanhas() {
         <button className='pesquisar'>Pesquisar</button>
 
       </div>
+
+      <section className="lista-campanhas" aria-label="Campanhas encontradas" aria-busy={carregando}>
+
+        {carregando && <p role="status">Carregando campanhas...</p>}
+
+        {erro && <p className="erro-campanhas" role="alert">{erro}</p>}
+
+        {!carregando && !erro && (
+          campanhas.length > 0 ? (
+            campanhas.map((campanha) => (
+              <article className="cartao-campanha" key={campanha.id_campanha}>
+                <h2>{campanha.nome_campanha}</h2>
+                <p>{campanha.descricao}</p>
+                <p>Status: {campanha.status_campanha}</p>
+              </article>
+            ))
+          ) : (
+            <p>Nenhuma campanha encontrada.</p>
+          )
+        )}
+
+      </section>
     </div>
   );
 }

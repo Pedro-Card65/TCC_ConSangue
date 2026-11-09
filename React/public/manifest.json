@@ -1,0 +1,15 @@
+{
+  "short_name": "ConSangue",
+  "name": "ConSangue",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#a3262f",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "assets/images/Logo_Vermelha.png",
+      "type": "image/png",
+      "sizes": "any"
+    }
+  ]
+}

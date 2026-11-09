@@ -69,11 +69,25 @@ endpoints.delete('/campanhas/:id', getAuthentication(u => u.tipo_usuario === 'in
         let linhas = await service.apagarCampanhaService(id_campanha);
         resp.send({ linhas });
     }
+    
     catch (error) {
-        resp.status(400).send({
-            erro: error.message
+        if (error.code === 'ER_ROW_IS_REFERENCED_2') {
+            return resp.status(409).json({
+                erro: 'Não é possível excluir a campanha porque existem grupos ou participações vinculados.'
+            });
+        }
+
+        if (!error.status) {
+            console.error(error);
+        }
+
+        return resp.status(error.status || 500).json({
+            erro: error.status
+                ? error.message
+                : 'Não foi possível excluir a campanha.'
         });
     }
+
 });
 
 export default endpoints;

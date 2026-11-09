@@ -84,12 +84,25 @@ endpoints.delete('/api/usuarios/deletar/certeza/:id', getAuthentication(), somen
             del
     })
     }
-    catch(erro) {
-        console.error(erro)
-        resp.status(erro.status || 500).send({
-            erro: erro.message
-        })
+    
+    catch (erro) {
+        if (erro.code === 'ER_ROW_IS_REFERENCED_2') {
+            return resp.status(409).json({
+                erro: 'Não é possível excluir a conta enquanto existirem registros vinculados.'
+            });
+        }
+
+        if (!erro.status) {
+            console.error(erro);
+        }
+
+        return resp.status(erro.status || 500).json({
+            erro: erro.status
+                ? erro.message
+                : 'Não foi possível excluir a conta.'
+        });
     }
+
 })
 
 ////////////////////////////////////////////////////////////////////////////////////////

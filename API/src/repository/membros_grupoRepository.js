@@ -32,23 +32,27 @@ export async function listarMembrosPorGrupo(idGrupo) {
     return linhas;
 };
 
+
 export async function listarGruposPorUsuario(idUsuario) {
     const command = `
         SELECT  m.id_membro,
                 g.id_grupo,
                 g.nome_grupo,
                 g.descricao,
+                g.id_criador,
                 m.papel,
                 m.data_entrada
         FROM    membros_grupo m
         JOIN    grupos g ON g.id_grupo = m.id_grupo
         WHERE   m.id_usuario = ?
         ORDER BY m.data_entrada DESC
-    `
+    `;
 
     const [linhas] = await con.query(command, [idUsuario]);
+
     return linhas;
 };
+
 
 export async function editarPapel(id, papel) {
     const command = `

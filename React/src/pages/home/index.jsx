@@ -8,7 +8,7 @@ const campanhas = [
     seguidores: 700,
     titulo: 'Campanha Mais Amor',
     periodo: 'De 15 a 30 de novembro',
-    imagem: '/assets/images/campanha-padrao.jpg',
+    imagem: '/assets/images/campanha-padrao.webp',
     descricao:
       'Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum dolorem expedita, nam non iste a ipsum hic sapiente mollitia voluptates harum sit architecto quae, laborum, quo ut molestias eius dolor?',
     grupos: 5,

@@ -1,4 +1,5 @@
 import './index.scss';
+import ModalCampanha from '../../componentes/modal-campanha/modal-campanha.jsx';
 import { useState, useEffect } from 'react';
 import { api } from '../../services/api.js';
 
@@ -6,6 +7,8 @@ export default function Home() {
   const [campanhas, setCampanhas] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
+
+  const [campanhaAberta, setCampanhaAberta] = useState(null);
 
   useEffect(() => {
     const fetchCampanhas = async () => {
@@ -57,7 +60,9 @@ export default function Home() {
               </div>
 
               <div className="cartao-acoes">
-                <button type="button" className="cartao-saiba-mais">Saiba mais</button>
+                <button type="button" className="cartao-saiba-mais"
+                  onClick={() => setCampanhaAberta(c)}> Saiba mais 
+                </button>
               </div>
 
               <p className="cartao-descricao">{c.descricao}</p>
@@ -69,6 +74,10 @@ export default function Home() {
             <p>Nenhuma campanha encontrada.</p>
           </div>
         )
+      )}
+
+      {campanhaAberta && (
+        <ModalCampanha campanha={campanhaAberta} aoFechar={() => setCampanhaAberta(null)} />
       )}
 
     </div>

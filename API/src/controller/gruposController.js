@@ -71,8 +71,12 @@ endpoints.delete('/grupo/:id', getAuthentication(), somenteCriadorGrupo, async (
         resp.send({linhasAfetadas});
     }
     catch (error) {
-        resp.status(400).send({
-            erro: error.message
+        if (!error.status) console.error(error);
+
+        resp.status(error.status || 500).json({
+            erro: error.status
+                ? error.message
+                : 'Não foi possível excluir o grupo.'
         });
     }
 });

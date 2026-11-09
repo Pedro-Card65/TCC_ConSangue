@@ -161,6 +161,15 @@ export function permissaoMembro(permitirProprio = false) {
             );
             if (!linhas.length) return negar(resp, 404, 'Membro não encontrado.');
             const membro = linhas[0];
+            
+            if (membro.id_usuario === membro.id_criador) {
+                return negar(
+                    resp,
+                    403,
+                    'O criador não pode ser removido ou rebaixado do próprio grupo.'
+                );
+            }
+
             if (membro.id_criador !== req.user.id_usuario &&
                 membro.admin_id === null &&
                 !(permitirProprio && membro.id_usuario === req.user.id_usuario)) {

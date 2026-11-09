@@ -94,16 +94,47 @@ export async function editarGrupo(grupo, id) {
     return linhasAfetadas;
 };
 
+
 export async function apagarGrupo(id) {
-    const command = `
-        DELETE FROM grupos
-            WHERE id_grupo = ?
-    `
+    const conexao = await con.getConnection();
 
-    const [linhas] = await con.query(command, [
-        id
-    ])
+    try {
+        await conexao.beginTransaction();
 
-    let linhasAfetadas = linhas.affectedRows;
-    return linhasAfetadas;
-};
+        const [vinculos] = await conexao.execute(
+            `SELECT id_grupo_campanha
+             FROM grupos_campanhas
+             WHERE id_grupo = ?
+             LIMIT 1`,
+            [id]
+        );
+
+        if (vinculos.length > 0) {
+            const erro = new Error(
+                'Desvincule as campanhas antes de excluir o grupo.'
+            );
+            erro.status = 409;
+            throw erro;
+        }
+
+        await conexao.execute(
+            'DELETE FROM membros_grupo WHERE id_grupo = ?',
+            [id]
+        );
+
+        const [resultado] = await conexao.execute(
+            'DELETE FROM grupos WHERE id_grupo = ?',
+            [id]
+        );
+
+        await conexao.commit();
+        return resultado.affectedRows;
+
+    } catch (erro) {
+        await conexao.rollback();
+        throw erro;
+
+    } finally {
+        conexao.release();
+    }
+}

@@ -13,3 +13,6 @@ const con = mysql.createPool({
 });
 
 await con.query('SELECT 1');
+
+console.log('-> Conectou com MySQL!');
+export { con };

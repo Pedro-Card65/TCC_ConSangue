@@ -142,7 +142,7 @@ export default function InformacoesLaterais() {
       <div className="cartao" aria-busy={carregando}>
         <div className="foto-nome-user">
           <div className="foto-perfil-reservada">
-            <img src="/assets/icons/banido.png" alt="" />
+            <img src={usuario?.foto_perfil || '/assets/icons/perfil-vermelho.webp'} alt="" />
           </div>
           <h3>{usuario ? abreviarNome(usuario.nome) : 'Usuário'}</h3>
         </div>
@@ -157,7 +157,7 @@ export default function InformacoesLaterais() {
             </div>
             <div className="dados-usuario">
               <p>{usuario.nome || 'Nome não informado'}</p>
-              <p>{usuario.cidade || 'Cidade não informada'}</p>
+              <p>Cidade: {usuario.cidade || 'Não informada'}</p>
               <p>Tipo Sanguíneo: {usuario.tipo_sanguineo || 'Não informado'}</p>
             </div>
           </div>

@@ -1,6 +1,6 @@
 import './index.scss';
 import LogoSlogan from '../../componentes/logo-slogan/logo-slogan.jsx';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { api } from '../../services/api.js';
 
 const STATUS = {
@@ -11,6 +11,38 @@ const STATUS = {
 
 const formatarData = (d) => (d ? new Date(d).toLocaleDateString('pt-BR') : '—');
 
+const AVATAR_PADRAO = '/assets/icons/perfil-vermelho.webp';
+const FOTO_TAMANHO = 256;
+
+function carregarImagem(arquivo) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(arquivo);
+    const img = new Image();
+    img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('imagem inválida')); };
+    img.src = url;
+  });
+}
+
+// recorte quadrado central, 256x256, JPEG qualidade 0.8
+async function redimensionarFoto(arquivo) {
+  const img = await carregarImagem(arquivo);
+  const lado = Math.min(img.naturalWidth, img.naturalHeight);
+  const sx = (img.naturalWidth - lado) / 2;
+  const sy = (img.naturalHeight - lado) / 2;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = FOTO_TAMANHO;
+  canvas.height = FOTO_TAMANHO;
+
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, FOTO_TAMANHO, FOTO_TAMANHO);
+  ctx.drawImage(img, sx, sy, lado, lado, 0, 0, FOTO_TAMANHO, FOTO_TAMANHO);
+
+  return canvas.toDataURL('image/jpeg', 0.8);
+}
+
 
 export default function User() {
 
@@ -20,6 +52,10 @@ export default function User() {
   const [historico, setHistorico] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState(false);
+  const [fotoPerfil, setFotoPerfil] = useState(null);
+  const [salvandoFoto, setSalvandoFoto] = useState(false);
+  const [erroFoto, setErroFoto] = useState('');
+  const fotoInputRef = useRef(null);
 
   useEffect(() => {
   let ativo = true;
@@ -55,6 +91,7 @@ export default function User() {
       });
 
       setUsuario(u);
+      setFotoPerfil(u.foto_perfil ?? null);
       setEstatisticas({
         grupos: listaGrupos.length,
         participadas: listaParts.filter((p) => p.status === 'comparecimento_informado').length,
@@ -76,6 +113,48 @@ export default function User() {
   carregar();
   return () => { ativo = false; };
 }, []);
+
+  async function enviarFoto(foto) {
+    const token = sessionStorage.getItem('token');
+
+    setSalvandoFoto(true);
+    setErroFoto('');
+
+    try {
+      await api.put(
+        '/api/usuarios/foto',
+        { foto },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setFotoPerfil(foto);
+    } catch (e) {
+      setErroFoto(e.response?.data?.erro || 'Não foi possível salvar a foto.');
+    } finally {
+      setSalvandoFoto(false);
+    }
+  }
+
+  async function aoEscolherFoto(e) {
+    const arquivo = e.target.files?.[0];
+    e.target.value = '';
+
+    if (!arquivo) return;
+
+    if (!arquivo.type.startsWith('image/')) {
+      setErroFoto('Selecione um arquivo de imagem.');
+      return;
+    }
+
+    setErroFoto('');
+
+    try {
+      const foto = await redimensionarFoto(arquivo);
+      await enviarFoto(foto);
+    } catch {
+      setErroFoto('Não foi possível processar essa imagem.');
+    }
+  }
+
     if (carregando) return <p>Carregando perfil...</p>;
     if (!sessionStorage.getItem('token')) return <p>Faça login para ver seu perfil.</p>;
     if (erro || !usuario) return <p role="alert">Não foi possível carregar o perfil.</p>;
@@ -102,7 +181,39 @@ export default function User() {
           </div>
 
           <div className="conteudo-informacoes-usuario">
-            <img src="/assets/icons/banido.png" alt="Foto do usuário" />
+            <div className="coluna-foto">
+              <button
+                type="button"
+                className="botao-foto"
+                title="Alterar foto"
+                aria-label="Alterar foto"
+                disabled={salvandoFoto}
+                onClick={() => fotoInputRef.current?.click()}
+              >
+                <img
+                  className="foto-usuario"
+                  src={fotoPerfil || AVATAR_PADRAO}
+                  alt="Foto do usuário"
+                />
+              </button>
+
+              <input
+                ref={fotoInputRef}
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={aoEscolherFoto}
+              />
+
+              {fotoPerfil && !salvandoFoto && (
+                <button type="button" className="botao-remover-foto" onClick={() => enviarFoto(null)}>
+                  Remover foto
+                </button>
+              )}
+
+              {salvandoFoto && <span className="status-foto">Salvando...</span>}
+              {erroFoto && <span className="erro-foto" role="alert">{erroFoto}</span>}
+            </div>
 
             <div className="coluna-user-1">
               <p>{usuario.nome}</p>

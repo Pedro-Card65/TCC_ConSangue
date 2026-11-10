@@ -1,4 +1,4 @@
-/* import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { api } from '../services/api';
 
@@ -61,4 +61,3 @@ export default function RotaProtegida() {
 
     return <Outlet />;
 }
- */

@@ -1,6 +1,7 @@
 import './index.scss';
 import LogoSlogan from '../../componentes/logo-slogan/logo-slogan.jsx';
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api.js';
 
 const STATUS = {
@@ -56,6 +57,32 @@ export default function User() {
   const [salvandoFoto, setSalvandoFoto] = useState(false);
   const [erroFoto, setErroFoto] = useState('');
   const fotoInputRef = useRef(null);
+  const navigate = useNavigate();
+  const [confirmandoExclusao, setConfirmandoExclusao] = useState(false);
+  const [excluindo, setExcluindo] = useState(false);
+  const [erroExclusao, setErroExclusao] = useState('');
+
+  async function excluirConta() {
+    const token = sessionStorage.getItem('token');
+    setExcluindo(true);
+    setErroExclusao('');
+    try {
+      await api.delete(`/api/usuarios/deletar/certeza/${usuario.id_usuario}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('usuario');
+      navigate('/', { replace: true });
+    } catch (erro) {
+      setErroExclusao(
+        erro.response?.status === 409
+          ? 'Não é possível excluir: há grupos ou participações vinculados.'
+          : erro.response?.data?.erro || 'Não foi possível excluir a conta.'
+      );
+    } finally {
+      setExcluindo(false);
+    }
+  }
 
   useEffect(() => {
   let ativo = true;
@@ -94,12 +121,12 @@ export default function User() {
       setFotoPerfil(u.foto_perfil ?? null);
       setEstatisticas({
         grupos: listaGrupos.length,
-        participadas: listaParts.filter((p) => p.status === 'comparecimento_informado').length,
-        interesse: listaParts.filter((p) => p.status === 'interessado').length,
+        participadas: listaParts.filter((p) => p.status_participacao === 'comparecimento_informado').length,
+        interesse: listaParts.filter((p) => p.status_participacao === 'interessado').length,
       });
       setProximaCampanha(
         cruzadas
-          .filter((p) => p.status === 'pretende_ir' && new Date(p.data_prevista) > new Date())
+          .filter((p) => p.status_participacao === 'pretende_ir' && new Date(p.data_prevista) > new Date())
           .sort((a, b) => new Date(a.data_prevista) - new Date(b.data_prevista))[0] || null
       );
       setHistorico(cruzadas);
@@ -281,7 +308,7 @@ export default function User() {
                   </div>
 
                   <div className="confirmacao">
-                    <h2>{STATUS[proximaCampanha.status]?.texto}</h2>
+                    <h2>{STATUS[proximaCampanha.status_participacao]?.texto}</h2>
                   </div>
                 </div>
 
@@ -307,11 +334,11 @@ export default function User() {
                   <li className="informacoes-historico-campanhas" key={h.id_participacao ?? h.id_campanha}>
                     <p>
                       {h.nome_campanha} — {h.nome_hemo} •{' '}
-                      {h.status === 'comparecimento_informado' ? 'Realizada em' : 'Interesse em'}{' '}
+                      {h.status_participacao === 'comparecimento_informado' ? 'Realizada em' : 'Interesse em'}{' '}
                       {formatarData(h.data)}
                     </p>
-                    <span className={`status-historico ${STATUS[h.status]?.classe}`}>
-                      {STATUS[h.status]?.texto}
+                    <span className={`status-historico ${STATUS[h.status_participacao]?.classe}`}>
+                      {STATUS[h.status_participacao]?.texto}
                     </span>
                   </li>
                 ))}
@@ -323,6 +350,38 @@ export default function User() {
         </div>
 
       </section>
+
+      <div className="area-excluir">
+        <button type="button" className="botao-excluir-conta" onClick={() => setConfirmandoExclusao(true)}>
+          Excluir conta
+        </button>
+      </div>
+
+      {confirmandoExclusao && (
+        <div className="excluir-fundo" onClick={() => { if (!excluindo) setConfirmandoExclusao(false); }}>
+          <div
+            className="excluir-caixa"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="titulo-excluir-conta"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 id="titulo-excluir-conta">Excluir sua conta?</h2>
+            <p>Essa ação é permanente e não pode ser desfeita.</p>
+
+            {erroExclusao && <p role="alert" className="erro-excluir">{erroExclusao}</p>}
+
+            <div className="excluir-acoes">
+              <button type="button" disabled={excluindo} onClick={() => setConfirmandoExclusao(false)}>
+                Cancelar
+              </button>
+              <button type="button" className="confirmar-excluir" disabled={excluindo} onClick={excluirConta}>
+                {excluindo ? 'Excluindo...' : 'Sim, excluir'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

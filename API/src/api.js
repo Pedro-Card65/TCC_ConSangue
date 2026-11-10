@@ -5,7 +5,7 @@ import { addRoutes } from './routes.js';
 
 const api = express();
 api.use(cors());
-api.use(express.json());
+api.use(express.json({ limit: '1mb' }));
 addRoutes(api);
 
 const port = Number(process.env.PORT || 3000);

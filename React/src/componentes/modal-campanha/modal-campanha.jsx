@@ -85,6 +85,21 @@ export default function ModalCampanha({ campanha, aoFechar }) {
     finally { setSalvando(false); }
   }
 
+  async function removerInteresse() {
+    if (salvando || carregando || !participacao) return;
+    setSalvando(true);
+    setErro('');
+    setMensagem('');
+    try {
+      await api.delete(`/api/participacoes/${participacao.id_registro}`, { headers });
+      setParticipacao(null);
+      setGrupo('');
+      setMostrarGrupos(false);
+      setMensagem('Interesse removido.');
+    } catch (error) { setErro(error.response?.data?.erro || 'Não foi possível remover seu interesse.'); }
+    finally { setSalvando(false); }
+  }
+
   function teclado(evento) {
     if (evento.key === 'Escape' && !salvando) aoFechar();
     if (evento.key !== 'Tab') return;
@@ -145,8 +160,8 @@ export default function ModalCampanha({ campanha, aoFechar }) {
         {candidato && campanha.status_campanha === 'ativa' && <>
           <div className="modal-acoes">
             <button type="button" disabled={carregando || salvando} onClick={carregarGrupos}>Participar com meu grupo</button>
-            <button type="button" disabled={carregando || salvando || Boolean(participacao)} onClick={() => participar()}>
-              {participacao ? 'Participação registrada' : salvando ? 'Salvando...' : 'Tenho interesse'}
+            <button type="button" disabled={carregando || salvando} onClick={participacao ? removerInteresse : () => participar()}>
+              {salvando ? 'Salvando...' : participacao ? 'Remover interesse' : 'Tenho interesse'}
             </button>
           </div>
           {mostrarGrupos && <div className="selecao-grupo">

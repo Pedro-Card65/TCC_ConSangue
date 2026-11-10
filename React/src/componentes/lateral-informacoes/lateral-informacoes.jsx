@@ -100,7 +100,7 @@ export default function InformacoesLaterais() {
             const data = dataISO(participacao.data_prevista);
 
             return (
-              participacao.status_participacao === 'pretende_ir' &&
+              ['pretende_ir', 'interessado'].includes(participacao.status_participacao) &&
               campanha?.status_campanha === 'ativa' &&
               (!data || data >= hoje)
             );

@@ -1,5 +1,5 @@
-
 import * as dbCampanhas from '../repository/campanhasRepository.js';
+import { erroHttp } from '../utils/erroHttp.js';
 
 function validarId(valor, campo = 'ID') {
     const id = Number(valor);
@@ -8,7 +8,7 @@ function validarId(valor, campo = 'ID') {
         !/^[1-9]\d*$/.test(String(valor)) ||
         !Number.isSafeInteger(id)
     ) {
-        throw new Error(`${campo} inválido.`);
+        throw erroHttp(400, `${campo} inválido.`);
     }
 
     return id;
@@ -19,7 +19,7 @@ function validarData(valor, campo) {
         typeof valor !== 'string' ||
         !/^\d{4}-\d{2}-\d{2}$/.test(valor)
     ) {
-        throw new Error(`${campo} inválida.`);
+        throw erroHttp(400, `${campo} inválida.`);
     }
 
     const data = new Date(`${valor}T00:00:00Z`);
@@ -28,7 +28,7 @@ function validarData(valor, campo) {
         Number.isNaN(data.getTime()) ||
         data.toISOString().slice(0, 10) !== valor
     ) {
-        throw new Error(`${campo} inválida.`);
+        throw erroHttp(400, `${campo} inválida.`);
     }
 
     return valor;
@@ -43,7 +43,7 @@ function validarHorario(valor, campo) {
         typeof valor !== 'string' ||
         !/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/.test(valor)
     ) {
-        throw new Error(`${campo} inválido.`);
+        throw erroHttp(400, `${campo} inválido.`);
     }
 
     return valor.length === 5
@@ -57,7 +57,7 @@ function validarDadosCampanha(campanha) {
         typeof campanha !== 'object' ||
         Array.isArray(campanha)
     ) {
-        throw new Error('Dados da campanha inválidos.');
+        throw erroHttp(400, 'Dados da campanha inválidos.');
     }
 
     const id_hemocentro = validarId(
@@ -69,13 +69,14 @@ function validarDadosCampanha(campanha) {
         typeof campanha.nome_campanha !== 'string' ||
         !campanha.nome_campanha.trim()
     ) {
-        throw new Error('Nome da campanha é obrigatório.');
+        throw erroHttp(400, 'Nome da campanha é obrigatório.');
     }
 
     const nome_campanha = campanha.nome_campanha.trim();
 
     if (nome_campanha.length > 100) {
-        throw new Error(
+        throw erroHttp(
+            400,
             'O nome da campanha pode ter até 100 caracteres.'
         );
     }
@@ -84,7 +85,7 @@ function validarDadosCampanha(campanha) {
 
     if (campanha.descricao != null) {
         if (typeof campanha.descricao !== 'string') {
-            throw new Error('Descrição inválida.');
+            throw erroHttp(400, 'Descrição inválida.');
         }
 
         descricao = campanha.descricao.trim() || null;
@@ -101,7 +102,8 @@ function validarDadosCampanha(campanha) {
     );
 
     if (data_inicio > data_fim) {
-        throw new Error(
+        throw erroHttp(
+            400,
             'A data de início não pode ser maior que a data de término.'
         );
     }
@@ -122,7 +124,8 @@ function validarDadosCampanha(campanha) {
         horario_fim !== null &&
         horario_inicio >= horario_fim
     ) {
-        throw new Error(
+        throw erroHttp(
+            400,
             'O horário de término deve ser posterior ao horário de início.'
         );
     }
@@ -130,7 +133,8 @@ function validarDadosCampanha(campanha) {
     const statusPermitidos = ['ativa', 'encerrada'];
 
     if (!statusPermitidos.includes(campanha.status_campanha)) {
-        throw new Error(
+        throw erroHttp(
+            400,
             "O status deve ser 'ativa' ou 'encerrada'."
         );
     }
@@ -163,7 +167,7 @@ export async function listarCampanhasPorNomeService(nome) {
         !nome.trim() ||
         nome.trim().length > 100
     ) {
-        throw new Error('Nome de busca inválido.');
+        throw erroHttp(400, 'Nome de busca inválido.');
     }
 
     return dbCampanhas.listarCampanhasPorNome(nome.trim());

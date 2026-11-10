@@ -61,12 +61,12 @@ h1 {
             &:focus-within {
                 border-color: #AD2626;
             }
-            
+
             img {
                 width: 1.5rem;
                 height: 1rem;
                 padding-left: 0.5rem;
-                object-fit: contain; 
+                object-fit: contain;
 
             }
 
@@ -134,9 +134,9 @@ h1 {
             cursor: pointer;
 
             &:focus {
-                    outline: none;
-                    border-color: #AD2626;
-                }
+                outline: none;
+                border-color: #AD2626;
+            }
         }
     }
 
@@ -153,6 +153,11 @@ h1 {
             border-radius: 0.5rem;
             border: solid 0.15rem rgb(228, 228, 228);
             cursor: pointer;
+
+            &:focus {
+                outline: none;
+                border-color: #AD2626;
+            }
         }
     }
 

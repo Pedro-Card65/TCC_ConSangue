@@ -11,8 +11,8 @@
         cursor: pointer;
     }
 
-    
-    .b2{
+
+    .b2 {
 
         h1 {
             display: flex;
@@ -21,54 +21,54 @@
             font-weight: 400;
             color: #AD2626;
         }
-        
+
         .botoes {
             display: flex;
             gap: 1rem;
 
             button {
                 border-radius: 0.625rem;
-                
+
             }
 
-            button#criar{
-            display: flex;
+            button#criar {
+                display: flex;
 
-            align-items: center;
-            justify-content: center;
-            gap: 0.2rem;
+                align-items: center;
+                justify-content: center;
+                gap: 0.2rem;
 
-            width: 15.0625rem;
-            height: 3.1875rem;
+                width: 15.0625rem;
+                height: 3.1875rem;
 
-            background-color: #AD2626;
-            color: white;
-            border: none;
-            /* border-radius: ; */
+                background-color: #AD2626;
+                color: white;
+                border: none;
+                /* border-radius: ; */
 
             }
 
             button#entrar {
                 display: flex;
 
-            align-items: center;
-            justify-content: center;
-            gap: 0.2rem;
+                align-items: center;
+                justify-content: center;
+                gap: 0.2rem;
 
-            width: 13.125rem;
-            height: 3.1875rem;
+                width: 13.125rem;
+                height: 3.1875rem;
 
-            background-color: white;
-            color: #AD2626;
-            border: solid 2px #AD2626;
+                background-color: white;
+                color: #AD2626;
+                border: solid 2px #AD2626;
             }
         }
     }
 
     img {
-            width: 2.125rem;
-            height: 1.625rem;
-        }
+        width: 2.125rem;
+        height: 1.625rem;
+    }
 
 
     .grupos .gru {
@@ -82,18 +82,18 @@
 
 
         gap: 2rem;
-        
+
 
         .gru {
             display: flex;
             flex-direction: column;
             height: auto;
-
-
-            border-radius: 0.625rem;
-            border: solid 2px #D9D9D9;
             background-color: white;
-            
+            border-radius: 0.5rem;
+            box-sizing: border-box;
+            justify-content: start;
+            box-shadow: 0px 0px 15px rgb(233, 233, 233);
+
             align-items: start;
             padding: 1rem;
             gap: 1rem;
@@ -116,18 +116,18 @@
                 width: 1.1875rem;
                 height: 1.4375rem;
             }
-            
+
             .titulo {
                 display: flex;
                 gap: 1rem;
                 align-items: center;
-                
+
 
                 .text {
-                display: flex;
-                flex-direction: column;
-                
-                margin-right: 8rem;
+                    display: flex;
+                    flex-direction: column;
+
+                    margin-right: 8rem;
 
                 }
 
@@ -140,7 +140,7 @@
 
                 width: 8.25rem;
                 height: 1.6875rem;
-                
+
                 background-color: #AD2626;
                 color: white;
 

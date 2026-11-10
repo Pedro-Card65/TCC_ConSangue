@@ -24,114 +24,13 @@ function normalizarLista(resposta, chave) {
 }
 
 export default function ParticipacoesHistorico() {
-  const [participacoes, setParticipacoes] = useState([]);
-  const [campanhas, setCampanhas] = useState([]);
-  const [grupos, setGrupos] = useState([]);
-  const [carregando, setCarregando] = useState(true);
-  const [erro, setErro] = useState('');
 
-  useEffect(() => {
-    let ativo = true;
-
-    async function carregar() {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setErro('Faça login para consultar suas participações.');
-        setCarregando(false);
-        return;
-      }
-
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      try {
-        const [resParticipacoes, resCampanhas, resUsuario] = await Promise.all([
-          api.get('/api/participacoes', config),
-          api.get('/campanhas'),
-          api.get('/api/usuarios/me', config),
-        ]);
-        const listaParticipacoes = normalizarLista(resParticipacoes, 'participacoes');
-        const listaCampanhas = normalizarLista(resCampanhas, 'campanhas');
-        const usuario = resUsuario.data?.usuario ?? resUsuario.data;
-        let listaGrupos = [];
-
-        if (usuario?.id_usuario != null) {
-          try {
-            const resGrupos = await api.get(`/grupos/usuario/${usuario.id_usuario}`, config);
-            listaGrupos = normalizarLista(resGrupos, 'grupos');
-          } catch {
-            // O histórico continua disponível mesmo se a consulta de grupos falhar.
-          }
-        }
-
-        if (!ativo) return;
-        setParticipacoes(listaParticipacoes);
-        setCampanhas(listaCampanhas);
-        setGrupos(listaGrupos);
-      } catch {
-        if (ativo) setErro('Não foi possível carregar suas participações. Tente novamente mais tarde.');
-      } finally {
-        if (ativo) setCarregando(false);
-      }
-    }
-
-    carregar();
-    return () => { ativo = false; };
-  }, []);
-
-  const campanhasPorId = new Map(campanhas.map((campanha) => [String(campanha.id_campanha), campanha]));
-  const gruposPorId = new Map(grupos.map((grupo) => [String(grupo.id_grupo), grupo]));
-  const registros = participacoes.map((participacao) => {
-    const campanha = campanhasPorId.get(String(participacao.id_campanha)) ?? {};
-    const vinculo = campanha.id_grupo_campanha != null
-      ? grupos.find((grupo) => String(grupo.id_grupo_campanha) === String(campanha.id_grupo_campanha))
-      : null;
-    const grupo = vinculo
-      ? gruposPorId.get(String(vinculo.id_grupo))
-      : gruposPorId.get(String(participacao.id_grupo));
-    return { ...participacao, ...campanha, nomeGrupo: grupo?.nome_grupo ?? grupo?.nome ?? '' };
-  });
-
-  const agora = new Date();
-  const proximas = registros
-    .filter((item) => item.status_participacao === 'pretende_ir' && item.data_prevista && new Date(`${String(item.data_prevista).slice(0, 10)}T00:00:00`) >= new Date(agora.toDateString()))
-    .sort((a, b) => new Date(a.data_prevista) - new Date(b.data_prevista));
-  const proxima = proximas[0];
-  const historico = registros.filter((item) => item !== proxima);
-
-  function nomeHospital(item) {
-    return item.nome_hemo ?? item.nome_instituicao ?? item.nome_hospital ?? 'Instituição não informada';
-  }
-
-  function enderecoHospital(item) {
-    const local = [item.endereco, item.numero].filter(Boolean).join(', ');
-    return [local, [item.cidade, item.estado].filter(Boolean).join(' - ')].filter(Boolean).join(' • ');
-  }
-
-  function cartao(item) {
-    return (
-      <div className="participacoes" key={item.id_registro}>
-        <h2>{item.nome_campanha ?? 'Campanha sem nome'} - {nomeHospital(item)}</h2>
-        {enderecoHospital(item) && <p>{enderecoHospital(item)}</p>}
-        <p>{formatarData(item.data_prevista)}{item.horario_previsto ? ` • ${String(item.horario_previsto).slice(0, 5)}` : ''}</p>
-        {item.nomeGrupo && <p>Grupo: {item.nomeGrupo}</p>}
-        <div className="partBaixo">
-          <p>Status: {STATUS[item.status_participacao] ?? item.status_participacao ?? 'Não informado'}</p>
-          {item.status_participacao !== 'comparecimento_informado' && (
-            <button type="button" onClick={async () => {
-              const token = localStorage.getItem('token');
-              try {
-                await api.delete(`/api/participacoes/${item.id_registro}`, {
-                  headers: { Authorization: `Bearer ${token}` },
-                });
-                setParticipacoes((atuais) => atuais.filter((registro) => registro.id_registro !== item.id_registro));
-              } catch {
-                setErro('Não foi possível cancelar esta participação.');
-              }
-            }}>Cancelar presença</button>
-          )}
-        </div>
-      </div>
-    );
-  }
+  let nomeCampanha = []
+  let nomeHospital = [];
+  let endereco = [];
+  let data = [];
+  let grupo = [];
+  let status = [];
 
   return (
     <div className="pagina-participacaoHistorico">

@@ -1,4 +1,5 @@
 import * as dbMembro from '../repository/membros_grupoRepository.js';
+import { erroHttp } from '../utils/erroHttp.js';
 
 const PAPEIS = ['administrador', 'membro'];
 
@@ -6,7 +7,7 @@ function validarId(valor, campo) {
     const id = Number(valor);
 
     if (!Number.isInteger(id) || id <= 0) {
-        throw new Error(`${campo} inválido`);
+        throw erroHttp(400, `${campo} inválido`);
     }
 
     return id;
@@ -18,7 +19,7 @@ export async function entrarGrupoService(membro) {
     const papel = membro.papel ?? 'membro';
 
     if (!PAPEIS.includes(papel)) {
-        throw new Error("Papel deve ser 'administrador' ou 'membro'");
+        throw erroHttp(400, "Papel deve ser 'administrador' ou 'membro'");
     }
 
     return dbMembro.entrarGrupo({ id_usuario, id_grupo, papel });
@@ -36,13 +37,13 @@ export async function editarPapelService(id, papel) {
     const idMembro = validarId(id, 'ID do membro');
 
     if (!PAPEIS.includes(papel)) {
-        throw new Error("Papel deve ser 'administrador' ou 'membro'");
+        throw erroHttp(400, "Papel deve ser 'administrador' ou 'membro'");
     }
 
     const linhas = await dbMembro.editarPapel(idMembro, papel);
 
     if (linhas === 0) {
-        throw new Error('Membro não encontrado');
+        throw erroHttp(404, 'Membro não encontrado');
     }
 
     return linhas;
@@ -52,7 +53,7 @@ export async function removerMembroService(id) {
     const linhas = await dbMembro.removerMembro(validarId(id, 'ID do membro'));
 
     if (linhas === 0) {
-        throw new Error('Membro não encontrado');
+        throw erroHttp(404, 'Membro não encontrado');
     }
 
     return linhas;

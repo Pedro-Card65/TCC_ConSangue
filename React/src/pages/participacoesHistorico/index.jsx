@@ -34,7 +34,7 @@ export default function ParticipacoesHistorico() {
     let ativo = true;
 
     async function carregar() {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       if (!token) {
         setErro('Faça login para consultar suas participações.');
         setCarregando(false);
@@ -117,7 +117,7 @@ export default function ParticipacoesHistorico() {
           <p>Status: {STATUS[item.status_participacao] ?? item.status_participacao ?? 'Não informado'}</p>
           {item.status_participacao !== 'comparecimento_informado' && (
             <button type="button" onClick={async () => {
-              const token = localStorage.getItem('token');
+              const token = sessionStorage.getItem('token');
               try {
                 await api.delete(`/api/participacoes/${item.id_registro}`, {
                   headers: { Authorization: `Bearer ${token}` },
@@ -143,7 +143,7 @@ export default function ParticipacoesHistorico() {
             {proxima ? cartao(proxima) : <p>Você não tem participações agendadas.</p>}
             <h1>Histórico</h1>
             <div className="historico">
-              {historico.length ? historico.map(cartao) : <p>Você ainda não tem histórico de participações.</p>}
+              {historico.length ? historico.map(cartao) : <p>Participe para consultar suas participações.</p>}
             </div>
           </>
         )}

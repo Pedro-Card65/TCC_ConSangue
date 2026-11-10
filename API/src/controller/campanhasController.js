@@ -4,7 +4,22 @@ import * as service from '../service/campanhasService.js';
 import { Router } from "express";
 const endpoints = Router();
 
-//Finalizado
+function tratarErro(resp, error) {
+    if (error.status) {
+        return resp.status(error.status).json({ erro: error.message });
+    }
+
+    if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+        return resp.status(409).json({ erro: 'Hemocentro informado não existe.' });
+    }
+
+    if (error.code === 'ER_DUP_ENTRY') {
+        return resp.status(409).json({ erro: 'Já existe um registro com esses dados.' });
+    }
+
+    console.error(error);
+    return resp.status(500).json({ erro: 'Erro interno ao processar a solicitação.' });
+}
 
 endpoints.post('/campanhas', getAuthentication(u => u.tipo_usuario === 'instituicao'), somenteMinhaInstituicaoNoBody, async (req, resp) => {
     try {
@@ -12,11 +27,9 @@ endpoints.post('/campanhas', getAuthentication(u => u.tipo_usuario === 'institui
 
         let id_campanha = await service.criarCampanhaService(campanha);
         resp.send({ id_campanha });
-    } 
+    }
     catch (error) {
-        resp.status(400).send({ 
-            erro: error.message 
-        });
+        tratarErro(resp, error);
     }
 });
 
@@ -28,9 +41,7 @@ endpoints.get('/campanhas', async (req, resp) => {
         resp.send({ campanhas });
     }
     catch (error) {
-        resp.status(400).send({
-            erro: error.message
-        });
+        tratarErro(resp, error);
     }
 });
 
@@ -41,9 +52,7 @@ endpoints.get('/campanhas/hemocentro/:id', async (req, resp) => {
         resp.send({ campanhas });
     }
     catch (error) {
-        resp.status(400).send({
-            erro: error.message
-        });
+        tratarErro(resp, error);
     }
 });
 
@@ -56,9 +65,7 @@ endpoints.put('/campanhas/:id', getAuthentication(u => u.tipo_usuario === 'insti
         resp.send({ linhas });
     }
     catch (error) {
-        resp.status(400).send({
-            erro: error.message
-        });
+        tratarErro(resp, error);
     }
 });
 
@@ -69,7 +76,7 @@ endpoints.delete('/campanhas/:id', getAuthentication(u => u.tipo_usuario === 'in
         let linhas = await service.apagarCampanhaService(id_campanha);
         resp.send({ linhas });
     }
-    
+
     catch (error) {
         if (error.code === 'ER_ROW_IS_REFERENCED_2') {
             return resp.status(409).json({

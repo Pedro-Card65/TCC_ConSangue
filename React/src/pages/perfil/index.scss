@@ -112,12 +112,59 @@ $largura-central: 600px;
     align-items: start;
     padding: 16px 18px;
 
-    > img {
+    .coluna-foto {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
       width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      object-fit: cover;
       align-self: center;
+
+      .botao-foto {
+        padding: 0;
+        border: 0;
+        background: none;
+        border-radius: 50%;
+        cursor: pointer;
+
+        &:disabled {
+          cursor: progress;
+          opacity: .6;
+        }
+      }
+
+      .foto-usuario {
+        display: block;
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .botao-remover-foto {
+        padding: 0;
+        border: 0;
+        background: none;
+        font-size: 10px;
+        color: $cinza-texto;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+
+      .status-foto,
+      .erro-foto {
+        font-size: 10px;
+        line-height: 1.3;
+        text-align: center;
+      }
+
+      .status-foto {
+        color: $cinza-texto;
+      }
+
+      .erro-foto {
+        color: $vermelho;
+      }
     }
 
     p {

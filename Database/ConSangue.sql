@@ -13,6 +13,7 @@ CREATE TABLE usuarios (
     cidade VARCHAR(100) NOT NULL,
     tipo_sanguineo VARCHAR(3),
     tipo_usuario ENUM('candidato', 'instituicao') NOT NULL,
+    foto_perfil MEDIUMTEXT NULL,
     data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

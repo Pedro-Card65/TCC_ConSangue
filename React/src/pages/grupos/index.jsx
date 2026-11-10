@@ -4,96 +4,96 @@ export default function Grupos() {
   return (
     <div className="bloco">
 
-        <div className="b2">
-          
-          <h1>MEUS GRUPOS</h1>
+      <div className="b2">
 
-          <div className="botoes">
+        <h1>MEUS GRUPOS</h1>
 
-            <button id='criar'>
-              Criar novo grupo
-              <img src="/assets/icons/add.png" alt="" />
-            </button>
+        <div className="botoes">
 
-            <button id='entrar'>
-              Entrar com Código
-            </button>
+          <button id='criar'>
+            Criar novo grupo
+            <img src="/assets/icons/add.png" alt="" />
+          </button>
 
-          </div>
+          <button id='entrar'>
+            Entrar com Código
+          </button>
 
         </div>
 
-        <div className="grupos">
+      </div>
 
-          <div className="gru">
+      <div className="grupos">
 
-            <div className="titulo">
-              
-              <img src="/assets/grupo/mao.png" alt="" />
-                
-                <div className="text">
-                  
-                  <h2>Nome</h2>
-                  <p>Membros</p>
-                
-                </div>
+        <div className="gru">
 
-                <img src="/assets/icons/gotaAdd.png" alt="" id='gota'/>
+          <div className="titulo">
+
+            <img src="/assets/grupo/mao.png" alt="" />
+
+            <div className="text">
+
+              <h2>Nome</h2>
+              <p>Membros</p>
 
             </div>
 
-            <p classname='desc'>・Campanha + Amor - Hospital Abidas</p>
-            <button>Ver Grupo</button>
+            <img src="/assets/icons/gotaAdd.png" alt="" id='gota' />
 
           </div>
 
-          <div className="gru">
+          <p classname='desc'>・Campanha + Amor - Hospital Abidas</p>
+          <button>Ver Grupo</button>
 
-            <div className="titulo">
-              
-              <img src="/assets/grupo/group.png" alt="" />
-                
-                <div className="text">
-                  
-                  <h2>Nome</h2>
-                  <p>Membros</p>
-                
-                </div>
-
-                <img src="/assets/icons/gotaAdd.png" alt="" id='gota'/>
-
-            </div>
-
-            <p classname='desc'>・Campanha + Amor - Hospital Abidas</p>
-            <button>Ver Grupo</button>
-
-          </div>
-
-          <div className="gru">
-
-            <div className="titulo">
-              
-              <img src="/assets/grupo/heart.png" alt="" />
-                
-                <div className="text">
-                  
-                  <h2>Nome</h2>
-                  <p>Membros</p>
-                
-                </div>
-    
-                <img src="/assets/icons/gotaAdd.png" alt="" id='gota'/>
-
-            </div>
-
-            <p classname='desc'>・Campanha + Amor - Hospital Abidas</p>
-            <button>Ver Grupo</button>
-
-          </div>
-
-
-          
         </div>
+
+        <div className="gru">
+
+          <div className="titulo">
+
+            <img src="/assets/grupo/group.png" alt="" />
+
+            <div className="text">
+
+              <h2>Nome</h2>
+              <p>Membros</p>
+
+            </div>
+
+            <img src="/assets/icons/gotaAdd.png" alt="" id='gota' />
+
+          </div>
+
+          <p classname='desc'>・Campanha + Amor - Hospital Abidas</p>
+          <button>Ver Grupo</button>
+
+        </div>
+
+        <div className="gru">
+
+          <div className="titulo">
+
+            <img src="/assets/grupo/heart.png" alt="" />
+
+            <div className="text">
+
+              <h2>Nome</h2>
+              <p>Membros</p>
+
+            </div>
+
+            <img src="/assets/icons/gotaAdd.png" alt="" id='gota' />
+
+          </div>
+
+          <p classname='desc'>・Campanha + Amor - Hospital Abidas</p>
+          <button>Ver Grupo</button>
+
+        </div>
+
+
+
+      </div>
     </div>
   );
 }

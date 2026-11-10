@@ -21,44 +21,26 @@ export async function criarCampanha(campanha){
     return result.insertId;
 };
 
+// Os dados do hemocentro permitem pesquisar e exibir a localização real.
 export async function listarCampanhas(){
-    const command = `
-    select
-        id_campanha,
-        id_hemocentro,
-        nome_campanha,
-        descricao,
-        data_inicio,
-        data_fim,
-        horario_inicio,
-        horario_fim,
-        status_campanha
-    from campanhas `
-
-    const [linhas] = await con.query(command, []);
+    const [linhas] = await con.query(`
+        SELECT c.*, h.nome_hemo, h.endereco, h.cidade, h.estado, h.telefone_centro
+        FROM campanhas c
+        JOIN hemocentros h ON h.id_hemocentro = c.id_hemocentro
+        ORDER BY c.data_inicio DESC, c.id_campanha DESC
+    `);
     return linhas;
 };
 
 export async function listarCampanhasPorNome(nome){
-    const command = `
-    select
-        id_campanha,
-        id_hemocentro,
-        nome_campanha,
-        descricao,
-        data_inicio,
-        data_fim,
-        horario_inicio,
-        horario_fim,
-        status_campanha
-    from campanhas
-    where nome_campanha like ? `
-
-    const [result] = await con.query(command, [
-        `%${nome}%`
-    ]);
-
-    return result;
+    const [linhas] = await con.query(`
+        SELECT c.*, h.nome_hemo, h.endereco, h.cidade, h.estado, h.telefone_centro
+        FROM campanhas c
+        JOIN hemocentros h ON h.id_hemocentro = c.id_hemocentro
+        WHERE c.nome_campanha LIKE ? OR h.nome_hemo LIKE ?
+        ORDER BY c.data_inicio DESC, c.id_campanha DESC
+    `, [`%${nome}%`, `%${nome}%`]);
+    return linhas;
 };
 
 export async function listarCampanhasPorHemocentro(id_hemocentro){

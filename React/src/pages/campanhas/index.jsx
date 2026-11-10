@@ -1,30 +1,67 @@
 import './index.scss';
 import { useState, useEffect } from 'react';
 import { api } from '../../services/api.js';
+import ModalCampanha from '../../componentes/modal-campanha/modal-campanha.jsx';
+
+const filtrosIniciais = {
+  nome: '',
+  tipo_sanguineo: '',
+  cidade: '',
+  status: 'ativa'
+};
+
+function normalizar(texto) {
+  return (texto || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+}
+
+function dataFormatada(data) {
+  if (!data) {
+    return '';
+  }
+
+  return new Date(data).toLocaleDateString('pt-BR', {
+    timeZone: 'UTC'
+  });
+}
 
 export default function Campanhas() {
   const [campanhas, setCampanhas] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
+  const [tentativa, setTentativa] = useState(0);
+  const [filtros, setFiltros] = useState(filtrosIniciais);
+  const [aplicados, setAplicados] = useState(filtrosIniciais);
+  const [campanhaAberta, setCampanhaAberta] = useState(null);
 
   useEffect(() => {
-    let ativo = true;
+    const controle = new AbortController();
 
     async function buscarCampanhas() {
-      try {
-        const resposta = await api.get('/api/campanhas');
+      setCarregando(true);
+      setErro('');
 
-        if (ativo) {
-          setCampanhas(resposta.data.campanhas);
+      try {
+        const resposta = await api.get('/api/campanhas', {
+          signal: controle.signal
+        });
+
+        if (!controle.signal.aborted) {
+          setCampanhas(resposta.data.campanhas || []);
         }
       }
       catch (error) {
-        if (ativo) {
-          setErro(error.response?.data?.erro || 'Não foi possível carregar as campanhas. Tente novamente mais tarde.');
+        if (!controle.signal.aborted) {
+          setErro(
+            error.response?.data?.erro ||
+            'Não foi possível carregar as campanhas. Verifique se a API está ligada.'
+          );
         }
       }
       finally {
-        if (ativo) {
+        if (!controle.signal.aborted) {
           setCarregando(false);
         }
       }
@@ -33,94 +70,214 @@ export default function Campanhas() {
     buscarCampanhas();
 
     return () => {
-      ativo = false;
+      controle.abort();
     };
-  }, []);
+  }, [tentativa]);
+
+  function alterar(evento) {
+    const { name, value } = evento.target;
+
+    setFiltros({
+      ...filtros,
+      [name]: value
+    });
+  }
+
+  function pesquisar(evento) {
+    evento.preventDefault();
+    setAplicados({ ...filtros });
+  }
+
+  function limparFiltros() {
+    setFiltros(filtrosIniciais);
+    setAplicados(filtrosIniciais);
+  }
+
+  function tentarNovamente() {
+    setTentativa(tentativa + 1);
+  }
+
+  function fecharCampanha() {
+    setCampanhaAberta(null);
+  }
+
+  const cidades = [];
+
+  for (const campanha of campanhas) {
+    if (campanha.cidade && !cidades.includes(campanha.cidade)) {
+      cidades.push(campanha.cidade);
+    }
+  }
+
+  cidades.sort((primeira, segunda) => primeira.localeCompare(segunda, 'pt-BR'));
+
+  const resultados = campanhas.filter(campanha => {
+    const nome = normalizar(`${campanha.nome_campanha} ${campanha.nome_hemo || ''}`);
+    const busca = normalizar(aplicados.nome.trim());
+
+    const correspondeNome = nome.includes(busca);
+    const correspondeCidade = !aplicados.cidade || campanha.cidade === aplicados.cidade;
+    const correspondeStatus = !aplicados.status || campanha.status_campanha === aplicados.status;
+
+    return correspondeNome && correspondeCidade && correspondeStatus;
+  });
 
   return (
     <div className="pagina-campanhas">
 
-      <h1> CAMPANHAS </h1>
+      <h1>CAMPANHAS</h1>
 
-      <div className="pesquisa">
+      <form className="pesquisa" onSubmit={pesquisar}>
 
-        <div className='pesquisa-nome'>
+        <div className="pesquisa-nome">
           <label htmlFor="busca-campanha">
-            Pesquisar Campanhas/Hemocentros
+            Pesquisar campanhas/hemocentros
           </label>
 
-          <div className='barra-pesquisa'>
+          <div className="barra-pesquisa">
             <img src="/assets/icons/lupa.png" alt="" />
+
             <input
               id="busca-campanha"
-              type="text"
-              placeholder='Nome da Campanha' />
+              name="nome"
+              value={filtros.nome}
+              onChange={alterar}
+              placeholder="Nome da campanha ou hemocentro"
+            />
           </div>
         </div>
 
-        <fieldset className="pesquisa-tipos">
-          <legend>
-            Buscar por tipo
-          </legend>
+        <div className="filtro-tipo">
+          <label htmlFor="tipo-sanguineo">Tipo sanguíneo</label>
 
-          <div className="grupo-tipos-rapidos">
-            <button> O- </button>
-            <button> A- </button>
-            <button> AB- </button>
-          </div>
-        </fieldset>
+          <select
+            id="tipo-sanguineo"
+            name="tipo_sanguineo"
+            value={filtros.tipo_sanguineo}
+            onChange={alterar}
+            aria-describedby="aviso-tipos"
+          >
+            <option value="">Todos os tipos</option>
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
+            <option value="O+">O+</option>
+            <option value="O-">O-</option>
+          </select>
+        </div>
 
         <div className="filtro-cidade">
-          <label htmlFor="cidade">
-            Distrito/Cidade
-          </label>
+          <label htmlFor="cidade">Cidade</label>
 
-          <select id="cidade">
-            <option value="" disabled>Cidade</option>
-            <option value="sao-paulo">São Paulo</option>
-            <option value="sao-bernardo">São Bernardo</option>
-            <option value="diadema">Diadema</option>
-            <option value="campinas">Campinas</option>
+          <select
+            id="cidade"
+            name="cidade"
+            value={filtros.cidade}
+            onChange={alterar}
+          >
+            <option value="">Todas as cidades</option>
+
+            {cidades.map(cidade => (
+              <option key={cidade} value={cidade}>
+                {cidade}
+              </option>
+            ))}
           </select>
         </div>
 
         <div className="filtro-status">
-          <label htmlFor="status">
-            Status
-          </label>
+          <label htmlFor="status">Status</label>
 
-          <select id="status">
-            <option value="ativas" >Ativas</option>
-            <option value="finalizadas">Finalizadas</option>
-            
+          <select
+            id="status"
+            name="status"
+            value={filtros.status}
+            onChange={alterar}
+          >
+            <option value="">Todos</option>
+            <option value="ativa">Ativas</option>
+            <option value="encerrada">Finalizadas</option>
           </select>
         </div>
 
-        <button className='pesquisar'>Pesquisar</button>
+        <button className="pesquisar" type="submit" disabled={carregando}>
+          Pesquisar
+        </button>
 
-      </div>
+        <button type="button" onClick={limparFiltros}>
+          Limpar filtros
+        </button>
 
-      <section className="lista-campanhas" aria-label="Campanhas encontradas" aria-busy={carregando}>
+      </form>
 
-        {carregando && <p role="status">Carregando campanhas...</p>}
+      <p className="aviso-tipos" id="aviso-tipos">
+        O filtro por tipo sanguíneo ainda não altera os resultados da pesquisa.
+      </p>
 
-        {erro && <p className="erro-campanhas" role="alert">{erro}</p>}
+      <section
+        className="lista-campanhas"
+        aria-label="Campanhas encontradas"
+        aria-busy={carregando}
+      >
+
+        {carregando && (
+          <p role="status">Carregando campanhas...</p>
+        )}
+
+        {erro && (
+          <div role="alert">
+            <p>{erro}</p>
+
+            <button onClick={tentarNovamente}>
+              Tentar novamente
+            </button>
+          </div>
+        )}
 
         {!carregando && !erro && (
-          campanhas.length > 0 ? (
-            campanhas.map((campanha) => (
+          <>
+            <p role="status">{resultados.length} campanha(s) encontrada(s).</p>
+
+            {resultados.length === 0 && (
+              <p>Nenhuma campanha encontrada. Experimente mudar os filtros.</p>
+            )}
+
+            {resultados.map(campanha => (
               <article className="cartao-campanha" key={campanha.id_campanha}>
                 <h2>{campanha.nome_campanha}</h2>
+
+                <p>{campanha.nome_hemo} — {campanha.cidade}/{campanha.estado}</p>
                 <p>{campanha.descricao}</p>
-                <p>Status: {campanha.status_campanha}</p>
+
+                <p>
+                  De {dataFormatada(campanha.data_inicio)} a {dataFormatada(campanha.data_fim)}
+                </p>
+
+                <p>
+                  Status: {campanha.status_campanha === 'ativa' ? 'Ativa' : 'Finalizada'}
+                </p>
+
+                <button type="button" onClick={() => setCampanhaAberta(campanha)}>
+                  Ver detalhes e participar
+                </button>
               </article>
-            ))
-          ) : (
-            <p>Nenhuma campanha encontrada.</p>
-          )
+            ))}
+          </>
         )}
 
       </section>
+
+      {campanhaAberta && (
+        <ModalCampanha
+          key={campanhaAberta.id_campanha}
+          campanha={campanhaAberta}
+          aoFechar={fecharCampanha}
+        />
+      )}
+
     </div>
   );
 }

@@ -15,6 +15,14 @@ $branco: #ffffff;
 $fonte-texto: 'Inter', sans-serif;
 $fonte-logo: 'Lexend', sans-serif;
 
+.pagina-participacaoHistorico {
+    h1 {
+        padding-bottom: 2rem;
+        font-weight: 400;
+        color: #AD2626;
+    }
+}
+
 .bloco-participacoes {
     display: flex;
     flex-direction: column;
@@ -26,9 +34,9 @@ $fonte-logo: 'Lexend', sans-serif;
     box-shadow: 0px 0px 15px rgb(233, 233, 233);
 
     h1 {
-        color: $vermelho;
-        font: $fonte-texto;
-        font-size: 1.7rem;
+        padding-bottom: 2rem;
+        font-weight: 400;
+        color: #AD2626;
     }
 
     .partBaixo {

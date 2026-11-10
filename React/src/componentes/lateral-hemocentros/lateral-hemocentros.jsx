@@ -7,6 +7,7 @@ export default function HemocentrosLaterais() {
   const [hemocentros, setHemocentros] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState(false);
+  const [aberto, setAberto] = useState(null);
 
   useEffect(() => {
     let ativo = true;
@@ -59,17 +60,24 @@ export default function HemocentrosLaterais() {
                 </div>
 
                 <div className="acoes">
-                  <button type="button" aria-label="Seguir hemocentro">
-                    <img src="/assets/icons/mais-vermelho.webp" alt="" />
-                  </button>
-                  <button type="button" aria-label="Ver hemocentro">
-                    <img src="/assets/icons/lupa-vermelha.webp" alt="" />
+                  <button
+                    type="button"
+                    aria-expanded={aberto === h.id_hemocentro}
+                    aria-controls={`detalhes-hemo-${h.id_hemocentro}`}
+                    onClick={() => setAberto(aberto === h.id_hemocentro ? null : h.id_hemocentro)}
+                  >
+                    {aberto === h.id_hemocentro ? 'Ocultar' : 'Ver perfil'}
                   </button>
                 </div>
 
               </div>
 
-              <p>{h.endereco}, {h.cidade} - {h.estado}, {h.cep}</p>
+              {aberto === h.id_hemocentro && (
+                <div className="detalhes-hemocentro" id={`detalhes-hemo-${h.id_hemocentro}`}>
+                  <p>{h.endereco}, {h.cidade} - {h.estado}, {h.cep}</p>
+                  {h.telefone_centro && <p>Telefone: {h.telefone_centro}</p>}
+                </div>
+              )}
 
             </li>
           ))}

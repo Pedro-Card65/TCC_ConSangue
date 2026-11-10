@@ -1,5 +1,6 @@
 import './barra-navegacao.scss';
-import { NavLink } from 'react-router-dom';
+import { useState } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 const itens = [
   { id: 1, rota: '/participacoesHistorico', nome: 'Participações Histórico', icone: 'participacoes' },
@@ -10,8 +11,34 @@ const itens = [
 ];
 
 export default function BarraNavegacao() {
+  const navigate = useNavigate();
+  const [menuAberto, setMenuAberto] = useState(false);
+
+  function irPara(rota) {
+    setMenuAberto(false);
+    navigate(rota);
+  }
+
+  function sair() {
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('usuario');
+    setMenuAberto(false);
+    navigate('/', { replace: true });
+  }
+
+  function teclado(evento) {
+    if (evento.key === 'Escape') setMenuAberto(false);
+  }
+
   return (
-    <nav className="barra-navegacao" aria-label="Navegação principal">
+    <nav className="barra-navegacao" aria-label="Navegação principal" onKeyDown={teclado}>
+
+      {menuAberto && (
+        <div className="menu-opcoes" role="menu" aria-label="Mais opções">
+          <button type="button" role="menuitem" onClick={() => irPara('/perfil')}>Perfil</button>
+          <button type="button" role="menuitem" onClick={sair}>Sair</button>
+        </div>
+      )}
 
       <div className="conteudo-barra">
 
@@ -30,7 +57,14 @@ export default function BarraNavegacao() {
           ))}
         </ul>
 
-        <button type="button" className="botao-menu" aria-label="Abrir menu">
+        <button
+          type="button"
+          className="botao-menu"
+          aria-label={menuAberto ? 'Fechar menu' : 'Ver mais opções'}
+          aria-expanded={menuAberto}
+          aria-haspopup="menu"
+          onClick={() => setMenuAberto((aberto) => !aberto)}
+        >
           <img src="/assets/icons/menu.webp" alt="" />
         </button>
 

@@ -95,9 +95,12 @@ const [cadastro, setCadastro] = useState({
 if (def === 'Login'){
   return (
     <div className="Background">
-      <LogoSlogan/>
 
       <main className="Login">
+        <div className="Login-logo">
+          <LogoSlogan/>
+        </div>
+
         <h1>Fazer Login na sua Conta</h1>
 
         <form onSubmit={fazerLogin}>

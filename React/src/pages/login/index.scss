@@ -58,6 +58,21 @@
   text-align: center;
   z-index: 1;
 
+  // Logo centralizada acima do título (sobrescreve o posicionamento absoluto do canto)
+  .Login-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 28px;
+
+    .logo-slogan {
+      position: static;
+    }
+
+    .logo img {
+      height: 90px;
+    }
+  }
+
   h1 {
     font-size: 23px;
     font-weight: 500;

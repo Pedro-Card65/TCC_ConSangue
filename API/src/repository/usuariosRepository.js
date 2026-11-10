@@ -35,6 +35,7 @@ export async function buscarPorID(id) {
             tipo_usuario,
             cpf,
             telefone,
+            foto_perfil,
             data_cadastro
         FROM usuarios
         WHERE id_usuario = ?
@@ -112,6 +113,18 @@ export async function buscarLoginPorCPF(cpf) {
         [cpf]
     );
     return linhas[0] ?? null;
+}
+
+export async function atualizarFotoPerfil(id, foto) {
+    const command = `
+        Update usuarios
+        Set foto_perfil = ?
+        Where id_usuario = ?
+    `;
+
+    const [result] = await con.query(command, [foto, id]);
+
+    return result.affectedRows;
 }
 
 export async function buscarCredenciaisPorID(id) {

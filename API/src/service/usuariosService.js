@@ -180,6 +180,50 @@ export async function buscarPorID(id) {
 
 ///////////////////////////////////////////////////////////////////////////////////////
 
+const FOTO_PREFIXOS = [
+    'data:image/jpeg;base64,',
+    'data:image/png;base64,',
+    'data:image/webp;base64,'
+];
+
+const FOTO_MAX_CARACTERES = 300 * 1024;
+
+export async function atualizarFotoPerfil(id, foto) {
+    id = Number(id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+        throw criarErro('ID inválido.');
+    }
+
+    // null remove a foto
+    if (foto !== null) {
+        if (typeof foto !== 'string' ||
+            !FOTO_PREFIXOS.some(prefixo => foto.startsWith(prefixo))) {
+            throw criarErro('A foto deve ser uma imagem JPEG, PNG ou WEBP em base64.');
+        }
+
+        if (foto.length > FOTO_MAX_CARACTERES) {
+            throw criarErro('Foto muito grande. O limite é de 300 KB.');
+        }
+
+        const dados = foto.slice(foto.indexOf(',') + 1);
+
+        if (!/^[A-Za-z0-9+/]+={0,2}$/.test(dados)) {
+            throw criarErro('Foto em base64 inválida.');
+        }
+    }
+
+    const afetados = await repository.atualizarFotoPerfil(id, foto);
+
+    if (afetados === 0) {
+        throw criarErro('Usuário não encontrado.', 404);
+    }
+
+    return afetados;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+
 export async function buscarPorUser(nome) {
 
     if (!nome || typeof nome !== 'string') {

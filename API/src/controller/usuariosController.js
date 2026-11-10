@@ -152,4 +152,31 @@ endpoints.put('/api/usuarios/modificar/email/:id', getAuthentication(), somenteM
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
+endpoints.put('/api/usuarios/foto', getAuthentication(), async (req, resp) => {
+    try {
+        // id vem do token, nunca do corpo ou da URL
+        const id = req.user.id_usuario;
+        const foto = req.body?.foto;
+
+        await service.atualizarFotoPerfil(id, foto);
+
+        resp.status(200).json({
+            mensagem: foto === null
+                ? 'Foto de perfil removida com sucesso!'
+                : 'Foto de perfil atualizada com sucesso!'
+        });
+    }
+    catch (erro) {
+        if (!erro.status) console.error(erro);
+
+        resp.status(erro.status || 500).json({
+            erro: erro.status
+                ? erro.message
+                : 'Erro interno ao atualizar foto de perfil.'
+        });
+    }
+});
+
+////////////////////////////////////////////////////////////////////////////////////////
+
 export default endpoints;

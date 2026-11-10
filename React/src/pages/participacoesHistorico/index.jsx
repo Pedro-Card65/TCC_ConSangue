@@ -4,25 +4,28 @@ export default function ParticipacoesHistorico() {
   return (
     <div className="pagina-participacaoHistorico">
 
-      <h1>Participações</h1>
+      <h1> PARTICIPAÇÕES </h1>
 
-      <h1>Próxima participação</h1>
-      <div className="participacoes">
-        <h2>Compania Mais Amor - Hospital Abidas</h2>
-        <p>Praça da Luz, 500 • São Paulo, SP</p>
-        <p>22 de Novembro de 2026 </p>
-        <p>Grupo: Amigos do Sangue</p>
+      <div className='bloco-participacoes'>
 
-        <div className="partBaixo">
-          <p>Status: Agendado</p>
-          <button>Cancelar Presença</button>
+        <h1>Próxima participação</h1>
+        <div className="participacoes">
+          <h2>Compania Mais Amor - Hospital Abidas</h2>
+          <p>Praça da Luz, 500 • São Paulo, SP</p>
+          <p>22 de Novembro de 2026 </p>
+          <p>Grupo: Amigos do Sangue</p>
+
+          <div className="partBaixo">
+            <p>Status: Agendado</p>
+            <button>Cancelar Presença</button>
+          </div>
+
         </div>
 
-      </div>
+        <h1>Histórico</h1>
+        <div className="historico">
 
-      <h1>Histórico</h1>
-      <div className="historico">
-        
+        </div>
       </div>
     </div>
 

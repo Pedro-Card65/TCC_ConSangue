@@ -5,23 +5,39 @@ import { Router } from 'express';
 
 const endpoints = Router();
 
+
 function tratarErro(resp, error) {
     if (error.code === 'ER_DUP_ENTRY') {
-        return resp.status(409).send({
-            erro: 'Usuário já é membro deste grupo'
+        return resp.status(409).json({
+            erro: 'Usuário já é membro deste grupo.'
         });
     }
 
     if (error.code === 'ER_NO_REFERENCED_ROW_2') {
-        return resp.status(404).send({
-            erro: 'Usuário ou grupo não encontrado'
+        return resp.status(404).json({
+            erro: 'Usuário ou grupo não encontrado.'
         });
     }
 
-    resp.status(400).send({
-        erro: error.message
+    if (error.code === 'ER_ROW_IS_REFERENCED_2') {
+        return resp.status(409).json({
+            erro: 'Não é possível remover este vínculo porque existem registros relacionados.'
+        });
+    }
+
+    if (error.status) {
+        return resp.status(error.status).json({
+            erro: error.message
+        });
+    }
+
+    console.error(error);
+
+    return resp.status(500).json({
+        erro: 'Erro interno ao processar a solicitação.'
     });
 }
+
 
 // Entrar em um grupo / adicionar membro
 endpoints.post('/membro', getAuthentication(), inserirMeuId('id_usuario'), (req, resp, next) => { req.body.papel = 'membro'; next(); }, async (req, resp) => {
@@ -62,7 +78,7 @@ endpoints.get('/grupos/usuario/:id_usuario', getAuthentication(), somenteMeuId('
 endpoints.put('/membro/:id', getAuthentication(), permissaoMembro(), async (req, resp) => {
     try {
         let id = req.params.id;
-        let papel = req.body.papel;
+        let papel = req.body?.papel;
 
         const linhasAfetadas = await service.editarPapelService(id, papel);
         resp.send({ linhasAfetadas });

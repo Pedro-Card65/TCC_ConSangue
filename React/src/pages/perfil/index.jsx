@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import ModalCampanha from '../../componentes/modal-campanha/modal-campanha.jsx';
+import PainelInstitucional from '../../componentes/painel-institucional';
 
 const STATUS = {
   comparecimento_informado: { texto: 'Compareceu', classe: 'compareceu' },
@@ -104,6 +105,12 @@ export default function User() {
       const me = (await api.get('/api/usuarios/me', { headers })).data;
       const id = me.id_usuario ?? me.usuario?.id_usuario;
 
+      const autenticado = me.usuario ?? me;
+      if (autenticado.tipo_usuario === 'instituicao') {
+        if (ativo) setUsuario(autenticado);
+        return;
+      }
+
       const [busca, grupos, parts, camps] = await Promise.all([
         api.get(`/api/usuarios/busca/${id}`, { headers }),
         api.get(`/api/grupos/usuario/${id}`, { headers }),
@@ -201,6 +208,7 @@ export default function User() {
     if (carregando) return <p>Carregando perfil...</p>;
     if (!sessionStorage.getItem('token')) return <p>Faça login para ver seu perfil.</p>;
     if (erro || !usuario) return <p role="alert">Não foi possível carregar o perfil.</p>;
+    if (usuario.tipo_usuario === 'instituicao') return <PainelInstitucional />;
   return (
 
     <div className="pagina-user">

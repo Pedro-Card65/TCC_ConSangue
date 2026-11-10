@@ -46,6 +46,14 @@ endpoints.get('/api/instituicoes', async (req, resp) => {
 });
 
 
+endpoints.get('/api/instituicoes/me', getAuthentication(u => u.tipo_usuario === 'instituicao'), async (req, resp) => {
+    try {
+        resp.json(await service.buscarMeuPainel(req.user.id_usuario));
+    } catch (erro) {
+        tratarErro(resp, erro);
+    }
+});
+
 //Buscar instituições
 endpoints.get('/api/instituicoes/:id', async (req, resp) => {
     try {

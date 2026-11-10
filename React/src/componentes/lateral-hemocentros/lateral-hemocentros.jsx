@@ -1,50 +1,80 @@
 import './lateral-hemocentros.scss';
-
-const hemocentros = [
-  { id: 1, nome: 'Hospital Guloso', seguidores: 700, endereco: 'Praça da Luz, 500 - Luz, São Paulo - SP', cep: '01120-010' },
-  { id: 2, nome: 'Hospital Abidas', seguidores: 700, endereco: 'Praça da Luz, 500 - Luz, São Paulo - SP', cep: '01120-010' },
-  { id: 3, nome: 'Hospital Abidas', seguidores: 700, endereco: 'Praça da Luz, 500 - Luz, São Paulo - SP', cep: '01120-010' },
-  { id: 4, nome: 'Hospital Abidas', seguidores: 700, endereco: 'Praça da Luz, 500 - Luz, São Paulo - SP', cep: '01120-010' },
-  { id: 5, nome: 'Hospital Carvalho', seguidores: 700, endereco: 'Praça da Luz, 500 - Luz, São Paulo - SP', cep: '01120-010'},
-  { id: 6, nome: 'Hospital Carvalho', seguidores: 700, endereco: 'Praça da Luz, 500 - Luz, São Paulo - SP', cep: '01120-010'},
-  { id: 7, nome: 'Hospital Carvalho', seguidores: 700, endereco: 'Praça da Luz, 500 - Luz, São Paulo - SP', cep: '01120-010'},
-  { id: 8, nome: 'Hospital Carvalho', seguidores: 700, endereco: 'Praça da Luz, 500 - Luz, São Paulo - SP', cep: '01120-010'},
-  { id: 9, nome: 'Hospital Carvalho', seguidores: 700, endereco: 'Praça da Luz, 500 - Luz, São Paulo - SP', cep: '01120-010'}
-];
+import { useState, useEffect } from 'react';
+import { api } from '../../services/api.js';
 
 export default function HemocentrosLaterais() {
+
+  const [hemocentros, setHemocentros] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState(false);
+
+  useEffect(() => {
+    let ativo = true;
+
+    async function carregarHemocentros() {
+      try {
+        const response = await api.get('/api/instituicoes');
+        if (ativo) {
+          setHemocentros(response.data);
+          setCarregando(false);
+        }
+      } catch (error) {
+        if (ativo) {
+          setErro(true);
+          setCarregando(false);
+        }
+      }
+    }
+
+    carregarHemocentros();
+
+    return () => {
+      ativo = false;
+    };
+  }, []);
+
   return (
     <section className="hemocentros-laterais">
       <img className="icone-topo" src="/assets/icons/dois-quadrados.webp" alt="" />
       <h2 className="titulo">Encontre Hemocentros parceiros</h2>
-      <ul className="lista-hemocentros">
-        {hemocentros.map((h) => (
-          <li className="cartao-hemocentro" key={h.id}>
 
-            <div className="cabecalho-cartao">
+      {carregando && <p>Carregando hemocentros...</p>}
 
-              <div className="nome-hemocentro">
-                <p>{h.nome}</p>
-                <img src="/assets/icons/mini-gota-sangue.webp" alt="" />
+      {erro && <p role="alert">Não foi possível carregar os hemocentros.</p>}
+
+      {!carregando && !erro && hemocentros.length === 0 && (
+        <p>Nenhum hemocentro encontrado.</p>
+      )}
+
+      {!carregando && !erro && hemocentros.length > 0 && (
+        <ul className="lista-hemocentros">
+          {hemocentros.map((h) => (
+            <li className="cartao-hemocentro" key={h.id_hemocentro}>
+
+              <div className="cabecalho-cartao">
+
+                <div className="nome-hemocentro">
+                  <p>{h.nome_hemo}</p>
+                  <img src="/assets/icons/mini-gota-sangue.webp" alt="" />
+                </div>
+
+                <div className="acoes">
+                  <button type="button" aria-label="Seguir hemocentro">
+                    <img src="/assets/icons/mais-vermelho.webp" alt="" />
+                  </button>
+                  <button type="button" aria-label="Ver hemocentro">
+                    <img src="/assets/icons/lupa-vermelha.webp" alt="" />
+                  </button>
+                </div>
+
               </div>
 
-              <div className="acoes">
-                <button type="button" aria-label="Seguir hemocentro">
-                  <img src="/assets/icons/mais-vermelho.webp" alt="" />
-                </button>
-                <button type="button" aria-label="Ver hemocentro">
-                  <img src="/assets/icons/lupa-vermelha.webp" alt="" />
-                </button>
-              </div>
+              <p>{h.endereco}, {h.cidade} - {h.estado}, {h.cep}</p>
 
-            </div>
-
-            <p>{h.seguidores} seguidores</p>
-            <p>{h.endereco}, {h.cep}</p>
-
-          </li>
-        ))}
-      </ul>
+            </li>
+          ))}
+        </ul>
+      )}
 
     </section>
   );

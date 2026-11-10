@@ -31,7 +31,8 @@ endpoints.get('/api/usuarios/me', getAuthentication(), async (req, resp) => {
             email,
             cidade,
             tipo_sanguineo,
-            tipo_usuario
+            tipo_usuario,
+            foto_perfil
         } = usuario;
 
         resp.status(200).json({
@@ -40,7 +41,8 @@ endpoints.get('/api/usuarios/me', getAuthentication(), async (req, resp) => {
             email,
             cidade,
             tipo_sanguineo,
-            tipo_usuario
+            tipo_usuario,
+            foto_perfil
         });
 
     } catch (erro) {

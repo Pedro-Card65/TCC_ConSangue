@@ -45,7 +45,7 @@ export default function ParticipacoesHistorico() {
       try {
         const [resParticipacoes, resCampanhas, resUsuario] = await Promise.all([
           api.get('/api/participacoes', config),
-          api.get('/campanhas'),
+          api.get('/api/campanhas'),
           api.get('/api/usuarios/me', config),
         ]);
         const listaParticipacoes = normalizarLista(resParticipacoes, 'participacoes');
@@ -55,7 +55,7 @@ export default function ParticipacoesHistorico() {
 
         if (usuario?.id_usuario != null) {
           try {
-            const resGrupos = await api.get(`/grupos/usuario/${usuario.id_usuario}`, config);
+            const resGrupos = await api.get(`/api/grupos/usuario/${usuario.id_usuario}`, config);
             listaGrupos = normalizarLista(resGrupos, 'grupos');
           } catch {
             // O histórico continua disponível mesmo se a consulta de grupos falhar.

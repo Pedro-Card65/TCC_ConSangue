@@ -23,7 +23,7 @@ export default function User() {
 
   useEffect(() => {
   let ativo = true;
-  const token = localStorage.getItem('token'); // use a mesma chave que o login salva
+  const token = sessionStorage.getItem('token'); // mesmo storage que o login usa
 
   if (!token) { setCarregando(false); return; }
 
@@ -77,7 +77,7 @@ export default function User() {
   return () => { ativo = false; };
 }, []);
     if (carregando) return <p>Carregando perfil...</p>;
-    if (!localStorage.getItem('token')) return <p>Faça login para ver seu perfil.</p>;
+    if (!sessionStorage.getItem('token')) return <p>Faça login para ver seu perfil.</p>;
     if (erro || !usuario) return <p role="alert">Não foi possível carregar o perfil.</p>;
   return (
 

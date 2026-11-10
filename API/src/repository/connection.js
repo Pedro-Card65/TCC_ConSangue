@@ -12,7 +12,13 @@ const con = mysql.createPool({
     connectionLimit: 10
 });
 
-await con.query('SELECT 1');
+try {
+    await con.query('SELECT 1');
+    console.log('-> Conectou com MySQL!');
+} catch (erro) {
+    // Não imprime a senha: mostra só o código do erro e onde conferir.
+    console.error(`-> Não foi possível conectar ao MySQL (${erro.code || 'erro desconhecido'}). Confira DB_HOST, DB_PORT, DB_USER, DB_PASSWORD e DB_NAME no .env.`);
+    process.exit(1);
+}
 
-console.log('-> Conectou com MySQL!');
 export { con };

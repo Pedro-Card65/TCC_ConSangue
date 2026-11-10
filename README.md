@@ -68,7 +68,8 @@ TCC_ConSangue/
 │       └── utils/
 ├── Database/
 │   ├── ConSangue.sql
-│   └── dados_teste.sql
+│   ├── dados_teste.sql
+│   └── migracao_foto_perfil.sql
 ├── React/
 │   ├── .env.example
 │   ├── .env.production
@@ -114,6 +115,16 @@ mysql -u root -p < Database/ConSangue.sql
 O script cria o banco **`ConSangue`** e as tabelas necessárias.
 
 O arquivo **`Database/dados_teste.sql`** é opcional e deve ser executado **somente em ambiente local/de testes**, após o script principal. Seus registros são fictícios; a senha armazenada no usuário de demonstração não é um hash válido para autenticação. Para testar login, crie uma conta pelo formulário de cadastro.
+
+#### Atualizar um banco já existente (foto de perfil)
+
+Quem já tinha o banco criado antes da foto de perfil deve adicionar a coluna `foto_perfil` com o script **`Database/migracao_foto_perfil.sql`**:
+
+```sql
+ALTER TABLE ConSangue.usuarios ADD COLUMN foto_perfil MEDIUMTEXT NULL;
+```
+
+O script **não é idempotente**: se a coluna já existir, o MySQL retorna erro de coluna duplicada. Para conferir antes, use `SHOW COLUMNS FROM ConSangue.usuarios LIKE 'foto_perfil';`. Não há nada a fazer se a coluna já aparecer. Bancos novos criados com `ConSangue.sql` já têm a coluna.
 
 ### 3. Configurar e iniciar a API
 
@@ -200,7 +211,7 @@ O esquema relacional está definido em `Database/ConSangue.sql`.
 
 | Tabela | Finalidade |
 | --- | --- |
-| `usuarios` | Contas de candidatos e instituições |
+| `usuarios` | Contas de candidatos e instituições, com a foto de perfil opcional (`foto_perfil`, em base64) |
 | `hemocentros` | Informações das instituições/hemocentros |
 | `campanhas` | Dados e períodos das campanhas |
 | `grupos` | Comunidades de mobilização |
@@ -217,7 +228,8 @@ As rotas são agrupadas sob o prefixo `/api`. Alguns exemplos:
 | `GET` | `/api/status` | Verificar resposta da API |
 | `POST` | `/api/usuarios/cadastro` | Cadastrar usuário |
 | `POST` | `/api/usuarios/login` | Autenticar usuário |
-| `GET` | `/api/usuarios/me` | Consultar usuário autenticado |
+| `GET` | `/api/usuarios/me` | Consultar usuário autenticado (inclui `foto_perfil`) |
+| `PUT` | `/api/usuarios/foto` | Definir a foto de perfil do usuário autenticado (`{ "foto": "data:image/jpeg;base64,..." }`, JPEG, PNG ou WEBP, até 300 KB) ou removê-la com `{ "foto": null }`. O usuário vem do token, não do corpo |
 | `GET` | `/api/campanhas` | Listar ou pesquisar campanhas |
 | `POST` | `/api/campanhas` | Criar campanha (instituição) |
 | `GET` | `/api/grupos` | Listar grupos |

@@ -1,6 +1,6 @@
 // paginas de rotas para ligar 
 import { BrowserRouter, Routes, Route, /* Navigate */ } from 'react-router-dom';
-/* import Bloqueio from './componentes/bloqueio.jsx'; */
+import Bloqueio from './componentes/bloqueio.jsx';
 import LayoutComBarra from './layouts/layout-barra-navegacao/layout-barra-navegacao.jsx';
 import LayoutPrincipal from './layouts/layout-principal/layout-principal.jsx';
 import Login from './pages/login/index.jsx';
@@ -44,6 +44,7 @@ export default function Router() {
     <BrowserRouter>
         <Routes>
         <Route path="/" element={<Login />} />
+        <Route element={<Bloqueio />}>
         <Route element={<LayoutComBarra />}>
             <Route element={<LayoutPrincipal />}>
             <Route path="/home" element={<Home />} />
@@ -52,6 +53,7 @@ export default function Router() {
             <Route path="/participacoesHistorico" element={<ParticipacoesHistorico />} />
             </Route>
             <Route path="/perfil" element={<Perfil />} />
+        </Route>
         </Route>
         <Route path="*" element={<Error />} />
         </Routes>

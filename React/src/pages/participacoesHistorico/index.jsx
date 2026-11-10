@@ -3,12 +3,12 @@ import './index.scss';
 
 export default function ParticipacoesHistorico() {
 
-  let nomeCampanha = []
+  /* let nomeCampanha = []
   let nomeHospital = [];
   let endereco = [];
   let data = [];
   let grupo = [];
-  let status = [];
+  let status = []; */
 
   return (
     <div className="pagina-participacaoHistorico">

@@ -157,7 +157,7 @@ export default function InformacoesLaterais() {
             </div>
             <div className="dados-usuario">
               <p>{usuario.nome || 'Nome não informado'}</p>
-              <p>{usuario.cidade || 'Cidade não informada'}</p>
+              <p>Cidade: {usuario.cidade || 'Não informada'}</p>
               <p>Tipo Sanguíneo: {usuario.tipo_sanguineo || 'Não informado'}</p>
             </div>
           </div>

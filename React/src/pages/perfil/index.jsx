@@ -1,38 +1,86 @@
 import './index.scss';
 import LogoSlogan from '../../componentes/logo-slogan/logo-slogan.jsx';
+import { useState, useEffect } from 'react';
+import { api } from '../../services/api.js';
 
-const usuario = {
-  nome: 'José Alves da Silva',
-  email: 'josealves@gmail.com',
-  cidade: 'São Paulo',
-  tipo_sanguineo: 'O-',
-  data_cadastro: '13/10/2026',
-  perfil: 'Doador'
+const STATUS = {
+  comparecimento_informado: { texto: 'Compareceu', classe: 'compareceu' },
+  interessado: { texto: 'Interesse', classe: 'interesse' },
+  pretende_ir: { texto: 'Planejada', classe: 'planejada' },
 };
 
-const estatisticas = [
-  { id: 1, icone: '/assets/icons/check-vermelho.png', valor: 5, rotulo: 'Campanhas participadas' },
-  { id: 2, icone: '/assets/icons/grupos-vermelho.webp', valor: 3, rotulo: 'Grupos' },
-  { id: 3, icone: '/assets/icons/coracao-vermelho.png', valor: 3, rotulo: 'Interesse de participação' }
-];
+const formatarData = (d) => (d ? new Date(d).toLocaleDateString('pt-BR') : '—');
 
-const proximaCampanha = {
-  nome: 'Campanha Unidos Pelo Sangue',
-  hemocentro: 'Hemocentro do Centro',
-  horario: '9h00',
-  cidade: 'São Paulo/SP',
-  dia: '14',
-  mes_ano: 'Set/26',
-  status: 'Planejada'
-};
-
-const historico = [
-  { id: 1, campanha: 'Campanha Vida em Dobro', hemocentro: 'Hospital Santa Cruz', data: '10/05/2026', status: 'Compareceu' },
-  { id: 2, campanha: 'Mega Doação de Primavera', hemocentro: 'Hemocentro Central', data: '02/08/2026', status: 'Interesse' }
-];
 
 export default function User() {
+
+  const [usuario, setUsuario] = useState(null);
+  const [estatisticas, setEstatisticas] = useState({ grupos: 0, participadas: 0, interesse: 0 });
+  const [proximaCampanha, setProximaCampanha] = useState(null);
+  const [historico, setHistorico] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState(false);
+
+  useEffect(() => {
+  let ativo = true;
+  const token = localStorage.getItem('token'); // use a mesma chave que o login salva
+
+  if (!token) { setCarregando(false); return; }
+
+  const headers = { Authorization: `Bearer ${token}` };
+
+  async function carregar() {
+    try {
+      const me = (await api.get('/api/usuarios/me', { headers })).data;
+      const id = me.id_usuario ?? me.usuario?.id_usuario;
+
+      const [busca, grupos, parts, camps] = await Promise.all([
+        api.get(`/api/usuarios/busca/${id}`, { headers }),
+        api.get(`/api/grupos/usuario/${id}`, { headers }),
+        api.get('/api/participacoes', { headers }),
+        api.get('/api/campanhas'),
+      ]);
+
+      if (!ativo) return;
+
+      const u = busca.data.usuario ?? busca.data;
+      const listaGrupos = grupos.data.grupos ?? [];
+      const listaCamps = camps.data.campanhas ?? [];
+      const listaParts = (parts.data.participacoes ?? [])
+        .filter((p) => p.id_usuario === id); // remova se a API já filtra pelo token
+
+      const cruzadas = listaParts.map((p) => {
+        const c = listaCamps.find((x) => x.id_campanha === p.id_campanha) || {};
+        return { ...p, ...c, data: p.data_prevista || p.data_registro };
+      });
+
+      setUsuario(u);
+      setEstatisticas({
+        grupos: listaGrupos.length,
+        participadas: listaParts.filter((p) => p.status === 'comparecimento_informado').length,
+        interesse: listaParts.filter((p) => p.status === 'interessado').length,
+      });
+      setProximaCampanha(
+        cruzadas
+          .filter((p) => p.status === 'pretende_ir' && new Date(p.data_prevista) > new Date())
+          .sort((a, b) => new Date(a.data_prevista) - new Date(b.data_prevista))[0] || null
+      );
+      setHistorico(cruzadas);
+    } catch (e) {
+      if (ativo) setErro(true);
+    } finally {
+      if (ativo) setCarregando(false);
+    }
+  }
+
+  carregar();
+  return () => { ativo = false; };
+}, []);
+    if (carregando) return <p>Carregando perfil...</p>;
+    if (!localStorage.getItem('token')) return <p>Faça login para ver seu perfil.</p>;
+    if (erro || !usuario) return <p role="alert">Não foi possível carregar o perfil.</p>;
   return (
+
     <div className="pagina-user">
 
       <LogoSlogan />
@@ -49,13 +97,11 @@ export default function User() {
       <section className="user">
 
         <div className="informacoes-usuario">
-
           <div className="titulo-informacoes-usuario">
             <h3>Suas informações</h3>
           </div>
 
           <div className="conteudo-informacoes-usuario">
-
             <img src="/assets/icons/banido.png" alt="Foto do usuário" />
 
             <div className="coluna-user-1">
@@ -66,59 +112,66 @@ export default function User() {
             </div>
 
             <div className="coluna-user-2">
-              <p>Ingressou em: {usuario.data_cadastro}</p>
-              <p>{usuario.perfil} <img src="/assets/icons/mini-gota-sangue.webp" alt="" /></p>
+              <p>Ingressou em: {formatarData(usuario.data_cadastro)}</p>
+              <p>{usuario.tipo_usuario} <img src="/assets/icons/mini-gota-sangue.webp" alt="" /></p>
             </div>
-
           </div>
         </div>
 
         <div className="grupos-comunidades">
-
           <div className="titulo-grupos-comunidades">
             <h3>Grupos e comunidades</h3>
           </div>
 
           <div className="conteudo-grupos-comunidades">
-            {estatisticas.map((e) => (
-              <div className="estatistica" key={e.id}>
-                <div className="valor-estatistica">
-                  <img src={e.icone} alt="" />
-                  <span>{e.valor}</span>
-                </div>
-                <p>{e.rotulo}</p>
+            <div className="estatistica">
+              <div className="valor-estatistica">
+                <img src="/assets/icons/grupos-vermelho.webp" alt="" />
+                <span>{estatisticas.grupos}</span>
               </div>
-            ))}
-          </div>
+              <p>Grupos</p>
+            </div>
 
+            <div className="estatistica">
+              <div className="valor-estatistica">
+                <img src="/assets/icons/check-vermelho.png" alt="" />
+                <span>{estatisticas.participadas}</span>
+              </div>
+              <p>Campanhas participadas</p>
+            </div>
+
+            <div className="estatistica">
+              <div className="valor-estatistica">
+                <img src="/assets/icons/coracao-vermelho.png" alt="" />
+                <span>{estatisticas.interesse}</span>
+              </div>
+              <p>Campanhas de interesse</p>
+            </div>
+          </div>
         </div>
 
         <div className="proxima-campanha">
-
           <div className="titulo-proxima-campanha">
             <h3>Próxima campanha</h3>
           </div>
 
           <div className="conteudo-proxima-campanha">
-
             {proximaCampanha ? (
               <>
                 <div className="informacoes-proxima-campanha">
-
                   <div className="data-proxima-campanha">
-                    <h2>{proximaCampanha.dia} {proximaCampanha.mes_ano}</h2>
+                    <h2>{formatarData(proximaCampanha.data_prevista)}</h2>
                   </div>
 
                   <div className="informacoes-encontro-proxima-campanha">
-                    <h2>{proximaCampanha.nome}</h2>
-                    <p>{proximaCampanha.hemocentro}</p>
-                    <p>{proximaCampanha.horario} - {proximaCampanha.cidade}</p>
+                    <h2>{proximaCampanha.nome_campanha}</h2>
+                    <p>{proximaCampanha.nome_hemo}</p>
+                    <p>{proximaCampanha.horario_inicio} - {proximaCampanha.cidade}</p>
                   </div>
 
                   <div className="confirmacao">
-                    <h2>{proximaCampanha.status}</h2>
+                    <h2>{STATUS[proximaCampanha.status]?.texto}</h2>
                   </div>
-
                 </div>
 
                 <div className="acessar-proxima-campanha">
@@ -128,12 +181,10 @@ export default function User() {
             ) : (
               <p>Você não tem nenhuma campanha planejada</p>
             )}
-
           </div>
         </div>
 
         <div className="historico-campanhas">
-
           <div className="titulo-historico-campanhas">
             <h3>Histórico de campanhas</h3>
           </div>
@@ -142,12 +193,14 @@ export default function User() {
             {historico.length > 0 ? (
               <ul>
                 {historico.map((h) => (
-                  <li className="informacoes-historico-campanhas" key={h.id}>
+                  <li className="informacoes-historico-campanhas" key={h.id_participacao ?? h.id_campanha}>
                     <p>
-                      {h.campanha} — {h.hemocentro} • {h.status === 'Compareceu' ? 'Realizada em' : 'Interesse em'} {h.data}
+                      {h.nome_campanha} — {h.nome_hemo} •{' '}
+                      {h.status === 'comparecimento_informado' ? 'Realizada em' : 'Interesse em'}{' '}
+                      {formatarData(h.data)}
                     </p>
-                    <span className={`status-historico ${h.status.toLowerCase()}`}>
-                      {h.status}
+                    <span className={`status-historico ${STATUS[h.status]?.classe}`}>
+                      {STATUS[h.status]?.texto}
                     </span>
                   </li>
                 ))}
@@ -156,11 +209,9 @@ export default function User() {
               <p>Você ainda não tem histórico de campanhas</p>
             )}
           </div>
-
         </div>
 
       </section>
-
     </div>
   );
 }

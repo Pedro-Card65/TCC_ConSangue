@@ -14,10 +14,20 @@ export default function Grupos() {
   const [descricao, setDescricao] = useState('');
   const [entrada, setEntrada] = useState('');
   const [selecionado, setSelecionado] = useState(null);
+  const [grupoParaExcluir, setGrupoParaExcluir] = useState(null);
   const [membros, setMembros] = useState(null);
   const [erroMembros, setErroMembros] = useState('');
   const [salvando, setSalvando] = useState(false);
   const enviando = useRef(false);
+  const temporizadorMensagem = useRef(null);
+
+  useEffect(() => () => clearTimeout(temporizadorMensagem.current), []);
+
+  function mostrarMensagem(texto) {
+    clearTimeout(temporizadorMensagem.current);
+    setMensagem(texto);
+    temporizadorMensagem.current = setTimeout(() => setMensagem(''), 2000);
+  }
 
   useEffect(() => {
     let ativo = true;
@@ -69,13 +79,42 @@ export default function Grupos() {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       if (modo === 'criar') {
         await api.post('/api/grupo', { nome_grupo: nome.trim(), descricao: descricao.trim() }, config);
-        setMensagem('Grupo criado. Você é o administrador.');
+        mostrarMensagem('Grupo criado. Você é o administrador.');
       } else {
         await api.post('/api/membro', { id_grupo: Number(entrada) }, config);
-        setMensagem('Você entrou no grupo.');
+        mostrarMensagem('Você entrou no grupo.');
       }
       setModo(''); setAtualizacao(valor => valor + 1);
     } catch (error) { setErro(error.response?.data?.erro || 'Não foi possível salvar. Tente novamente.'); }
+    finally { enviando.current = false; setSalvando(false); }
+  }
+
+  async function sairDoGrupo(item) {
+    if (enviando.current) return;
+    const token = sessionStorage.getItem('token');
+    if (!token) { setErro('Sua sessão terminou. Faça login novamente.'); return; }
+    enviando.current = true; setSalvando(true); setErro('');
+    try {
+      await api.delete(`/api/membro/${item.id_membro}`, { headers: { Authorization: `Bearer ${token}` } });
+      if (String(selecionado) === String(item.id_grupo)) setSelecionado(null);
+      mostrarMensagem(`Você saiu do grupo ${item.nome_grupo}.`);
+      setAtualizacao(valor => valor + 1);
+    } catch (error) { setErro(error.response?.data?.erro || 'Não foi possível sair do grupo.'); }
+    finally { enviando.current = false; setSalvando(false); }
+  }
+
+  async function apagarGrupo(item) {
+    if (enviando.current) return;
+    const token = sessionStorage.getItem('token');
+    if (!token) { setErro('Sua sessão terminou. Faça login novamente.'); return; }
+    enviando.current = true; setSalvando(true); setErro('');
+    try {
+      await api.delete(`/api/grupo/${item.id_grupo}`, { headers: { Authorization: `Bearer ${token}` } });
+      if (String(selecionado) === String(item.id_grupo)) setSelecionado(null);
+      setGrupoParaExcluir(null);
+      mostrarMensagem(`Grupo ${item.nome_grupo} excluído com sucesso.`);
+      setAtualizacao(valor => valor + 1);
+    } catch (error) { setErro(error.response?.data?.erro || 'Não foi possível excluir o grupo.'); }
     finally { enviando.current = false; setSalvando(false); }
   }
 
@@ -89,7 +128,7 @@ export default function Grupos() {
       <button id="criar" disabled={carregando || salvando || !dados} onClick={() => abrir('criar')}>Criar novo grupo</button>
       <button id="entrar" disabled={carregando || salvando || !dados} onClick={() => abrir('entrar')}>Entrar em grupo</button>
     </div></div>
-    {mensagem && <p role="status">{mensagem}</p>}
+    {mensagem && <p className="mensagem-grupo" role="status">{mensagem}</p>}
     {erro && <div role="alert">{erro} {!modo && <button onClick={() => setAtualizacao(valor => valor + 1)}>Tentar novamente</button>}</div>}
     {modo && <form className="formulario-grupo" onSubmit={salvar} aria-label={modo === 'criar' ? 'Criar grupo' : 'Entrar em grupo'}>
       <h2>{modo === 'criar' ? 'Criar grupo' : 'Escolha um grupo'}</h2>
@@ -108,7 +147,12 @@ export default function Grupos() {
       {!grupos.length && !erro && <p>Você ainda não participa de um grupo.</p>}
       <div className="grupos">{grupos.map(item => <article className="gru" key={item.id_grupo}>
         <h2>{item.nome_grupo}</h2><p>{item.descricao}</p><p>{item.papel === 'administrador' ? 'Administrador' : 'Membro'}</p>
-        <button onClick={() => setSelecionado(item.id_grupo)} aria-label={`Ver grupo ${item.nome_grupo}`}>Ver grupo</button>
+        <div className="acoes-cartao-grupo">
+          <button onClick={() => setSelecionado(item.id_grupo)} aria-label={`Ver grupo ${item.nome_grupo}`}>Ver grupo</button>
+          {String(item.id_criador) === String(dados.usuario.id_usuario)
+            ? <button disabled={salvando} onClick={() => setGrupoParaExcluir(item)}>Excluir grupo</button>
+            : <button disabled={salvando} onClick={() => sairDoGrupo(item)}>Sair do grupo</button>}
+        </div>
       </article>)}</div>
       {grupo && <section className="detalhes-grupo" aria-label={`Detalhes de ${grupo.nome_grupo}`}>
         <h2>{grupo.nome_grupo}</h2><button onClick={() => setSelecionado(null)}>Fechar detalhes</button><h3>Membros</h3>
@@ -116,5 +160,16 @@ export default function Grupos() {
         {administrador && <VincularCampanha key={grupo.id_grupo} idGrupo={grupo.id_grupo} />}
       </section>}
     </>}
+    {grupoParaExcluir && <div className="modal-excluir-grupo" onClick={() => !salvando && setGrupoParaExcluir(null)}>
+      <section className="caixa-confirmacao-grupo" role="dialog" aria-modal="true" aria-labelledby="titulo-confirmacao-grupo" onClick={event => event.stopPropagation()}>
+        <h2 id="titulo-confirmacao-grupo">Excluir grupo?</h2>
+        <p>Tem certeza de que deseja excluir <strong>{grupoParaExcluir.nome_grupo}</strong>? Essa ação não pode ser desfeita.</p>
+        {erro && <p role="alert">{erro}</p>}
+        <div className="acoes-confirmacao-grupo">
+          <button type="button" disabled={salvando} onClick={() => setGrupoParaExcluir(null)}>Cancelar</button>
+          <button type="button" disabled={salvando} onClick={() => apagarGrupo(grupoParaExcluir)}>{salvando ? 'Excluindo...' : 'Excluir grupo'}</button>
+        </div>
+      </section>
+    </div>}
   </div>;
 }

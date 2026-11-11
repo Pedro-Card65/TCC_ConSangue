@@ -244,3 +244,72 @@ $texto: #1d1d1d;
   from { background-position: 200% 0; }
   to { background-position: -200% 0; }
 }
+
+.pagina-home .resultados-home {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid #ece1e3;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.pagina-home .resultados-home > h2 {
+  margin: 0;
+  color: #a3262f;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.pagina-home .resultados-categoria {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pagina-home .resultados-categoria h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.pagina-home .resultado-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #f1d4d7;
+  border-radius: 7px;
+  font-size: .9rem;
+}
+
+.pagina-home .resultado-item span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.pagina-home .resultado-item button {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid #a3262f;
+  border-radius: 6px;
+  background: #fff;
+  color: #a3262f;
+  font: inherit;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .pagina-home .resultados-home {
+    padding: 14px;
+  }
+
+  .pagina-home .resultado-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

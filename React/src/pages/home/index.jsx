@@ -42,13 +42,7 @@ export default function Home() {
             <article className="cartao-campanha" key={c.id_campanha}>
               <header className="cartao-topo">
                 <img className="cartao-logo" src="/assets/images/Simbolo_Vermelho.png" alt="" />
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-=======
->>>>>>> 6af48690620e19056571256973665b83dce1f097
-=======
->>>>>>> 6af48690620e19056571256973665b83dce1f097
                 <div className="cartao-identificacao">
                   <h2>{c.nome_campanha}</h2>
                   <p className="cartao-hemo">

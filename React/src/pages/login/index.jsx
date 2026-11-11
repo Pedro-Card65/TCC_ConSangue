@@ -93,27 +93,11 @@ const [cadastro, setCadastro] = useState({
 ////////////////////////////////////////////////////////////////////////////////
 if (def === 'Login'){
   return (
-<<<<<<< HEAD
-<<<<<<< HEAD
-    <div className="Background">
-
-      <main className="Login">
-        <div className="Login-logo">
-          <LogoSlogan/>
-=======
     <div className="Background auth-page auth-page--login">
 
       <main className="Login">
         <div className="Login-logo">
           <div className="auth-brand"><LogoSlogan/></div>
->>>>>>> 6af48690620e19056571256973665b83dce1f097
-=======
-    <div className="Background auth-page auth-page--login">
-
-      <main className="Login">
-        <div className="Login-logo">
-          <div className="auth-brand"><LogoSlogan/></div>
->>>>>>> 6af48690620e19056571256973665b83dce1f097
         </div>
 
         <h1>Fazer Login na sua Conta</h1>
@@ -153,8 +137,9 @@ if (def === 'Login'){
         <div className="auth-switch"><p>É a sua primeira vez por aqui?</p><button type="button" className="Troca" onClick={troca}>Faça o seu cadastro!</button></div>
       </main>
     </div>
-  )
+  );
 }
+
 async function fazerCadastro(e) {
     e.preventDefault();
 

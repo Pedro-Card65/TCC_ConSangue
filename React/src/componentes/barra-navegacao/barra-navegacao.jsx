@@ -1,13 +1,5 @@
 import './barra-navegacao.scss';
-<<<<<<< HEAD
-<<<<<<< HEAD
-import { useState } from 'react';
-=======
 import { useEffect, useRef, useState } from 'react';
->>>>>>> 6af48690620e19056571256973665b83dce1f097
-=======
-import { useEffect, useRef, useState } from 'react';
->>>>>>> 6af48690620e19056571256973665b83dce1f097
 import { NavLink, useNavigate } from 'react-router-dom';
 
 const itens = [
@@ -30,11 +22,6 @@ function lerTipoUsuario() {
 export default function BarraNavegacao() {
   const navigate = useNavigate();
   const [menuAberto, setMenuAberto] = useState(false);
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 6af48690620e19056571256973665b83dce1f097
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -57,10 +44,6 @@ export default function BarraNavegacao() {
   const itensVisiveis = tipoUsuario === 'instituicao'
     ? itens.filter((item) => item.rota !== '/participacoesHistorico')
     : itens;
-<<<<<<< HEAD
->>>>>>> 6af48690620e19056571256973665b83dce1f097
-=======
->>>>>>> 6af48690620e19056571256973665b83dce1f097
 
   function irPara(rota) {
     setMenuAberto(false);
@@ -80,19 +63,7 @@ export default function BarraNavegacao() {
 
   return (
     <nav className="barra-navegacao" aria-label="Navegação principal" onKeyDown={teclado}>
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-      {menuAberto && (
-        <div className="menu-opcoes" role="menu" aria-label="Mais opções">
-          <button type="button" role="menuitem" onClick={() => irPara('/perfil')}>Perfil</button>
-          <button type="button" role="menuitem" onClick={sair}>Sair</button>
-        </div>
-      )}
-=======
->>>>>>> 6af48690620e19056571256973665b83dce1f097
-=======
->>>>>>> 6af48690620e19056571256973665b83dce1f097
 
       <div className="conteudo-barra">
 
@@ -111,21 +82,6 @@ export default function BarraNavegacao() {
           ))}
         </ul>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-        <button
-          type="button"
-          className="botao-menu"
-          aria-label={menuAberto ? 'Fechar menu' : 'Ver mais opções'}
-          aria-expanded={menuAberto}
-          aria-haspopup="menu"
-          onClick={() => setMenuAberto((aberto) => !aberto)}
-        >
-          <img src="/assets/icons/menu.webp" alt="" />
-        </button>
-=======
-=======
->>>>>>> 6af48690620e19056571256973665b83dce1f097
         <div className="menu-container" ref={menuRef}>
           <button
             type="button"
@@ -145,10 +101,6 @@ export default function BarraNavegacao() {
             </div>
           )}
         </div>
-<<<<<<< HEAD
->>>>>>> 6af48690620e19056571256973665b83dce1f097
-=======
->>>>>>> 6af48690620e19056571256973665b83dce1f097
 
       </div>
 

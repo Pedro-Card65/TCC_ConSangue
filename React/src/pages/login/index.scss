@@ -118,7 +118,6 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-<<<<<<< HEAD
   width: min(100%, 500px);
   padding: clamp(20px, 4vw, 40px);
   box-sizing: border-box;
@@ -207,35 +206,6 @@
   text-align: center;
 }
 
-<<<<<<< HEAD
-  // Logo centralizada acima do título (sobrescreve o posicionamento absoluto do canto)
-  .Login-logo {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 28px;
-
-    .logo-slogan {
-      position: static;
-    }
-
-    .logo img {
-      height: 90px;
-    }
-  }
-
-  h1 {
-    font-size: 23px;
-    font-weight: 500;
-    margin: 0 0 35px;
-=======
-=======
-  justify-content: center;
-  gap: 6px;
-  margin-top: 18px;
-  text-align: center;
-}
-
->>>>>>> 6af48690620e19056571256973665b83dce1f097
 .auth-page .auth-switch p {
   margin: 0;
   font-size: 0.95rem;
@@ -327,10 +297,6 @@
     grid-template-columns: minmax(0, 1fr);
     justify-items: center;
     gap: 20px;
-<<<<<<< HEAD
->>>>>>> 6af48690620e19056571256973665b83dce1f097
-=======
->>>>>>> 6af48690620e19056571256973665b83dce1f097
   }
 
   .auth-page--cadastro .auth-brand {

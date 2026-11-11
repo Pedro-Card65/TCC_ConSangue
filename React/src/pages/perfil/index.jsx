@@ -68,16 +68,10 @@ export default function User() {
   const [confirmandoExclusao, setConfirmandoExclusao] = useState(false);
   const [excluindo, setExcluindo] = useState(false);
   const [erroExclusao, setErroExclusao] = useState('');
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
+
   const [campanhaAberta, setCampanhaAberta] = useState(null);
   const [atualizacao, setAtualizacao] = useState(0);
->>>>>>> 6af48690620e19056571256973665b83dce1f097
-=======
-  const [campanhaAberta, setCampanhaAberta] = useState(null);
-  const [atualizacao, setAtualizacao] = useState(0);
->>>>>>> 6af48690620e19056571256973665b83dce1f097
+
 
   async function excluirConta() {
     const token = sessionStorage.getItem('token');
@@ -152,17 +146,9 @@ export default function User() {
       hoje.setHours(0, 0, 0, 0);
       setProximaCampanha(
         cruzadas
-<<<<<<< HEAD
-<<<<<<< HEAD
-          .filter((p) => p.status_participacao === 'pretende_ir' && new Date(p.data_prevista) > new Date())
-=======
-          .filter((p) => p.status_participacao === 'pretende_ir' && p.data_prevista &&
+                    .filter((p) => p.status_participacao === 'pretende_ir' && p.data_prevista &&
             new Date(`${String(p.data_prevista).slice(0, 10)}T00:00:00`) >= hoje)
->>>>>>> 6af48690620e19056571256973665b83dce1f097
-=======
-          .filter((p) => p.status_participacao === 'pretende_ir' && p.data_prevista &&
-            new Date(`${String(p.data_prevista).slice(0, 10)}T00:00:00`) >= hoje)
->>>>>>> 6af48690620e19056571256973665b83dce1f097
+
           .sort((a, b) => new Date(a.data_prevista) - new Date(b.data_prevista))[0] || null
       );
       setHistorico(cruzadas);

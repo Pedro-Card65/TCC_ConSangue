@@ -97,3 +97,88 @@ $tamanho-gota: 14px;
     }
   }
 }
+
+.hemocentros-laterais {
+  .cartao-hemocentro {
+    padding: 12px;
+  }
+
+  .cabecalho-cartao {
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .nome-hemocentro {
+    min-width: 0;
+    flex: 1;
+    font-size: .9rem;
+    overflow-wrap: anywhere;
+  }
+
+  .acoes button {
+    width: auto;
+    min-height: 40px;
+    height: auto;
+    margin: 0;
+    padding: 8px 12px;
+    border: 1px solid #a3262f;
+    border-radius: 6px;
+    color: #a3262f;
+    font: inherit;
+    font-size: .8rem;
+    white-space: nowrap;
+  }
+
+  .detalhes-hemocentro {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #f1cfd3;
+
+    p {
+      font-size: .8rem;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    h3 {
+      margin: 8px 0 0;
+      font-size: .9rem;
+      font-weight: 600;
+    }
+  }
+
+  .campanhas-hemocentro {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      padding: 10px;
+      border: 1px solid #f1cfd3;
+      border-radius: 6px;
+      font-size: .8rem;
+    }
+
+    button {
+      min-height: 38px;
+      padding: 8px 12px;
+      border: 1px solid #a3262f;
+      border-radius: 6px;
+      background: #fff;
+      color: #a3262f;
+      font: inherit;
+      cursor: pointer;
+    }
+  }
+}

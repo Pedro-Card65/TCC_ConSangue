@@ -4,7 +4,11 @@ import { randomInt } from 'node:crypto';
 const ALFABETO_CONVITE = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
 function gerarCodigo() {
-    return Array.from({ length: 8 }, () => ALFABETO_CONVITE[randomInt(ALFABETO_CONVITE.length)]).join('');
+    let codigo;
+    do {
+        codigo = Array.from({ length: 8 }, () => ALFABETO_CONVITE[randomInt(ALFABETO_CONVITE.length)]).join('');
+    } while (/^\d+$/.test(codigo));
+    return codigo;
 }
 
 async function colunaConviteDisponivel() {

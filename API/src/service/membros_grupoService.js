@@ -25,6 +25,16 @@ export async function entrarGrupoService(membro) {
     return dbMembro.entrarGrupo({ id_usuario, id_grupo, papel });
 };
 
+export async function entrarGrupoPublicoService(membro) {
+    if (!membro || typeof membro !== 'object' || Array.isArray(membro) ||
+        membro.codigo_convite !== undefined) {
+        throw erroHttp(400, 'Informe somente o grupo público ao qual deseja entrar.');
+    }
+    const id_usuario = validarId(membro.id_usuario, 'ID do usuário');
+    const id_grupo = validarId(membro.id_grupo, 'ID do grupo');
+    return dbMembro.entrarGrupoPublico(id_usuario, id_grupo);
+}
+
 export async function listarMembrosPorGrupoService(idGrupo) {
     return dbMembro.listarMembrosPorGrupo(validarId(idGrupo, 'ID do grupo'));
 };

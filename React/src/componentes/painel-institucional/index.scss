@@ -28,3 +28,93 @@
     .indicadores, .campos-duplos { grid-template-columns: 1fr; }
   }
 }
+
+
+.painel-institucional {
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+
+  > a:first-child .logo-slogan {
+    position: static;
+  }
+
+  .painel-conteudo {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .lista-campanhas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    gap: 16px;
+  }
+
+  .lista-campanhas > li {
+    padding: 20px;
+    border: 1px solid #f0d6da;
+    border-radius: 12px;
+    background: #fffafa;
+    box-shadow: 0 2px 10px rgba(115, 33, 46, .05);
+  }
+
+  .lista-campanhas h3 {
+    margin: 0 0 8px;
+    color: #a51c30;
+    overflow-wrap: anywhere;
+    font-size: 1.08rem;
+  }
+
+  .adesao-campanha {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .adesao-campanha span {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px;
+    border-radius: 8px;
+    background: #fff;
+    border: 1px solid #f0d6da;
+    font-size: .78rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+
+  .adesao-campanha strong {
+    font-size: 1.35rem;
+    font-weight: 650;
+    color: #a51c30;
+  }
+}
+
+@media (max-width: 600px) {
+  .painel-institucional {
+    padding: 12px;
+
+    .painel-conteudo {
+      padding: 20px 14px;
+    }
+
+    .adesao-campanha {
+      gap: 8px;
+    }
+
+    .acoes button {
+      flex: 1 1 100%;
+      min-height: 44px;
+    }
+  }
+}
+
+@media (max-width: 360px) {
+  .painel-institucional .adesao-campanha {
+    grid-template-columns: 1fr;
+  }
+}

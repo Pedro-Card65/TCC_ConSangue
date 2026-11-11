@@ -7,7 +7,7 @@ import ModalCampanha from '../../componentes/modal-campanha/modal-campanha.jsx';
 import PainelInstitucional from '../../componentes/painel-institucional';
 
 const STATUS = {
-  comparecimento_informado: { texto: 'Compareceu', classe: 'compareceu' },
+  comparecimento_informado: { texto: 'Presença informada', classe: 'compareceu' },
   interessado: { texto: 'Interesse', classe: 'interesse' },
   pretende_ir: { texto: 'Planejada', classe: 'planejada' },
 };
@@ -359,7 +359,7 @@ export default function User() {
                   <li className="informacoes-historico-campanhas" key={h.id_registro}>
                     <p>
                       {h.nome_campanha} — {h.nome_hemo} •{' '}
-                      {h.status_participacao === 'comparecimento_informado' ? 'Realizada em' : 'Interesse em'}{' '}
+                      {h.status_participacao === 'comparecimento_informado' ? 'Presença informada em' : 'Interesse em'}{' '}
                       {formatarData(h.data)}
                     </p>
                     <span className={`status-historico ${STATUS[h.status_participacao]?.classe}`}>

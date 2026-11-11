@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { api } from '../../services/api';
 import LogoSlogan from '../logo-slogan/logo-slogan';
 import FormularioCampanha from './formulario-campanha';
+import BuscaGlobal from '../busca-global';
 import './index.scss';
 
 const autorizacao = () => ({ headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` } });
@@ -99,6 +100,7 @@ export default function PainelInstitucional() {
   return <main className="painel-institucional">
     <LogoSlogan />
     <section className="painel-conteudo">
+      <div className="busca-painel-institucional"><BuscaGlobal /></div>
       <h1>Painel institucional</h1>
       {mensagem && <p role="status">{mensagem}</p>}
       {carregando ? <p role="status">Carregando painel...</p> : erro ? <>

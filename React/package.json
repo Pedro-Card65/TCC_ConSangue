@@ -13,6 +13,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "prebuild": "react-scripts test --watchAll=false --runInBand",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

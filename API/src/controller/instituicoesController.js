@@ -54,6 +54,15 @@ endpoints.get('/api/instituicoes/me', getAuthentication(u => u.tipo_usuario === 
     }
 });
 
+// Adesão agregada das campanhas da instituição autenticada, sem dados pessoais.
+endpoints.get('/api/instituicoes/me/adesao', getAuthentication(u => u.tipo_usuario === 'instituicao'), async (req, resp) => {
+    try {
+        resp.json({ campanhas: await service.buscarMinhaAdesao(req.user.id_usuario) });
+    } catch (erro) {
+        tratarErro(resp, erro);
+    }
+});
+
 //Buscar instituições
 endpoints.get('/api/instituicoes/:id', async (req, resp) => {
     try {

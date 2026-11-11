@@ -261,3 +261,12 @@ As permissões dependem do perfil do usuário e, conforme a operação, da titul
 Projeto desenvolvido em equipe como **Trabalho de Conclusão de Curso (TCC)**, reunindo conhecimentos de desenvolvimento front-end, criação de APIs REST, banco de dados relacional, autenticação, design de interfaces e gestão de projeto.
 
 **ConSangue — uma iniciativa para incentivar a participação e a solidariedade por meio da tecnologia.**
+
+
+## Novidades dos grupos e painel institucional
+
+- Criadores podem editar nome, descrição e foto do grupo. A imagem é convertida para JPEG de 256 × 256 antes do envio.
+- Códigos de convite de 8 caracteres são gerados no backend, preservando o ingresso via IDs antigos.
+- O painel de hemocentros exibe contagens de interessados, intenções de comparecimento, comparecimentos informados e grupos vinculados por campanha. Esses números são registros no aplicativo, não doações confirmadas.
+- Em bancos já existentes, é necessário aplicar **`Database/migracao_foto_grupo.sql`** e **`Database/migracao_codigo_convite_grupo.sql`**, com backup prévio. Depois, execute `node scripts/preencher_codigos_grupos.mjs` a partir de `API/`.
+- Sem as migrações, as listagens continuam disponíveis e as operações que dependem das novas colunas retornam erro informativo. Veja `API/README.md`.

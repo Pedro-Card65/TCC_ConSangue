@@ -4,7 +4,10 @@ import Perfil from '../../pages/perfil';
 import { api } from '../../services/api';
 
 jest.mock('../../services/api', () => ({ api: { get: jest.fn(), post: jest.fn() } }));
-jest.mock('react-router-dom', () => ({ useNavigate: () => jest.fn() }));
+jest.mock('react-router-dom', () => ({
+  useNavigate: () => jest.fn(),
+  useLocation: () => ({ pathname: '/', search: '' })
+}));
 jest.mock('../logo-slogan/logo-slogan', () => () => null);
 
 let root, container, painel, campanhas;
@@ -20,6 +23,7 @@ beforeEach(() => {
     if (url === '/api/usuarios/me') return { data: { id_usuario: 7, tipo_usuario: 'instituicao' } };
     if (url === '/api/instituicoes/me') return { data: painel };
     if (url === '/api/campanhas/hemocentro/4') return { data: { campanhas } };
+    if (url === '/api/instituicoes/me/adesao') return { data: { campanhas: [] } };
     throw new Error(`Rota inesperada: ${url}`);
   });
 });
@@ -36,7 +40,7 @@ async function preencher(nome, value) {
     el.dispatchEvent(new Event('input', { bubbles: true }));
   });
 }
-async function enviar() { await act(async () => container.querySelector('form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))); }
+async function enviar() { await act(async () => container.querySelector('form:not([role=search])').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))); }
 async function campanhaValida() {
   await clicar('Criar nova campanha');
   await preencher('nome_campanha', 'Campanha nova');
@@ -49,7 +53,7 @@ test('perfil institucional usa apenas suas rotas e mostra o estado vazio', async
   expect(container.textContent).toContain('Instituição de teste');
   expect(container.textContent).toContain('Nenhuma campanha cadastrada');
   expect([...container.querySelectorAll('dd')].map(el => el.textContent)).toEqual(['0', '0', '0']);
-  expect(api.get.mock.calls.map(c => c[0])).toEqual(['/api/usuarios/me', '/api/instituicoes/me', '/api/campanhas/hemocentro/4']);
+  expect(api.get.mock.calls.map(c => c[0])).toEqual(['/api/usuarios/me', '/api/instituicoes/me', '/api/campanhas/hemocentro/4', '/api/instituicoes/me/adesao']);
 });
 
 test('falha de consulta não é tratada como cadastro ausente e permite tentar novamente', async () => {
@@ -57,7 +61,7 @@ test('falha de consulta não é tratada como cadastro ausente e permite tentar n
   api.get.mockResolvedValueOnce({ data: { id_usuario: 7, tipo_usuario: 'instituicao' } })
     .mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce({ data: { instituicao: null } });
   await renderizar();
-  expect(container.querySelector('form')).toBeNull();
+  expect(container.querySelector('form:not([role=search])')).toBeNull();
   expect(container.querySelector('[role="alert"]')).not.toBeNull();
   await clicar('Tentar novamente');
   expect(container.textContent).toContain('Cadastre sua instituição');
@@ -107,7 +111,7 @@ test('mantém formulário e valores quando a API recusa a criação', async () =
   expect(container.querySelector('[name="nome_campanha"]').value).toBe('Campanha nova');
   expect(container.textContent).not.toContain('Campanha criada com sucesso');
   await clicar('Cancelar');
-  expect(container.querySelector('form')).toBeNull();
+  expect(container.querySelector('form:not([role=search])')).toBeNull();
 });
 
 test('impede dois envios durante a mesma criação', async () => {

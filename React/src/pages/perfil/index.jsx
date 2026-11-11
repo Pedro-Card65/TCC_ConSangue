@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import ModalCampanha from '../../componentes/modal-campanha/modal-campanha.jsx';
 import PainelInstitucional from '../../componentes/painel-institucional';
+import BuscaGlobal from '../../componentes/busca-global';
 
 const STATUS = {
   comparecimento_informado: { texto: 'Compareceu', classe: 'compareceu' },
@@ -216,14 +217,7 @@ export default function User() {
       <LogoSlogan />
       {campanhaAberta && <ModalCampanha campanha={campanhaAberta} aoFechar={fecharCampanha} />}
 
-      <div className="pesquisa">
-        <img src="/assets/icons/LupaPesquisa.png" alt="" />
-        <input
-          type="text"
-          aria-label="Pesquisar"
-          placeholder="Pesquisar campanhas, hemocentros ou grupos..."
-        />
-      </div>
+      <div className="busca-perfil"><BuscaGlobal /></div>
 
       <section className="user">
 

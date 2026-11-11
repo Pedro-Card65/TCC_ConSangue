@@ -160,7 +160,7 @@ export default function InformacoesLaterais() {
     <section className="informacoes-laterais">
       <LogoSlogan />
 
-      <div className="cartao" aria-busy={carregando}>
+      <div className="cartao" aria-busy={carregando} role="region" aria-label="Informações do usuário" tabIndex={0}>
         <div className="foto-nome-user">
           <div className="foto-perfil-reservada">
             <img src={usuario?.foto_perfil || '/assets/icons/perfil-vermelho.webp'} alt="" />

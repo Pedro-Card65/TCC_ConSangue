@@ -11,13 +11,18 @@
   min-height: 100vh;
   background: #f3f3f3;
 
-  .coluna-esquerda,
+  .coluna-esquerda {
+    position: sticky;
+    top: 0;
+    height: calc(100dvh - #{$reserva-barra});
+    overflow: hidden;
+  }
+
   .coluna-direita {
     position: sticky;
     top: 0;
-    max-height: calc(100vh - #{$reserva-barra});
-    overflow-y: auto; // rolagem própria quando a lateral é maior que a tela
-    // o 32px de cima vem do padding/margin dos próprios componentes
+    max-height: calc(100dvh - #{$reserva-barra});
+    overflow-y: auto;
   }
 
   .coluna-centro {
@@ -39,6 +44,7 @@
     .coluna-esquerda,
     .coluna-direita {
       position: static;
+      height: auto;
       max-height: none;
       overflow: visible;
     }

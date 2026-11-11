@@ -1,7 +1,6 @@
 import './index.scss';
 import ModalCampanha from '../../componentes/modal-campanha/modal-campanha.jsx';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api.js';
 
 function formatarData(data) {
@@ -9,113 +8,37 @@ function formatarData(data) {
   return new Date(data).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
 }
 
-function normalizar(valor) {
-  return String(valor ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-}
-
 export default function Home() {
-  const navigate = useNavigate();
   const [campanhas, setCampanhas] = useState([]);
-  const [hemocentros, setHemocentros] = useState([]);
-  const [grupos, setGrupos] = useState([]);
-  const [busca, setBusca] = useState('');
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
   const [campanhaAberta, setCampanhaAberta] = useState(null);
 
   useEffect(() => {
-    let ativo = true;
+    const controle = new AbortController();
     async function carregar() {
-      const [resultadoCampanhas, resultadoHemocentros, resultadoGrupos] = await Promise.allSettled([
-        api.get('/api/campanhas'),
-        api.get('/api/instituicoes'),
-        api.get('/api/grupos')
-      ]);
-      if (!ativo) return;
-      if (resultadoCampanhas.status === 'fulfilled') {
-        setCampanhas(resultadoCampanhas.value.data?.campanhas ?? []);
-      } else {
-        setErro('Não foi possível carregar as campanhas.');
+      setCarregando(true);
+      try {
+        const resposta = await api.get('/api/campanhas', { signal: controle.signal });
+        if (!controle.signal.aborted) setCampanhas(resposta.data?.campanhas ?? []);
+      } catch {
+        if (!controle.signal.aborted) setErro('Não foi possível carregar as campanhas.');
+      } finally {
+        if (!controle.signal.aborted) setCarregando(false);
       }
-      if (resultadoHemocentros.status === 'fulfilled') {
-        const dados = resultadoHemocentros.value.data;
-        setHemocentros(Array.isArray(dados) ? dados : dados?.instituicoes ?? []);
-      }
-      if (resultadoGrupos.status === 'fulfilled') {
-        setGrupos(resultadoGrupos.value.data?.grupos ?? []);
-      }
-      setCarregando(false);
     }
     carregar();
-    return () => { ativo = false; };
+    return () => controle.abort();
   }, []);
-
-  const termo = normalizar(busca.trim());
-  const combina = (...valores) => valores.some(valor => normalizar(valor).includes(termo));
-  const campanhasExibidas = termo
-    ? campanhas.filter(c => combina(c.nome_campanha, c.descricao, c.nome_hemo, c.cidade, c.status_campanha))
-    : campanhas;
-  const hemocentrosExibidos = termo
-    ? hemocentros.filter(h => combina(h.nome_hemo, h.cidade, h.estado, h.endereco))
-    : [];
-  const gruposExibidos = termo
-    ? grupos.filter(g => combina(g.nome_grupo, g.descricao))
-    : [];
-  const semResultados = termo && campanhasExibidas.length === 0 &&
-    hemocentrosExibidos.length === 0 && gruposExibidos.length === 0;
 
   return (
     <div className="pagina-home">
-      <div className="pesquisa">
-        <img src="/assets/icons/LupaPesquisa.png" alt="" />
-        <input
-          type="search"
-          aria-label="Pesquisar campanhas, hemocentros ou grupos"
-          placeholder="Pesquisar campanhas, hemocentros ou grupos..."
-          value={busca}
-          onChange={e => setBusca(e.target.value)}
-        />
-      </div>
-
       {carregando && <p role="status">Carregando campanhas...</p>}
       {erro && <p role="alert">{erro}</p>}
 
-      {!carregando && termo && (
-        <section className="resultados-home" aria-live="polite">
-          <h2>Resultados da pesquisa</h2>
-          {hemocentrosExibidos.length > 0 && (
-            <div className="resultados-categoria">
-              <h3>Hemocentros ({hemocentrosExibidos.length})</h3>
-              {hemocentrosExibidos.map(h => (
-                <div className="resultado-item" key={h.id_hemocentro}>
-                  <span><strong>{h.nome_hemo}</strong> · {h.cidade}/{h.estado}</span>
-                  <button type="button" onClick={() => setBusca(h.nome_hemo)}>
-                    Ver campanhas
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-          {gruposExibidos.length > 0 && (
-            <div className="resultados-categoria">
-              <h3>Grupos ({gruposExibidos.length})</h3>
-              {gruposExibidos.map(g => (
-                <div className="resultado-item" key={g.id_grupo}>
-                  <span><strong>{g.nome_grupo}</strong> — {g.descricao}</span>
-                  <button type="button" onClick={() => navigate('/grupos', { state: { abrirGrupoId: g.id_grupo } })}>
-                    Ver grupo
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-          {semResultados && !erro && <p>Nenhum resultado encontrado para "{busca}".</p>}
-        </section>
-      )}
-
       {!carregando && !erro && (
-        campanhasExibidas.length > 0 ? (
-          campanhasExibidas.map(c => (
+        campanhas.length > 0 ? (
+          campanhas.map(c => (
             <article className="cartao-campanha" key={c.id_campanha}>
               <header className="cartao-topo">
                 <img className="cartao-logo" src="/assets/images/Simbolo_Vermelho.png" alt="" />
@@ -143,7 +66,7 @@ export default function Home() {
             </article>
           ))
         ) : (
-          !termo && <div className="home-aviso"><p>Nenhuma campanha encontrada.</p></div>
+          <div className="home-aviso"><p>Nenhuma campanha encontrada.</p></div>
         )
       )}
       {campanhaAberta && (

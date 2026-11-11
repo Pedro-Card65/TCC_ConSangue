@@ -105,11 +105,12 @@ export default function Grupos() {
       setUsuarioId(usuario.id_usuario);
       const resMeus = await api.get(`/api/grupos/usuario/${usuario.id_usuario}`, config);
       const meus = listaDa(resMeus, 'grupos');
-      setGrupos(todos);
+      const dadosPrivados = Object.fromEntries(meus.map(grupo => [String(grupo.id_grupo), grupo]));
+      setGrupos(todos.map(grupo => ({ ...grupo, ...(dadosPrivados[String(grupo.id_grupo)] || {}) })));
       setMeusIds(new Set(meus.map((grupo) => String(grupo.id_grupo))));
       setMeusGrupos(Object.fromEntries(meus.map((grupo) => [String(grupo.id_grupo), grupo])));
 
-      const resultadosContagem = await Promise.all(todos.map(async (grupo) => {
+      const resultadosContagem = await Promise.all(meus.map(async (grupo) => {
         try {
           const resposta = await api.get(`/api/membros/grupo/${grupo.id_grupo}`, config);
           return [grupo.id_grupo, listaDa(resposta, 'membros')];
@@ -160,8 +161,10 @@ export default function Grupos() {
     setMensagem('');
     try {
       const valor = String(id).trim().toUpperCase();
-      const convite = /^[A-HJ-NP-Z2-9]{8}$/.test(valor);
-      await api.post('/api/membro', convite ? { codigo_convite: valor } : { id_grupo: Number(valor) }, {
+      if (!/^[A-HJ-NP-Z2-9]{8}$/.test(valor)) {
+        throw new Error('Informe um convite de 8 caracteres, fornecido por um membro do grupo.');
+      }
+      await api.post('/api/membro', { codigo_convite: valor }, {
         headers: { Authorization: `Bearer ${tokenAtual()}` }
       });
       window.dispatchEvent(new Event('consangue:grupo-atualizado'));
@@ -171,7 +174,7 @@ export default function Grupos() {
       setCodigo('');
       await carregar();
     } catch (error) {
-      setErro(error.response?.data?.erro || 'Não foi possível entrar no grupo. Confira o código e tente novamente.');
+      setErro(error.response?.data?.erro || error.message || 'Não foi possível entrar no grupo. Confira o código e tente novamente.');
     } finally { setSalvando(false); }
   }
 
@@ -293,11 +296,11 @@ export default function Grupos() {
             <article className="cartao-grupo" key={grupo.id_grupo}>
               <div className="titulo-grupo">
                 <div className={`avatar-grupo avatar-${indice % 3}`} aria-hidden="true">
-                  {grupo.foto_grupo ? <img src={grupo.foto_grupo} alt="" /> : (grupo.nome_grupo || 'G').trim().charAt(0).toUpperCase()}
+                  {participando && grupo.foto_grupo ? <img src={grupo.foto_grupo} alt="" /> : (grupo.nome_grupo || 'G').trim().charAt(0).toUpperCase()}
                 </div>
                 <div className="texto-grupo">
                   <h2>{grupo.nome_grupo}</h2>
-                  <p>{contagens[grupo.id_grupo] ?? '—'} {contagens[grupo.id_grupo] === 1 ? 'membro' : 'membros'}</p>
+                  <p>{participando ? `${contagens[grupo.id_grupo] ?? '—'} ${contagens[grupo.id_grupo] === 1 ? 'membro' : 'membros'}` : 'Grupo fechado por convite'}</p>
                 </div>
                 
               </div>
@@ -385,10 +388,10 @@ export default function Grupos() {
           </>}
           {modal === 'entrar' && <>
             <h2 id="titulo-modal-grupos">Entrar com Código</h2>
-            <p>Informe o código de 8 caracteres ou o ID antigo do grupo.</p>
+            <p>Informe o código de convite de 8 caracteres fornecido por um membro do grupo.</p>
             <form onSubmit={(e) => { e.preventDefault(); entrarGrupo(codigo); }}>
               <label htmlFor="codigo-grupo">Código do grupo</label>
-              <input id="codigo-grupo" inputMode="text" autoCapitalize="characters" autoComplete="off" maxLength={16}
+              <input id="codigo-grupo" inputMode="text" autoCapitalize="characters" autoComplete="off" maxLength={8} pattern="[A-HJ-NP-Z2-9]{8}"
                 value={codigo} onChange={(e) => setCodigo(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
                 placeholder="Ex.: AB7K9M2P" required />
               {erro && <p className="erro-modal" role="alert">{erro}</p>}
@@ -405,21 +408,23 @@ export default function Grupos() {
               <h2 id="titulo-modal-grupos">{grupoSelecionado.nome_grupo}</h2>
             </div>
             <p>{grupoSelecionado.descricao || 'Grupo de doadores ConSangue.'}</p>
-            <div className="codigo-exibido">
-              <span>Código do grupo: <strong>{grupoSelecionado.codigo_convite || grupoSelecionado.id_grupo}</strong></span>
-              <button type="button" className="botao-secundario" onClick={async () => {
-                try {
-                  await navigator.clipboard.writeText(String(grupoSelecionado.codigo_convite || grupoSelecionado.id_grupo));
-                  setMensagem('Código copiado.');
-                } catch {
-                  setMensagem('Selecione o código acima para copiar.');
-                }
-              }}>Copiar código</button>
-            </div>
+            {meusIds.has(String(grupoSelecionado.id_grupo)) && grupoSelecionado.codigo_convite && (
+              <div className="codigo-exibido">
+                <span>Código do grupo: <strong>{grupoSelecionado.codigo_convite}</strong></span>
+                <button type="button" className="botao-secundario" onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(String(grupoSelecionado.codigo_convite));
+                    setMensagem('Código copiado.');
+                  } catch {
+                    setMensagem('Selecione o código acima para copiar.');
+                  }
+                }}>Copiar código</button>
+              </div>
+            )}
             {erro && <p className="erro-modal" role="alert">{erro}</p>}
             {meusIds.has(String(grupoSelecionado.id_grupo))
               ? <p className="aviso-participacao">Você já participa deste grupo.</p>
-              : <button className="botao-principal" type="button" disabled={salvando} onClick={() => entrarGrupo(grupoSelecionado.id_grupo)}>{salvando ? 'Entrando...' : 'Participar do grupo'}</button>}
+              : <button className="botao-principal" type="button" onClick={() => { setCodigo(''); setErro(''); setModal('entrar'); }}>Entrar com convite</button>}
             {meusIds.has(String(grupoSelecionado.id_grupo)) && String(grupoSelecionado.id_criador) !== String(usuarioId) && (
               <button className="botao-perigo" type="button" disabled={salvando} onClick={() => sairGrupo(grupoSelecionado)}>
                 {salvando ? 'Saindo...' : 'Sair do grupo'}

@@ -6,6 +6,7 @@ import { api } from '../../services/api';
 jest.mock('../../services/api', () => ({ api: { get: jest.fn() } }));
 jest.mock('react-router-dom', () => ({ useNavigate: () => jest.fn() }));
 jest.mock('../../componentes/logo-slogan/logo-slogan.jsx', () => () => null);
+jest.mock('../../componentes/busca-global', () => () => null);
 jest.mock('../../componentes/modal-campanha/modal-campanha.jsx', () => ({ campanha, aoFechar }) => (
   <div role="dialog">{campanha.nome_campanha}<button onClick={aoFechar}>Fechar detalhes</button></div>
 ));

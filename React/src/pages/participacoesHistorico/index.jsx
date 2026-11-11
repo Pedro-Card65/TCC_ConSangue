@@ -152,6 +152,6 @@ export default function ParticipacoesHistorico() {
           </>
         )}
       </div>
-    </div>
+    </div> 
   );
 };

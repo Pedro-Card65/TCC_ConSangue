@@ -1,5 +1,16 @@
 import * as repository from '../repository/instituicoesRepository.js';
 
+export async function buscarMinhaAdesao(idUsuario) {
+    const linhas = await repository.listarAdesaoPorCampanha(validarId(idUsuario));
+    return linhas.map(linha => ({
+        id_campanha: linha.id_campanha,
+        interessados: Number(linha.interessados),
+        pretendem_ir: Number(linha.pretendem_ir),
+        comparecimentos_informados: Number(linha.comparecimentos_informados),
+        grupos_vinculados: Number(linha.grupos_vinculados)
+    }));
+}
+
 export async function buscarMeuPainel(idUsuario) {
     const registro = await repository.buscarPainelPorUsuario(validarId(idUsuario));
     if (!registro) return { instituicao: null };

@@ -28,6 +28,7 @@ export default function Busca() {
   const [carregando, setCarregando] = useState(false);
   const [instituicaoExpandida, setInstituicaoExpandida] = useState(null);
   const [campanhaAberta, setCampanhaAberta] = useState(null);
+  const [filtro, setFiltro] = useState('todos');
 
   useEffect(() => {
     if (!termo) {
@@ -68,6 +69,10 @@ export default function Busca() {
     return () => controle.abort();
   }, [termo]);
 
+  useEffect(() => {
+    setFiltro('todos');
+  }, [termo]);
+
   const encontrados = useMemo(() => {
     const busca = normalizar(termo);
     const contem = (...campos) => campos.some(campo => normalizar(campo).includes(busca));
@@ -80,75 +85,161 @@ export default function Busca() {
   }, [dados, termo]);
 
   const total = encontrados.campanhas.length + encontrados.instituicoes.length + encontrados.grupos.length;
+  const filtros = [
+    { chave: 'todos', nome: 'Todos', quantidade: total },
+    { chave: 'campanhas', nome: 'Campanhas', quantidade: encontrados.campanhas.length },
+    { chave: 'instituicoes', nome: 'Hemocentros', quantidade: encontrados.instituicoes.length },
+    { chave: 'grupos', nome: 'Grupos', quantidade: encontrados.grupos.length }
+  ];
+  const categoriaVisivel = chave => filtro === 'todos' || filtro === chave;
+  const totalVisivel = filtro === 'todos' ? total : encontrados[filtro]?.length ?? 0;
 
   return (
     <div className="pagina-busca">
       <header className="cabecalho-resultados">
-        <h1>Resultados da pesquisa</h1>
-        <p>{termo ? <>Buscando por <strong>“{termo}”</strong></> : 'Digite o que deseja encontrar no campo acima.'}</p>
+        <div className="introducao-busca">
+          <span className="sobretitulo-busca">Explore o ConSangue</span>
+          <h1>Resultados da pesquisa</h1>
+          <p>
+            {termo
+              ? <>Confira o que encontramos para <strong>“{termo}”</strong>.</>
+              : 'Pesquise por campanhas, hemocentros ou grupos e encontre novas oportunidades de participar.'}
+          </p>
+        </div>
+        <div className="indicador-busca" aria-hidden="true">
+          <img src="/assets/images/Simbolo_Vermelho.png" alt="" />
+        </div>
       </header>
 
-      {carregando && <p role="status" className="estado-resultados">Consultando campanhas, hemocentros e grupos...</p>}
+      {carregando && (
+        <div className="estado-resultados" role="status">
+          <span className="icone-estado-busca" aria-hidden="true">
+            <img src="/assets/icons/LupaPesquisa.png" alt="" />
+          </span>
+          <strong>Buscando no ConSangue...</strong>
+          <p>Consultando campanhas, hemocentros e grupos.</p>
+        </div>
+      )}
+
       {!carregando && termo && (
         <>
           {falhas.length > 0 && (
             <p className="aviso-resultados" role="alert">
               Não foi possível consultar {falhas.map(f => f === 'instituicoes' ? 'hemocentros' : f).join(', ')}.
-              Os resultados podem estar incompletos.
+              Os resultados abaixo podem estar incompletos.
             </p>
           )}
-          <p className="quantidade-resultados" role="status">
-            {total} {total === 1 ? 'resultado encontrado' : 'resultados encontrados'}
-          </p>
-          {total === 0 && falhas.length === 0 && <p className="estado-resultados">Nenhum resultado encontrado. Experimente outro nome ou cidade.</p>}
 
-          {encontrados.campanhas.length > 0 && (
+          <div className="painel-filtros-busca">
+            <div className="resumo-busca">
+              <h2>Explore os resultados</h2>
+              <p>{totalVisivel} {totalVisivel === 1 ? 'resultado encontrado' : 'resultados encontrados'}</p>
+            </div>
+            <div className="filtros-categorias-busca" role="group" aria-label="Filtrar resultados por categoria">
+              {filtros.map(opcao => (
+                <button
+                  type="button"
+                  key={opcao.chave}
+                  className={'filtro-busca' + (filtro === opcao.chave ? ' ativo' : '')}
+                  aria-pressed={filtro === opcao.chave}
+                  onClick={() => setFiltro(opcao.chave)}
+                >
+                  {opcao.nome} <span>{opcao.quantidade}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {totalVisivel === 0 && falhas.length === 0 && (
+            <div className="estado-resultados">
+              <span className="icone-estado-busca" aria-hidden="true">
+                <img src="/assets/icons/LupaPesquisa.png" alt="" />
+              </span>
+              <strong>Nenhum resultado encontrado</strong>
+              <p>Tente pesquisar por outro nome ou cidade, ou selecione outra categoria.</p>
+            </div>
+          )}
+
+          {categoriaVisivel('campanhas') && encontrados.campanhas.length > 0 && (
             <section className="secao-resultados" aria-labelledby="resultados-campanhas">
-              <h2 id="resultados-campanhas">Campanhas <span>{encontrados.campanhas.length}</span></h2>
+              <div className="cabecalho-secao-resultados">
+                <div>
+                  <span className="marca-secao" aria-hidden="true" />
+                  <h2 id="resultados-campanhas">Campanhas</h2>
+                </div>
+                <span className="contagem-secao">{encontrados.campanhas.length} encontradas</span>
+              </div>
               <div className="grade-resultados">
                 {encontrados.campanhas.map(c => (
-                  <article className="cartao-resultado" key={c.id_campanha}>
-                    <div className="tipo-resultado">Campanha</div>
-                    <h3>{c.nome_campanha}</h3>
-                    <p className="detalhe-resultado">{c.nome_hemo} {c.cidade ? `· ${c.cidade}` : ''}</p>
-                    {c.descricao && <p>{c.descricao}</p>}
-                    <button type="button" onClick={() => setCampanhaAberta(c)}>Ver campanha</button>
+                  <article className="cartao-resultado resultado-campanha" key={c.id_campanha}>
+                    <div className="capa-campanha-resultado">
+                      <img src="/assets/images/campanha-padrao.webp" alt="" loading="lazy" />
+                      <span className="tipo-resultado">Campanha</span>
+                    </div>
+                    <div className="conteudo-resultado">
+                      <h3>{c.nome_campanha}</h3>
+                      <p className="detalhe-resultado">{[c.nome_hemo, c.cidade].filter(Boolean).join(' · ')}</p>
+                      {c.descricao && <p className="descricao-resultado">{c.descricao}</p>}
+                      <div className="rodape-resultado">
+                        {c.status_campanha && <span className="status-resultado">{c.status_campanha}</span>}
+                        <button type="button" onClick={() => setCampanhaAberta(c)}>Ver campanha</button>
+                      </div>
+                    </div>
                   </article>
                 ))}
               </div>
             </section>
           )}
 
-          {encontrados.instituicoes.length > 0 && (
+          {categoriaVisivel('instituicoes') && encontrados.instituicoes.length > 0 && (
             <section className="secao-resultados" aria-labelledby="resultados-hemocentros">
-              <h2 id="resultados-hemocentros">Hemocentros <span>{encontrados.instituicoes.length}</span></h2>
+              <div className="cabecalho-secao-resultados">
+                <div>
+                  <span className="marca-secao" aria-hidden="true" />
+                  <h2 id="resultados-hemocentros">Hemocentros</h2>
+                </div>
+                <span className="contagem-secao">{encontrados.instituicoes.length} encontrados</span>
+              </div>
               <div className="grade-resultados">
                 {encontrados.instituicoes.map(h => {
                   const aberto = String(instituicaoExpandida) === String(h.id_hemocentro);
                   const campanhasInstituicao = dados.campanhas.filter(c => String(c.id_hemocentro) === String(h.id_hemocentro));
                   return (
-                    <article className="cartao-resultado" key={h.id_hemocentro}>
-                      <div className="tipo-resultado">Hemocentro</div>
-                      <h3>{h.nome_hemo}</h3>
-                      <p>{[h.cidade, h.estado].filter(Boolean).join(' / ')}</p>
-                      {h.endereco && <p className="detalhe-resultado">{h.endereco}</p>}
-                      <button type="button" aria-expanded={aberto} onClick={() => setInstituicaoExpandida(aberto ? null : h.id_hemocentro)}>
-                        {aberto ? 'Ocultar campanhas' : 'Ver campanhas'}
-                      </button>
-                      {aberto && (
-                        <div className="campanhas-do-hemocentro">
-                          <h4>Campanhas deste hemocentro</h4>
-                          {falhas.includes('campanhas')
-                            ? <p>Campanhas indisponíveis no momento.</p>
-                            : campanhasInstituicao.length === 0
-                              ? <p>Nenhuma campanha cadastrada.</p>
-                              : campanhasInstituicao.map(c => (
+                    <article className="cartao-resultado resultado-hemocentro" key={h.id_hemocentro}>
+                      <div className="conteudo-resultado">
+                        <div className="cabecalho-cartao-resultado">
+                          <span className="avatar-resultado avatar-hemocentro" aria-hidden="true">
+                            <img src="/assets/images/Simbolo_Vermelho.png" alt="" loading="lazy" />
+                          </span>
+                          <span className="tipo-resultado">Hemocentro</span>
+                        </div>
+                        <h3>{h.nome_hemo}</h3>
+                        <p className="detalhe-resultado">{[h.cidade, h.estado].filter(Boolean).join(' / ')}</p>
+                        {h.endereco && <p className="descricao-resultado">{h.endereco}</p>}
+                        <div className="rodape-resultado">
+                          <button
+                            type="button"
+                            aria-expanded={aberto}
+                            onClick={() => setInstituicaoExpandida(aberto ? null : h.id_hemocentro)}
+                          >
+                            {aberto ? 'Ocultar campanhas' : 'Ver campanhas'}
+                          </button>
+                        </div>
+                        {aberto && (
+                          <div className="campanhas-do-hemocentro">
+                            <h4>Campanhas deste hemocentro</h4>
+                            {falhas.includes('campanhas')
+                              ? <p>Campanhas indisponíveis no momento.</p>
+                              : campanhasInstituicao.length === 0
+                                ? <p>Nenhuma campanha cadastrada.</p>
+                                : campanhasInstituicao.map(c => (
                                   <button className="link-campanha" type="button" key={c.id_campanha} onClick={() => setCampanhaAberta(c)}>
                                     {c.nome_campanha}
                                   </button>
                                 ))}
-                        </div>
-                      )}
+                          </div>
+                        )}
+                      </div>
                     </article>
                   );
                 })}
@@ -156,16 +247,34 @@ export default function Busca() {
             </section>
           )}
 
-          {encontrados.grupos.length > 0 && (
+          {categoriaVisivel('grupos') && encontrados.grupos.length > 0 && (
             <section className="secao-resultados" aria-labelledby="resultados-grupos">
-              <h2 id="resultados-grupos">Grupos <span>{encontrados.grupos.length}</span></h2>
+              <div className="cabecalho-secao-resultados">
+                <div>
+                  <span className="marca-secao" aria-hidden="true" />
+                  <h2 id="resultados-grupos">Grupos</h2>
+                </div>
+                <span className="contagem-secao">{encontrados.grupos.length} encontrados</span>
+              </div>
               <div className="grade-resultados">
                 {encontrados.grupos.map(g => (
-                  <article className="cartao-resultado" key={g.id_grupo}>
-                    <div className="tipo-resultado">Grupo</div>
-                    <h3>{g.nome_grupo}</h3>
-                    {g.descricao && <p>{g.descricao}</p>}
-                    <button type="button" onClick={() => navigate('/grupos', { state: { abrirGrupoId: g.id_grupo } })}>Ver grupo</button>
+                  <article className="cartao-resultado resultado-grupo" key={g.id_grupo}>
+                    <div className="conteudo-resultado">
+                      <div className="cabecalho-cartao-resultado">
+                        <span className="avatar-resultado avatar-grupo-busca" aria-hidden="true">
+                          {(g.nome_grupo || 'G').trim().charAt(0).toUpperCase()}
+                        </span>
+                        <span className="tipo-resultado">Grupo</span>
+                      </div>
+                      <h3>{g.nome_grupo}</h3>
+                      {g.descricao && <p className="descricao-resultado">{g.descricao}</p>}
+                      <p className="detalhe-resultado">Participação mediante convite</p>
+                      <div className="rodape-resultado">
+                        <button type="button" onClick={() => navigate('/grupos', { state: { abrirGrupoId: g.id_grupo } })}>
+                          Ver grupo
+                        </button>
+                      </div>
+                    </div>
                   </article>
                 ))}
               </div>

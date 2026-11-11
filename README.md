@@ -320,6 +320,17 @@ No endpoint `POST /api/membro`, envie `codigo_convite` com 8 caracteres válidos
 - O uso de bcrypt, JWT e MySQL **não equivale automaticamente a conformidade integral com a LGPD**; uma implantação real exige avaliação específica de proteção, finalidade, retenção e exclusão de dados.
 - O status de comparecimento informado não é comprovante de doação efetiva.
 
+## Limitações conhecidas e próximos passos (versão acadêmica, 11/11/2026)
+
+- **Cadastro de instituições sem aprovação prévia:** o formulário público permite selecionar o tipo de conta `instituicao`. Nesta versão, a seleção não representa confirmação de vínculo oficial com hemocentro nem credenciamento por uma autoridade. Para uso real, a equipe propõe verificar a identidade/vínculo institucional e exigir aprovação antes de autorizar a publicação de campanhas.
+- **Privacidade dos grupos:** a restrição da lista de integrantes **já foi implementada**. O endpoint `GET /api/membros/grupo/:id_grupo` exige autenticação e participação no grupo; os convites e fotos privadas não constam da lista pública. Portanto, a antiga falha de exposição de integrantes/convites **não deve ser apresentada como pendência atual**. O controle deve continuar sendo verificado nos testes de regressão.
+- **Registros autodeclarados:** interesse, intenção de comparecimento e comparecimento informado não equivalem a doação clinicamente comprovada. Os indicadores medem somente interações registradas no ConSangue.
+- **Validação de entrega:** os testes automatizados e os deploys não substituem o fluxo completo em produção com perfis de candidato e instituição. Antes da apresentação, verificar login, criação de campanha, grupo/convite, participação, autorização, histórico e recarga, sem usar dados pessoais reais.
+
+**Resposta sugerida para a banca:** “O ConSangue é um protótipo acadêmico de mobilização. Nesta versão, a escolha do perfil de instituição é pública; em uma implantação real, a instituição precisaria passar por verificação e aprovação. Já protegemos os convites e a consulta aos integrantes dos grupos, e os registros de comparecimento não substituem a validação de uma doação pelo hemocentro.”
+
+O roteiro para demonstrar o sistema com segurança está em [docs/roteiro-demonstracao-tcc.md](docs/roteiro-demonstracao-tcc.md).
+
 ## Testes de aceitação e preparação para o TCC
 
 A demonstração deve ser validada com **contas fictícias**, na versão realmente publicada:

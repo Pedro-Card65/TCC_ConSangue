@@ -334,7 +334,7 @@ A demonstração deve ser validada com **contas fictícias**, na versão realmen
 
 O endpoint `/api/status` confirma apenas que o servidor HTTP está respondendo. Use uma consulta real, como `GET /api/campanhas`, e operações com dados fictícios para verificar a integração com MySQL.
 
-**Situação em 11/11/2026:** o frontend está configurado para Vercel e a API/MySQL para Railway. A branch `master` contém busca global, grupos com convites, painel institucional, foto de grupos, indicadores e testes React. Permanecem necessários a confirmação das migrações no banco hospedado, os testes ponta a ponta e a verificação das execuções mais recentes do CI.
+**Situação em 11/11/2026:** o frontend está configurado para Vercel e a API/MySQL para Railway. A branch `master` contém busca global, grupos com convites, painel institucional, foto de grupos, indicadores e testes React. As migrações de fotos e convites foram executadas no MySQL do Railway em 11/11/2026, com backup e rotação dos 3 códigos expostos. Os convites antigos não funcionam mais. Os testes automatizados de React e de política de convites passam no Vercel/Railway; ainda são necessários testes ponta a ponta com contas de demonstração, autorização entre membros e revisão visual em dispositivos reais.
 
 ## Contexto acadêmico
 

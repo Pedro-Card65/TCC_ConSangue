@@ -1,74 +1,72 @@
-*{
-    margin: 0;
-    box-sizing: border-box;
-    padding: 0;
+.pagina-erro404 {
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  background: linear-gradient(to right, white, #ffb5b5);
+  font-family: 'Lexend', sans-serif;
 }
 
-.Background{
-    background-image: linear-gradient(to right, white, rgb(255, 181, 181));
-    width: 99.2vw;
-    height: 110vh;
-    display: flex;
-    justify-content: center;
-    .OrganizaçãoErro{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 40%;
-        height: 12rem;
-        justify-content: space-around;
-        border-radius: 1rem;
-    }
-    .OrganizaçãoErro div{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-    }
-    h2{
-        font-size: 3rem;
-        color: #000000;
-        font-family: "Lexend", sans-serif;
-        font-optical-sizing: auto;
-        font-weight: 600;
-        font-style: normal;
-    }
-    p100{
-        font-size: 1.2rem;
-        color: #3f3f3f;
-        font-family: "Lexend", sans-serif;
-        font-optical-sizing: auto;
-        font-weight: 600;
-        font-style: normal;
-    }
-    p99{
-        font-size: 1.2rem;
-        color: #AD2626;
-        font-family: "Lexend", sans-serif;
-        font-optical-sizing: auto;
-        font-weight: 600;
-        font-style: normal;
-    }
-    .divzinha{
-        display: flex;
-        justify-content: center;
-        width: 100%;
-        flex-direction: column;
-        align-items: center;
-    }
+.pagina-erro404 .OrganizaçãoErro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: min(100%, 500px);
+  padding: 24px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  text-align: center;
 }
-.VoltarAoMenu{
-    background-color: #AD2626;
-    color: white;
-    border: none;
-    width: 20rem;
-    height: 3rem;
-    border-radius: 0.6rem;
-    font-family: "Lexend", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 600;
-    font-style: normal;
-    font-size: 1rem;
-    cursor: pointer;
+
+.pagina-erro404 .OrganizaçãoErro > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.pagina-erro404 h2 {
+  margin: 0;
+  color: #111;
+  font-size: clamp(2rem, 6vw, 3rem);
+  font-weight: 600;
+}
+
+.pagina-erro404 .erro-descricao {
+  margin: 0;
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  font-weight: 500;
+  color: #ad2626;
+}
+
+.pagina-erro404 .erro-orientacao {
+  margin: 0;
+  font-size: clamp(0.95rem, 3vw, 1.2rem);
+  color: #3f3f3f;
+}
+
+.pagina-erro404 .VoltarAoMenu {
+  width: min(100%, 320px);
+  min-height: 48px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 9px;
+  background: #ad2626;
+  color: white;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pagina-erro404 a {
+  display: block;
+  width: 100%;
+  text-align: center;
 }

@@ -55,6 +55,14 @@ export function inserirMeuId(campo) {
     };
 }
 
+// Listagem de participantes exige associação comprovada ao grupo no banco.
+export function somenteMembroGrupo(req, resp, next) {
+    const idGrupo = idValido(req.params.id_grupo);
+    verificarPermissao(req, resp, next,
+        'SELECT id_membro FROM membros_grupo WHERE id_grupo = ? AND id_usuario = ? LIMIT 1',
+        [idGrupo, req.user.id_usuario]);
+}
+
 export function somenteDonoInstituicao(req, resp, next) {
     const id = idValido(req.params.id);
     verificarPermissao(req, resp, next,

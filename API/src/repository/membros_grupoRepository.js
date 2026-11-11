@@ -1,5 +1,32 @@
 import { con } from './connection.js';
 
+// Entrada pública não utiliza convite, mas só é possível quando o próprio banco
+// confirma que o grupo está marcado como público. Os grupos privados continuam fechados.
+export async function entrarGrupoPublico(idUsuario, idGrupo) {
+    const [colunas] = await con.query(
+        "SELECT 1 AS existe FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'grupos' AND COLUMN_NAME = 'visibilidade' LIMIT 1"
+    );
+    if (!colunas.length) {
+        const erro = new Error('A entrada em grupos públicos ainda não está ativa no banco.');
+        erro.status = 503;
+        throw erro;
+    }
+
+    const [resultado] = await con.execute(
+        `INSERT INTO membros_grupo (id_usuario, id_grupo, papel)
+         SELECT ?, g.id_grupo, 'membro' FROM grupos g
+         WHERE g.id_grupo = ? AND g.visibilidade = 'publico'`,
+        [idUsuario, idGrupo]
+    );
+
+    if (!resultado.affectedRows) {
+        const erro = new Error('Grupo inexistente ou privado: utilize um convite para entrar.');
+        erro.status = 403;
+        throw erro;
+    }
+    return resultado.insertId;
+}
+
 export async function entrarGrupo(membro) {
     const command = `
         INSERT INTO membros_grupo (id_usuario, id_grupo, papel)
@@ -34,6 +61,10 @@ export async function listarMembrosPorGrupo(idGrupo) {
 
 
 export async function listarGruposPorUsuario(idUsuario) {
+    const [colunas] = await con.query(
+        "SELECT 1 AS existe FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'grupos' AND COLUMN_NAME = 'visibilidade' LIMIT 1"
+    );
+    const visibilidade = colunas.length ? 'g.visibilidade' : "'privado' AS visibilidade";
     const command = `
         SELECT  m.id_membro,
                 g.id_grupo,
@@ -42,6 +73,7 @@ export async function listarGruposPorUsuario(idUsuario) {
                 g.id_criador,
                 g.codigo_convite,
                 g.foto_grupo,
+                ${visibilidade},
                 m.papel,
                 m.data_entrada
         FROM    membros_grupo m

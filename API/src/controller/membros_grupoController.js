@@ -1,5 +1,5 @@
 import { getAuthentication } from '../utils/jwt.js';
-import { inserirMeuId, somenteMeuId, permissaoMembro } from '../utils/permissoes.js';
+import { inserirMeuId, somenteMeuId, permissaoMembro, somenteMembroGrupo } from '../utils/permissoes.js';
 import * as service from '../service/membros_grupoService.js';
 import { Router } from 'express';
 
@@ -53,7 +53,7 @@ endpoints.post('/membro', getAuthentication(), inserirMeuId('id_usuario'), (req,
 });
 
 // Listar membros de um grupo
-endpoints.get('/membros/grupo/:id_grupo', getAuthentication(), async (req, resp) => {
+endpoints.get('/membros/grupo/:id_grupo', getAuthentication(), somenteMembroGrupo, async (req, resp) => {
     try {
         let membros = await service.listarMembrosPorGrupoService(req.params.id_grupo);
         resp.send({ membros });

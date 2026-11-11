@@ -1,5 +1,5 @@
 import './barra-navegacao.scss';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 
 const itens = [
@@ -22,6 +22,23 @@ function lerTipoUsuario() {
 export default function BarraNavegacao() {
   const navigate = useNavigate();
   const [menuAberto, setMenuAberto] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    if (!menuAberto) return undefined;
+    function fecharFora(evento) {
+      if (menuRef.current && !menuRef.current.contains(evento.target)) setMenuAberto(false);
+    }
+    function fecharEsc(evento) {
+      if (evento.key === 'Escape') setMenuAberto(false);
+    }
+    document.addEventListener('pointerdown', fecharFora);
+    document.addEventListener('keydown', fecharEsc);
+    return () => {
+      document.removeEventListener('pointerdown', fecharFora);
+      document.removeEventListener('keydown', fecharEsc);
+    };
+  }, [menuAberto]);
   const tipoUsuario = lerTipoUsuario();
   // Histórico de participações é só para candidatos.
   const itensVisiveis = tipoUsuario === 'instituicao'
@@ -47,13 +64,6 @@ export default function BarraNavegacao() {
   return (
     <nav className="barra-navegacao" aria-label="Navegação principal" onKeyDown={teclado}>
 
-      {menuAberto && (
-        <div className="menu-opcoes" role="menu" aria-label="Mais opções">
-          <button type="button" role="menuitem" onClick={() => irPara('/perfil')}>Perfil</button>
-          <button type="button" role="menuitem" onClick={sair}>Sair</button>
-        </div>
-      )}
-
       <div className="conteudo-barra">
 
         <ul className="itens-navegacao">
@@ -71,16 +81,25 @@ export default function BarraNavegacao() {
           ))}
         </ul>
 
-        <button
-          type="button"
-          className="botao-menu"
-          aria-label={menuAberto ? 'Fechar menu' : 'Ver mais opções'}
-          aria-expanded={menuAberto}
-          aria-haspopup="menu"
-          onClick={() => setMenuAberto((aberto) => !aberto)}
-        >
-          <img src="/assets/icons/menu.webp" alt="" />
-        </button>
+        <div className="menu-container" ref={menuRef}>
+          <button
+            type="button"
+            className="botao-menu"
+            aria-label={menuAberto ? 'Fechar menu' : 'Ver mais opções'}
+            aria-expanded={menuAberto}
+            aria-haspopup="menu"
+            aria-controls="opcoes-menu-principal"
+            onClick={() => setMenuAberto((aberto) => !aberto)}
+          >
+            <img src="/assets/icons/menu.webp" alt="" />
+          </button>
+          {menuAberto && (
+            <div className="menu-opcoes" id="opcoes-menu-principal" role="menu" aria-label="Mais opções">
+              <button type="button" role="menuitem" onClick={() => irPara('/perfil')}>Perfil</button>
+              <button type="button" role="menuitem" onClick={sair}>Sair</button>
+            </div>
+          )}
+        </div>
 
       </div>
 

@@ -33,7 +33,7 @@ $largura-central: 600px;
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
-  padding: 42px 16px 110px;
+  padding: 42px clamp(24px, 3vw, 48px) 110px;
   background: #f3f3f3;
   font-family: 'Lexend', sans-serif;
 
@@ -498,6 +498,8 @@ $largura-central: 600px;
 }
 
 @media (max-width: 600px) {
+  .pagina-user { padding-inline: 20px; }
+
   .pagina-user > a:first-child {
     width: min(100%, 220px);
     margin-bottom: 16px;
@@ -526,4 +528,8 @@ $largura-central: 600px;
   .pagina-user .busca-perfil {
     margin-bottom: 14px;
   }
+}
+
+@media (max-width: 360px) {
+  .pagina-user { padding-inline: 16px; }
 }

@@ -72,3 +72,33 @@
     color: #237a43;
   }
 }
+
+.vincular-campanha {
+  margin-top: 1.25rem;
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: .65rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e6dadd;
+  }
+
+  h3 { margin: .3rem 0; font-size: 1rem; color: #9d2330; }
+  .campanha-do-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+    padding: .8rem;
+    border: 1px solid #eadfe0;
+    border-radius: .5rem;
+    background: #fffaf9;
+  }
+  .campanha-do-grupo small { color: #5f5557; }
+  .campanha-do-grupo .situacao-campanha-grupo {
+    margin: .3rem 0;
+    color: #286b49;
+  }
+  .acoes-campanha-grupo { display: flex; flex-wrap: wrap; gap: .55rem; }
+  .acoes-campanha-grupo button { flex: 1 1 9rem; min-height: 2.6rem; }
+}

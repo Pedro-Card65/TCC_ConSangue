@@ -20,10 +20,6 @@ Resposta 200 para uma instituição cadastrada:
 
 O formulário React usa o contrato existente de `POST /api/campanhas`: `id_hemocentro`, `nome_campanha`, `descricao`, `data_inicio`, `data_fim`, `horario_inicio`, `horario_fim`, `status_campanha`. Datas usam `YYYY-MM-DD`, horários são opcionais, status aceita `ativa` ou `encerrada`. O servidor valida titularidade do hemocentro e datas/horários. Sucesso retorna 200 com `{ "id_campanha": 12 }`; validações retornam 400, recurso alheio 403 e conflito 409. Não existe campo de meta de doações para campanha neste contrato.
 
-## Verificação local
-
-Com Node.js 24 e dependências instaladas, execute `npm test` nesta pasta. Os testes usam HTTP local com JWTs exclusivos de teste e substituem a conexão MySQL. A consulta dos indicadores também é executada sobre dados fictícios em SQLite em memória. Nenhuma conexão com o banco real é aberta. Essa verificação não substitui o teste de implantação com MySQL.
-
 ## Publicação e teste funcional
 
 Publicar a API com a nova rota antes de disponibilizar o novo painel no React. Nenhuma migração de banco é exigida por esses dois blocos. O preview React usa a URL de API configurada no ambiente: enquanto essa API estiver na versão anterior, o painel novo não estará disponível.

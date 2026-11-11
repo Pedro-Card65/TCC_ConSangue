@@ -50,7 +50,9 @@ endpoints.get('/api/usuarios/busca/:id', getAuthentication(), somenteMeuId(), as
         console.error(erro);
 
         resp.status(erro.status || 500).send({
-            erro: erro.message
+            erro: erro.status
+                ? erro.message
+                : 'Erro interno do servidor'
         });
     }
 });
@@ -69,7 +71,9 @@ endpoints.get('/api/usuarios/busca/nome/:nome', getAuthentication(), async (req,
         console.error(erro);
 
         resp.status(erro.status || 500).send({
-            erro: erro.message
+            erro: erro.status
+                ? erro.message
+                : 'Erro interno do servidor'
         });
     }
 })
@@ -122,7 +126,9 @@ endpoints.put('/api/usuarios/modificar/telefone/:id', getAuthentication(), somen
     catch(erro) {
         console.error(erro);
         resp.status(erro.status || 500).send({
-            erro: erro.message
+            erro: erro.status
+                ? erro.message
+                : 'Erro interno do servidor'
         });
     }
 });
@@ -145,7 +151,9 @@ endpoints.put('/api/usuarios/modificar/email/:id', getAuthentication(), somenteM
     catch(erro){
         console.error(erro)
         resp.status(erro.status || 500).send({
-            erro: erro.message
+            erro: erro.status
+                ? erro.message
+                : 'Erro interno do servidor'
         })
     }
 })

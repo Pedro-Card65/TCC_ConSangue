@@ -143,6 +143,6 @@ Arquivo: `API/src/controller/participacoesController.js`. Os endpoints são do c
 
 ## Pendências do contrato
 
-- **`GET /api/instituicoes/me`:** só existe na PR #2 (`API/src/controller/instituicoesController.js`, linhas 49-55 na PR). Entra no contrato quando a PR #2 for mergeada. Até lá, o painel institucional do React depende dessa rota.
+- **`GET /api/instituicoes/me`:** a rota já existe na master (`API/src/controller/instituicoesController.js:49`) e faz parte do contrato. O painel institucional do React depende dela.
 - **Códigos de criação:** `POST /api/campanhas` e `POST /api/grupo` respondem 200, e os demais POSTs de criação respondem 201. Decidir se padroniza para 201 ou se mantém e documenta.
 - **`cpf` na busca por ID:** `GET /api/usuarios/busca/:id` não traz `cpf` a partir da PR #6. Antes dela, traz.

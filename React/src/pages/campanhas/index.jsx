@@ -5,7 +5,6 @@ import ModalCampanha from '../../componentes/modal-campanha/modal-campanha.jsx';
 
 const filtrosIniciais = {
   nome: '',
-  tipo_sanguineo: '',
   cidade: '',
   status: 'ativa'
 };
@@ -147,28 +146,6 @@ export default function Campanhas() {
           </div>
         </div>
 
-        <div className="filtro-tipo">
-          <label htmlFor="tipo-sanguineo">Tipo sanguíneo</label>
-
-          <select
-            id="tipo-sanguineo"
-            name="tipo_sanguineo"
-            value={filtros.tipo_sanguineo}
-            onChange={alterar}
-            aria-describedby="aviso-tipos"
-          >
-            <option value="">Todos os tipos</option>
-            <option value="A+">A+</option>
-            <option value="A-">A-</option>
-            <option value="B+">B+</option>
-            <option value="B-">B-</option>
-            <option value="AB+">AB+</option>
-            <option value="AB-">AB-</option>
-            <option value="O+">O+</option>
-            <option value="O-">O-</option>
-          </select>
-        </div>
-
         <div className="filtro-cidade">
           <label htmlFor="cidade">Cidade</label>
 
@@ -212,10 +189,6 @@ export default function Campanhas() {
         </button>
 
       </form>
-
-      <p className="aviso-tipos" id="aviso-tipos">
-        O filtro por tipo sanguíneo ainda não altera os resultados da pesquisa.
-      </p>
 
       <section
         className="lista-campanhas"

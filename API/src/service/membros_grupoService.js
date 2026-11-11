@@ -1,4 +1,5 @@
 import * as dbMembro from '../repository/membros_grupoRepository.js';
+import { buscarIdPorCodigoConvite } from '../repository/gruposRepository.js';
 import { erroHttp } from '../utils/erroHttp.js';
 
 const PAPEIS = ['administrador', 'membro'];
@@ -15,7 +16,17 @@ function validarId(valor, campo) {
 
 export async function entrarGrupoService(membro) {
     const id_usuario = validarId(membro.id_usuario, 'ID do usuário');
-    const id_grupo = validarId(membro.id_grupo, 'ID do grupo');
+    let id_grupo;
+    if (membro.codigo_convite !== undefined) {
+        const codigo = String(membro.codigo_convite).trim().toUpperCase();
+        if (!/^[A-HJ-NP-Z2-9]{8}$/.test(codigo)) {
+            throw erroHttp(400, 'Código de convite inválido. Informe 8 caracteres.');
+        }
+        id_grupo = await buscarIdPorCodigoConvite(codigo);
+        if (!id_grupo) throw erroHttp(404, 'Código de convite não encontrado.');
+    } else {
+        id_grupo = validarId(membro.id_grupo, 'ID do grupo');
+    }
     const papel = membro.papel ?? 'membro';
 
     if (!PAPEIS.includes(papel)) {

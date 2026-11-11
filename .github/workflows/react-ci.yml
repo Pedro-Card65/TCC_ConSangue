@@ -1,0 +1,45 @@
+name: React — testes e build
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'React/**'
+      - '.github/workflows/react-ci.yml'
+  pull_request:
+    branches: [master]
+    paths:
+      - 'React/**'
+      - '.github/workflows/react-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  react-tests:
+    name: Testes React e build de produção
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: React
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+      - name: Instalar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: React/package-lock.json
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+      - name: Executar todos os testes
+        env:
+          CI: 'true'
+        run: npm test -- --watchAll=false --runInBand
+      - name: Gerar build de produção
+        env:
+          CI: 'true'
+        run: npm run build

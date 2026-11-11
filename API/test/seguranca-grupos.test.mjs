@@ -53,10 +53,53 @@ test('membros exigem autenticação e vínculo na API', () => {
 test('serviço de ingresso usa somente o código, nunca o ID recebido do cliente', () => {
   const codigo = ler('../src/service/membros_grupoService.js');
   const inicio = codigo.indexOf('export async function entrarGrupoService(');
-  const fim = codigo.indexOf('export async function listarMembrosPorGrupoService(', inicio);
+  const fim = codigo.indexOf('export async function entrarGrupoPublicoService(', inicio);
   assert.ok(inicio >= 0 && fim > inicio);
   const trecho = codigo.slice(inicio, fim);
   assert.match(trecho, /validarConviteDeEntrada\(membro\)/);
   assert.match(trecho, /buscarIdPorCodigoConvite\(codigo\)/);
   assert.doesNotMatch(trecho, /validarId\(membro\.id_grupo/);
+});
+
+test('visibilidade de grupos valida público, privado e padrão seguro', async () => {
+  const { validarVisibilidadeGrupo } = await import('../src/utils/visibilidadeGrupo.js');
+  assert.equal(validarVisibilidadeGrupo(), 'privado');
+  assert.equal(validarVisibilidadeGrupo('privado'), 'privado');
+  assert.equal(validarVisibilidadeGrupo('publico'), 'publico');
+  for (const valor of ['', 'aberto', null, true, 2, 'PUBLICO']) {
+    assert.throws(() => validarVisibilidadeGrupo(valor), { status: 400 });
+  }
+});
+
+test('ingresso público é separado de convite e condicionado ao tipo do grupo no SQL', () => {
+  const rotas = ler('../src/controller/membros_grupoController.js');
+  const service = ler('../src/service/membros_grupoService.js');
+  const repository = ler('../src/repository/membros_grupoRepository.js');
+  assert.match(rotas, /post\('\/membro\/publico', getAuthentication\(\), inserirMeuId\('id_usuario'\)/);
+  assert.match(service, /entrarGrupoPublicoService\(membro\)/);
+  assert.match(repository, /export async function entrarGrupoPublico/);
+  assert.match(repository, /g\.visibilidade = 'publico'/);
+  assert.match(repository, /INSERT INTO membros_grupo \(id_usuario, id_grupo, papel\)\s+SELECT/);
+});
+
+test('vinculo coletivo nao cria participacao individual automaticamente', () => {
+  const repository = ler('../src/repository/grupos_campanhasRepository.js');
+  const start = repository.indexOf('export async function criarGrupoCampanha(');
+  const end = repository.indexOf('export async function listarGruposCampanha(', start);
+  assert.ok(start >= 0 && end > start);
+  const trecho = repository.slice(start, end);
+  assert.match(trecho, /INSERT INTO grupos_campanhas/);
+  assert.doesNotMatch(trecho, /INSERT INTO participacoes/);
+  const participacoes = ler('../src/service/participacoesService.js');
+  assert.match(participacoes, /validarVinculo\(/);
+  assert.match(participacoes, /verificarMembro\(/);
+});
+
+test('listagem publica revela visibilidade mas nunca foto e convite', () => {
+  const codigo = ler('../src/repository/gruposRepository.js');
+  const inicio = codigo.indexOf('export async function listarGrupos()');
+  const fim = codigo.indexOf('export async function editarGrupo(', inicio);
+  const publicas = codigo.slice(inicio, fim);
+  assert.match(publicas, /visibilidade/);
+  assert.doesNotMatch(publicas, /foto_grupo|codigo_convite/);
 });

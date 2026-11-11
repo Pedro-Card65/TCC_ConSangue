@@ -29,3 +29,23 @@ Com Node.js 24 e dependências instaladas, execute `npm test` nesta pasta. Os te
 Publicar a API com a nova rota antes de disponibilizar o novo painel no React. Nenhuma migração de banco é exigida por esses dois blocos. O preview React usa a URL de API configurada no ambiente: enquanto essa API estiver na versão anterior, o painel novo não estará disponível.
 
 Após revisão e publicação, entrar com uma conta institucional de teste, abrir Perfil, cadastrar o hemocentro se necessário, criar campanha, conferir lista e indicadores, recarregar e verificar a campanha na listagem de candidato. Usar ambiente/dados de teste para esse fluxo, pois o formulário grava no banco da API configurada. Edição/exclusão de campanhas e metas permanecem fora destes blocos.
+
+
+## Fotos e convites de grupos
+
+O código aceita editar a foto de cada grupo (JPEG convertido para 256 × 256) e novos convites de 8 caracteres, mantendo compatibilidade com os IDs numéricos anteriores.
+
+Em um banco **já existente**, faça backup e aplique, uma única vez, as migrações:
+
+1. `Database/migracao_foto_grupo.sql`
+2. `Database/migracao_codigo_convite_grupo.sql`
+
+Depois, com o ambiente de conexão MySQL corretamente configurado, execute a partir da pasta `API`:
+
+```bash
+node scripts/preencher_codigos_grupos.mjs
+```
+
+O preenchimento só altera códigos nulos, e pode ser repetido. Grupos, usuários, campanhas e vínculos são preservados. Até aplicar a migração, o código mantém a listagem antiga funcionando e retorna erro informativo ao tentar salvar foto ou entrar por código alfanumérico. Não exponha variáveis `DB_*` em mensagens ou commits.
+
+Os códigos de convite não são um mecanismo de autorização: o backend continua verificando autenticação e permissões para ações administrativas. Fotos devem ser de grupos, não de documentos pessoais.

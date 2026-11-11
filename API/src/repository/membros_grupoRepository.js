@@ -40,6 +40,8 @@ export async function listarGruposPorUsuario(idUsuario) {
                 g.nome_grupo,
                 g.descricao,
                 g.id_criador,
+                g.codigo_convite,
+                g.foto_grupo,
                 m.papel,
                 m.data_entrada
         FROM    membros_grupo m

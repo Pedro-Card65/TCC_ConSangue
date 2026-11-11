@@ -6,6 +6,7 @@ import { api } from '../../services/api';
 jest.mock('../../services/api', () => ({ api: { get: jest.fn(), post: jest.fn() } }));
 jest.mock('react-router-dom', () => ({ useNavigate: () => jest.fn(), useLocation: () => ({ pathname: '/perfil', search: '' }) }));
 jest.mock('../logo-slogan/logo-slogan', () => () => null);
+jest.mock('../busca-global', () => () => null);
 
 let root, container, painel, campanhas;
 const instituicao = { id_hemocentro: 4, nome_hemo: 'Instituição de teste', endereco: 'Rua de teste', cidade: 'São Paulo', estado: 'SP' };

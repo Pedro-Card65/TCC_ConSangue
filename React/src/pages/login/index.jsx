@@ -1,6 +1,5 @@
 
 import './index.scss';
-import './index2.scss';
 import { useState } from 'react'
 import { api } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
@@ -94,11 +93,11 @@ const [cadastro, setCadastro] = useState({
 ////////////////////////////////////////////////////////////////////////////////
 if (def === 'Login'){
   return (
-    <div className="Background">
+    <div className="Background auth-page auth-page--login">
 
       <main className="Login">
         <div className="Login-logo">
-          <LogoSlogan/>
+          <div className="auth-brand"><LogoSlogan/></div>
         </div>
 
         <h1>Fazer Login na sua Conta</h1>
@@ -133,7 +132,7 @@ if (def === 'Login'){
 
 </form>
 
-        <div className="Cadastro"><p>É a sua primeira vez por aqui?<p className='Troca' onClick={troca}>Faça o seu Cadastro!</p></p></div>
+        <div className="auth-switch"><p>É a sua primeira vez por aqui?</p><button type="button" className="Troca" onClick={troca}>Faça o seu cadastro!</button></div>
       </main>
     </div>
   )
@@ -197,7 +196,7 @@ async function fazerCadastro(e) {
 }
 // Tela de cadastro
     return (
-    <div className="Background">
+    <div className="Background auth-page auth-page--cadastro">
         <LogoSlogan/>
   
         <main className="Cadastro">
@@ -344,7 +343,7 @@ async function fazerCadastro(e) {
 
 </form>
       
-          <div className="Cadastro"><p className='Troca' onClick={troca}>Voltar para a tela de Login</p></div>
+          <div className="auth-switch"><button type="button" className="Troca" onClick={troca}>Voltar para a tela de login</button></div>
         </main>
   
       </div>

@@ -343,3 +343,157 @@
   color: #6b6264;
   font-size: .76rem;
 }
+
+
+/* Editor de fotos integrado à identidade visual do ConSangue. */
+.modal-grupos {
+  .editor-foto-grupo {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 18px;
+    border: 1px solid #efd8dc;
+    border-radius: 14px;
+    background: linear-gradient(145deg, #fffafa, #fcf1f3);
+  }
+
+  .editor-foto-grupo .avatar-preview {
+    flex: 0 0 76px;
+    width: 76px;
+    height: 76px;
+    overflow: hidden;
+    border: 2px solid #e9cdd2;
+    background: #fff;
+  }
+
+  .editor-foto-acoes {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 9px;
+    min-width: 0;
+  }
+
+  .titulo-foto-grupo {
+    font-weight: 600;
+    font-size: .94rem;
+    color: #9a2030;
+  }
+
+  .descricao-foto-grupo {
+    margin: 0;
+    color: #74656a;
+    font-size: .78rem;
+    line-height: 1.5;
+  }
+
+  .editor-foto-acoes .input-foto-grupo {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    opacity: 0;
+    clip-path: inset(50%);
+  }
+
+  .linha-upload-foto {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .editor-foto-acoes .botao-upload-foto {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    flex: 0 0 auto;
+    min-height: 42px;
+    margin: 0;
+    padding: 9px 15px;
+    border: 1px solid #ac2335;
+    border-radius: 9px;
+    background: #ac2335;
+    color: #fff;
+    font-size: .83rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s ease;
+
+    &:hover:not(.desabilitado) { background: #85192a; }
+    &.desabilitado { opacity: .55; cursor: not-allowed; pointer-events: none; }
+  }
+
+  .input-foto-grupo:focus-visible + .linha-upload-foto .botao-upload-foto {
+    outline: 3px solid #dfa2ac;
+    outline-offset: 2px;
+  }
+
+  .nome-arquivo-foto {
+    min-width: 0;
+    color: #74656a;
+    font-size: .78rem;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+
+  .editor-foto-acoes .botao-remover-foto {
+    min-height: 38px;
+    margin: 0;
+    padding: 8px 12px;
+    border: 1px solid #dfb0b8;
+    border-radius: 9px;
+    background: transparent;
+    color: #a32636;
+    font: inherit;
+    font-size: .82rem;
+    font-weight: 500;
+    cursor: pointer;
+
+    &:hover:not(:disabled) { background: #fce7eb; }
+  }
+
+  .acoes-finais-grupo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid #f0dce0;
+
+    .botao-secundario, .botao-perigo {
+      min-height: 44px;
+      margin: 0;
+      padding: 10px 16px;
+      border-radius: 9px;
+      font-size: .87rem;
+      font-weight: 500;
+    }
+
+    .botao-perigo {
+      border: 1px solid #bb273b;
+      background: #fff7f8;
+      color: #a32235;
+    }
+
+    .botao-perigo:hover { background: #fde7eb; }
+  }
+}
+
+@media (max-width: 460px) {
+  .modal-grupos {
+    .editor-foto-grupo { align-items: center; padding: 14px; gap: 12px; }
+    .editor-foto-grupo .avatar-preview { flex-basis: 64px; width: 64px; height: 64px; }
+    .linha-upload-foto { align-items: stretch; flex-direction: column; }
+    .editor-foto-acoes .botao-upload-foto { width: 100%; }
+    .acoes-finais-grupo { flex-direction: column; }
+    .acoes-finais-grupo .botao-secundario,
+    .acoes-finais-grupo .botao-perigo { width: 100%; }
+  }
+}

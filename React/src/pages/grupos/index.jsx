@@ -19,6 +19,7 @@ export default function Grupos() {
   const [meusGrupos, setMeusGrupos] = useState({});
   const [usuarioId, setUsuarioId] = useState(null);
   const [contagens, setContagens] = useState({});
+  const [membrosPorGrupo, setMembrosPorGrupo] = useState({});
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
   const [mensagem, setMensagem] = useState('');
@@ -57,12 +58,13 @@ export default function Grupos() {
       const resultadosContagem = await Promise.all(todos.map(async (grupo) => {
         try {
           const resposta = await api.get(`/api/membros/grupo/${grupo.id_grupo}`, config);
-          return [grupo.id_grupo, listaDa(resposta, 'membros').length];
+          return [grupo.id_grupo, listaDa(resposta, 'membros')];
         } catch {
           return [grupo.id_grupo, null];
         }
       }));
-      setContagens(Object.fromEntries(resultadosContagem));
+      setContagens(Object.fromEntries(resultadosContagem.map(([id, membros]) => [id, membros?.length ?? null])));
+      setMembrosPorGrupo(Object.fromEntries(resultadosContagem));
     } catch (error) {
       setErro(error.response?.data?.erro || 'Não foi possível carregar os grupos. Verifique sua conexão com a API.');
     } finally {
@@ -243,6 +245,21 @@ export default function Grupos() {
               <button className="botao-perigo" type="button" disabled={salvando} onClick={() => sairGrupo(grupoSelecionado)}>
                 {salvando ? 'Saindo...' : 'Sair do grupo'}
               </button>
+            )}
+
+            {meusIds.has(String(grupoSelecionado.id_grupo)) && (
+              <section className="membros-detalhes-grupo" aria-label="Membros do grupo">
+                <h3>Membros</h3>
+                {membrosPorGrupo[grupoSelecionado.id_grupo] == null
+                  ? <p>Não foi possível consultar os membros deste grupo.</p>
+                  : membrosPorGrupo[grupoSelecionado.id_grupo].length === 0
+                    ? <p>Nenhum membro encontrado.</p>
+                    : <ul>
+                        {membrosPorGrupo[grupoSelecionado.id_grupo].map((membro) => (
+                          <li key={membro.id_membro}>{membro.nome || membro.usuario || 'Participante'} — {membro.papel === 'administrador' ? 'Administrador' : 'Membro'}</li>
+                        ))}
+                      </ul>}
+              </section>
             )}
             {meusIds.has(String(grupoSelecionado.id_grupo)) && String(grupoSelecionado.id_criador) === String(usuarioId) && (
               <VincularCampanha key={grupoSelecionado.id_grupo} idGrupo={grupoSelecionado.id_grupo} />

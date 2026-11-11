@@ -106,3 +106,51 @@ $vermelho: #a3262f;
     }
   }
 }
+@media (max-width: 600px) {
+  .barra-navegacao {
+    left: 8px;
+    right: 8px;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    height: 58px;
+    box-sizing: border-box;
+
+    .conteudo-barra {
+      width: 100%;
+      max-width: none;
+      justify-content: space-between;
+      padding: 0 6px;
+      box-sizing: border-box;
+    }
+
+    .itens-navegacao {
+      flex: 1;
+      min-width: 0;
+      justify-content: space-around;
+      gap: 2px;
+    }
+
+    .item {
+      width: 36px;
+      height: 44px;
+
+      img {
+        width: 27px;
+        height: 27px;
+      }
+    }
+
+    .botao-menu {
+      position: static;
+      flex: 0 0 40px;
+      width: 40px;
+      height: 44px;
+      margin-left: 2px;
+      transform: none;
+
+      img {
+        width: 30px;
+        height: 30px;
+      }
+    }
+  }
+}

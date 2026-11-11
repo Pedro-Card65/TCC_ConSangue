@@ -8,6 +8,7 @@ import Home from './pages/home/index.jsx';
 import Perfil from './pages/perfil/index.jsx';
 import Campanhas from './pages/campanhas/index.jsx';
 import Grupos from './pages/grupos/index.jsx';
+import Busca from './pages/busca/index.jsx';
 import ParticipacoesHistorico from './pages/participacoesHistorico/index.jsx';
 import Error from './pages/error404/index.jsx';
 
@@ -22,6 +23,7 @@ import Error from './pages/error404/index.jsx';
                         <Route element={<LayoutComBarra />}>
                         <Route element={<LayoutPrincipal />}>
                         <Route path="/grupos" element={<Grupos />} />
+            <Route path="/busca" element={<Busca />} />
                         <Route path="/participacoesHistorico" element={<ParticipacoesHistorico />} />
 
                         <Route path="/home" element={<Home />} />

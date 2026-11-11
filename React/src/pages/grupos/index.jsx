@@ -212,6 +212,7 @@ export default function Grupos() {
   }
 
   function abrirGrupo(grupo) {
+    setErro('');
     setGrupoSelecionado(grupo);
     setModal('detalhes');
   }
@@ -324,7 +325,7 @@ export default function Grupos() {
           </>}
           {modal === 'editar' && grupoSelecionado && <>
             <h2 id="titulo-modal-grupos">Editar grupo</h2>
-            <p>Atualize o nome e a descrição do grupo.</p>
+            <p>Altere o nome, a descrição e, se desejar, a imagem do grupo.</p>
             <form onSubmit={editarGrupo}>
               <label htmlFor="editar-nome-grupo">Nome do grupo</label>
               <input id="editar-nome-grupo" value={nome} onChange={e => setNome(e.target.value)} maxLength={100} required />
@@ -342,7 +343,7 @@ export default function Grupos() {
               </div>
               {erro && <p className="erro-modal" role="alert">{erro}</p>}
               <div className="acoes-confirmacao">
-                <button className="botao-secundario" type="button" disabled={salvando} onClick={() => setModal('detalhes')}>Cancelar</button>
+                <button className="botao-secundario" type="button" disabled={salvando} onClick={() => { setErro(''); setFotoAlterada(false); setModal('detalhes'); }}>Cancelar</button>
                 <button className="botao-principal" type="submit" disabled={salvando}>{salvando ? 'Salvando...' : 'Salvar alterações'}</button>
               </div>
             </form>

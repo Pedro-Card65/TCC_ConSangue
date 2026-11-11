@@ -50,6 +50,7 @@ function CadastroInstituicao({ aoSalvar }) {
 export default function PainelInstitucional() {
   const [dados, setDados] = useState(null);
   const [campanhas, setCampanhas] = useState([]);
+  const [adesaoPorCampanha, setAdesaoPorCampanha] = useState({});
   const [erro, setErro] = useState('');
   const [carregando, setCarregando] = useState(true);
   const [versao, setVersao] = useState(0);
@@ -65,13 +66,20 @@ export default function PainelInstitucional() {
         const resposta = (await api.get('/api/instituicoes/me', autorizacao())).data;
         if (!resposta || !Object.prototype.hasOwnProperty.call(resposta, 'instituicao')) throw new Error('Resposta inválida');
         let lista = [];
+        let indicadores = {};
         if (resposta.instituicao) {
           if (!resposta.estatisticas || ['campanhas', 'grupos', 'agendamentos'].some(campo =>
             !Number.isFinite(resposta.estatisticas[campo]) || resposta.estatisticas[campo] < 0)) throw new Error('Indicadores inválidos');
           lista = (await api.get(`/api/campanhas/hemocentro/${resposta.instituicao.id_hemocentro}`, autorizacao())).data.campanhas;
           if (!Array.isArray(lista)) throw new Error('Campanhas inválidas');
+          try {
+            const adesao = (await api.get('/api/instituicoes/me/adesao', autorizacao())).data.campanhas;
+            if (Array.isArray(adesao)) indicadores = Object.fromEntries(adesao.map(item => [item.id_campanha, item]));
+          } catch {
+            // A listagem principal continua acessível se os indicadores não estiverem disponíveis.
+          }
         }
-        if (ativo) { setDados(resposta); setCampanhas(lista); }
+        if (ativo) { setDados(resposta); setCampanhas(lista); setAdesaoPorCampanha(indicadores); }
       } catch (e) {
         if (ativo) setErro('Não foi possível atualizar o painel. Tente novamente.');
       } finally {
@@ -121,6 +129,12 @@ export default function PainelInstitucional() {
               <p>{String(campanha.data_inicio).slice(0, 10).split('-').reverse().join('/')} a {String(campanha.data_fim).slice(0, 10).split('-').reverse().join('/')}</p>
               <p>{campanha.horario_inicio || 'Início não informado'} — {campanha.horario_fim || 'Término não informado'}</p>
               <p>Status: {campanha.status_campanha === 'ativa' ? 'Ativa' : 'Encerrada'}</p>
+              {adesaoPorCampanha[campanha.id_campanha] && <div className="adesao-campanha">
+                <span><strong>{adesaoPorCampanha[campanha.id_campanha].interessados}</strong> Interessados</span>
+                <span><strong>{adesaoPorCampanha[campanha.id_campanha].pretendem_ir}</strong> Pretendem ir</span>
+                <span><strong>{adesaoPorCampanha[campanha.id_campanha].comparecimentos_informados}</strong> Comparecimentos informados</span>
+                <span><strong>{adesaoPorCampanha[campanha.id_campanha].grupos_vinculados}</strong> Grupos vinculados</span>
+              </div>}
             </li>)}
           </ul>}
         </section>}

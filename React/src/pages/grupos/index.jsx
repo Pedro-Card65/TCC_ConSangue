@@ -71,6 +71,7 @@ export default function Grupos() {
   const [salvando, setSalvando] = useState(false);
   const [fotoGrupo, setFotoGrupo] = useState(null);
   const [fotoAlterada, setFotoAlterada] = useState(false);
+  const [nomeArquivoFoto, setNomeArquivoFoto] = useState('');
 
   useEffect(() => {
     const id = location.state?.abrirGrupoId;
@@ -223,6 +224,7 @@ export default function Grupos() {
     setDescricao(grupo.descricao || '');
     setFotoGrupo(grupo.foto_grupo || null);
     setFotoAlterada(false);
+    setNomeArquivoFoto('');
     setErro('');
     setModal('editar');
   }
@@ -236,6 +238,7 @@ export default function Grupos() {
       const novaFoto = await prepararFotoGrupo(arquivo);
       setFotoGrupo(novaFoto);
       setFotoAlterada(true);
+      setNomeArquivoFoto(arquivo.name);
     } catch (erroFoto) {
       setErro(erroFoto.message || 'Não foi possível processar a foto.');
     }
@@ -336,9 +339,41 @@ export default function Grupos() {
                   {fotoGrupo ? <img src={fotoGrupo} alt="" /> : (nome || 'G').trim().charAt(0).toUpperCase()}
                 </div>
                 <div className="editor-foto-acoes">
-                  <label htmlFor="foto-grupo-editar">Foto do grupo (opcional)</label>
-                  <input id="foto-grupo-editar" type="file" accept="image/jpeg,image/png,image/webp" onChange={selecionarFotoGrupo} disabled={salvando} />
-                  {fotoGrupo && <button type="button" className="botao-secundario" disabled={salvando} onClick={() => { setFotoGrupo(null); setFotoAlterada(true); }}>Remover foto</button>}
+                  <span className="titulo-foto-grupo">Foto do grupo (opcional)</span>
+                  <p id="descricao-foto-grupo" className="descricao-foto-grupo">
+                    Personalize a imagem do seu grupo. JPG, PNG ou WEBP, até 8 MB.
+                  </p>
+                  <input
+                    id="foto-grupo-editar"
+                    className="input-foto-grupo"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    aria-describedby="descricao-foto-grupo"
+                    onChange={selecionarFotoGrupo}
+                    disabled={salvando}
+                  />
+                  <div className="linha-upload-foto">
+                    <label htmlFor="foto-grupo-editar" className={`botao-upload-foto ${salvando ? 'desabilitado' : ''}`}>
+                      Escolher imagem
+                    </label>
+                    <span className="nome-arquivo-foto">
+                      {nomeArquivoFoto || (fotoGrupo ? 'Foto atual do grupo' : 'Nenhuma imagem escolhida')}
+                    </span>
+                  </div>
+                  {fotoGrupo && (
+                    <button
+                      type="button"
+                      className="botao-remover-foto"
+                      disabled={salvando}
+                      onClick={() => {
+                        setFotoGrupo(null);
+                        setFotoAlterada(true);
+                        setNomeArquivoFoto('');
+                      }}
+                    >
+                      Remover foto
+                    </button>
+                  )}
                 </div>
               </div>
               {erro && <p className="erro-modal" role="alert">{erro}</p>}
@@ -385,14 +420,6 @@ export default function Grupos() {
             {meusIds.has(String(grupoSelecionado.id_grupo))
               ? <p className="aviso-participacao">Você já participa deste grupo.</p>
               : <button className="botao-principal" type="button" disabled={salvando} onClick={() => entrarGrupo(grupoSelecionado.id_grupo)}>{salvando ? 'Entrando...' : 'Participar do grupo'}</button>}
-            {meusIds.has(String(grupoSelecionado.id_grupo)) && String(grupoSelecionado.id_criador) === String(usuarioId) && (
-              <button className="botao-secundario" type="button" onClick={() => abrirEdicao(grupoSelecionado)}>Editar grupo</button>
-            )}
-            {meusIds.has(String(grupoSelecionado.id_grupo)) && String(grupoSelecionado.id_criador) === String(usuarioId) && (
-              <button className="botao-perigo" type="button" onClick={() => { setErro(''); setModal('confirmar-apagar'); }}>
-                Apagar grupo
-              </button>
-            )}
             {meusIds.has(String(grupoSelecionado.id_grupo)) && String(grupoSelecionado.id_criador) !== String(usuarioId) && (
               <button className="botao-perigo" type="button" disabled={salvando} onClick={() => sairGrupo(grupoSelecionado)}>
                 {salvando ? 'Saindo...' : 'Sair do grupo'}
@@ -424,6 +451,16 @@ export default function Grupos() {
             )}
             {meusIds.has(String(grupoSelecionado.id_grupo)) && String(grupoSelecionado.id_criador) === String(usuarioId) && (
               <VincularCampanha key={grupoSelecionado.id_grupo} idGrupo={grupoSelecionado.id_grupo} />
+            )}
+            {meusIds.has(String(grupoSelecionado.id_grupo)) && String(grupoSelecionado.id_criador) === String(usuarioId) && (
+              <div className="acoes-finais-grupo" aria-label="Gerenciar grupo">
+                <button className="botao-secundario" type="button" onClick={() => abrirEdicao(grupoSelecionado)}>
+                  Editar grupo
+                </button>
+                <button className="botao-perigo" type="button" onClick={() => { setErro(''); setModal('confirmar-apagar'); }}>
+                  Excluir grupo
+                </button>
+              </div>
             )}
           </>}
           {modal === 'confirmar-apagar' && grupoSelecionado && <>

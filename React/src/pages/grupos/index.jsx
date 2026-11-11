@@ -1,5 +1,6 @@
 import './index.scss';
 import { useCallback, useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import VincularCampanha from '../../componentes/vincular-campanha';
 
@@ -14,6 +15,8 @@ function listaDa(resposta, chave) {
 }
 
 export default function Grupos() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [grupos, setGrupos] = useState([]);
   const [meusIds, setMeusIds] = useState(new Set());
   const [meusGrupos, setMeusGrupos] = useState({});
@@ -29,6 +32,17 @@ export default function Grupos() {
   const [descricao, setDescricao] = useState('');
   const [codigo, setCodigo] = useState('');
   const [salvando, setSalvando] = useState(false);
+
+  useEffect(() => {
+    const id = location.state?.abrirGrupoId;
+    if (!id || carregando) return;
+    const encontrado = grupos.find(grupo => String(grupo.id_grupo) === String(id));
+    if (encontrado) {
+      setGrupoSelecionado(encontrado);
+      setModal('detalhes');
+    }
+    navigate('/grupos', { replace: true, state: null });
+  }, [carregando, grupos, location.state, navigate]);
 
   const carregar = useCallback(async () => {
     const token = tokenAtual();
@@ -161,6 +175,36 @@ export default function Grupos() {
     setModal('detalhes');
   }
 
+  function abrirEdicao(grupo) {
+    setGrupoSelecionado(grupo);
+    setNome(grupo.nome_grupo || '');
+    setDescricao(grupo.descricao || '');
+    setErro('');
+    setModal('editar');
+  }
+
+  async function editarGrupo(evento) {
+    evento.preventDefault();
+    if (!grupoSelecionado) return;
+    setSalvando(true);
+    setErro('');
+    try {
+      await api.put(`/api/grupo/${grupoSelecionado.id_grupo}`, {
+        nome_grupo: nome.trim(),
+        descricao: descricao.trim()
+      }, { headers: { Authorization: `Bearer ${tokenAtual()}` } });
+      window.dispatchEvent(new Event('consangue:grupo-atualizado'));
+      setMensagem('Informações do grupo atualizadas.');
+      setModal('');
+      setGrupoSelecionado(null);
+      setNome('');
+      setDescricao('');
+      await carregar();
+    } catch (error) {
+      setErro(error.response?.data?.erro || 'Não foi possível atualizar o grupo.');
+    } finally { setSalvando(false); }
+  }
+
   return (
     <div className="pagina-grupos">
       <header className="cabecalho-grupos">
@@ -191,7 +235,7 @@ export default function Grupos() {
                   <h2>{grupo.nome_grupo}</h2>
                   <p>{contagens[grupo.id_grupo] ?? '—'} {contagens[grupo.id_grupo] === 1 ? 'membro' : 'membros'}</p>
                 </div>
-                <span className="gota-grupo" title="ConSangue" aria-hidden="true">♦</span>
+                
               </div>
               <p className="descricao-grupo">{grupo.descricao || 'Grupo de doadores ConSangue'}</p>
               <div className="rodape-cartao-grupo">
@@ -218,6 +262,21 @@ export default function Grupos() {
               <button className="botao-principal" type="submit" disabled={salvando}>{salvando ? 'Criando...' : 'Criar grupo'}</button>
             </form>
           </>}
+          {modal === 'editar' && grupoSelecionado && <>
+            <h2 id="titulo-modal-grupos">Editar grupo</h2>
+            <p>Atualize o nome e a descrição do grupo.</p>
+            <form onSubmit={editarGrupo}>
+              <label htmlFor="editar-nome-grupo">Nome do grupo</label>
+              <input id="editar-nome-grupo" value={nome} onChange={e => setNome(e.target.value)} maxLength={100} required />
+              <label htmlFor="editar-descricao-grupo">Descrição</label>
+              <textarea id="editar-descricao-grupo" value={descricao} onChange={e => setDescricao(e.target.value)} maxLength={255} rows={3} required />
+              {erro && <p className="erro-modal" role="alert">{erro}</p>}
+              <div className="acoes-confirmacao">
+                <button className="botao-secundario" type="button" disabled={salvando} onClick={() => setModal('detalhes')}>Cancelar</button>
+                <button className="botao-principal" type="submit" disabled={salvando}>{salvando ? 'Salvando...' : 'Salvar alterações'}</button>
+              </div>
+            </form>
+          </>}
           {modal === 'entrar' && <>
             <h2 id="titulo-modal-grupos">Entrar com Código</h2>
             <p>Informe o ID do grupo para participar.</p>
@@ -236,6 +295,9 @@ export default function Grupos() {
             {meusIds.has(String(grupoSelecionado.id_grupo))
               ? <p className="aviso-participacao">Você já participa deste grupo.</p>
               : <button className="botao-principal" type="button" disabled={salvando} onClick={() => entrarGrupo(grupoSelecionado.id_grupo)}>{salvando ? 'Entrando...' : 'Participar do grupo'}</button>}
+            {meusIds.has(String(grupoSelecionado.id_grupo)) && String(grupoSelecionado.id_criador) === String(usuarioId) && (
+              <button className="botao-secundario" type="button" onClick={() => abrirEdicao(grupoSelecionado)}>Editar grupo</button>
+            )}
             {meusIds.has(String(grupoSelecionado.id_grupo)) && String(grupoSelecionado.id_criador) === String(usuarioId) && (
               <button className="botao-perigo" type="button" onClick={() => { setErro(''); setModal('confirmar-apagar'); }}>
                 Apagar grupo

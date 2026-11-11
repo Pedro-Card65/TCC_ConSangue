@@ -1,6 +1,7 @@
 import './lateral-hemocentros.scss';
 import { useState, useEffect } from 'react';
 import { api } from '../../services/api.js';
+import ModalCampanha from '../modal-campanha/modal-campanha.jsx';
 
 export default function HemocentrosLaterais() {
 
@@ -8,6 +9,8 @@ export default function HemocentrosLaterais() {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState(false);
   const [aberto, setAberto] = useState(null);
+  const [campanhas, setCampanhas] = useState([]);
+  const [campanhaAberta, setCampanhaAberta] = useState(null);
 
   useEffect(() => {
     let ativo = true;
@@ -28,6 +31,9 @@ export default function HemocentrosLaterais() {
     }
 
     carregarHemocentros();
+    api.get('/api/campanhas').then(resposta => {
+      if (ativo) setCampanhas(resposta.data?.campanhas ?? []);
+    }).catch(() => {});
 
     return () => {
       ativo = false;
@@ -76,6 +82,17 @@ export default function HemocentrosLaterais() {
                 <div className="detalhes-hemocentro" id={`detalhes-hemo-${h.id_hemocentro}`}>
                   <p>{h.endereco}, {h.cidade} - {h.estado}, {h.cep}</p>
                   {h.telefone_centro && <p>Telefone: {h.telefone_centro}</p>}
+                  <h3>Campanhas deste hemocentro</h3>
+                  {campanhas.filter(c => String(c.id_hemocentro) === String(h.id_hemocentro)).length === 0
+                    ? <p>Nenhuma campanha disponível.</p>
+                    : <ul className="campanhas-hemocentro">
+                        {campanhas.filter(c => String(c.id_hemocentro) === String(h.id_hemocentro)).map(c => (
+                          <li key={c.id_campanha}>
+                            <span>{c.nome_campanha}</span>
+                            <button type="button" onClick={() => setCampanhaAberta(c)}>Saiba mais</button>
+                          </li>
+                        ))}
+                      </ul>}
                 </div>
               )}
 
@@ -84,6 +101,7 @@ export default function HemocentrosLaterais() {
         </ul>
       )}
 
+      {campanhaAberta && <ModalCampanha campanha={campanhaAberta} aoFechar={() => setCampanhaAberta(null)} />}
     </section>
   );
 }

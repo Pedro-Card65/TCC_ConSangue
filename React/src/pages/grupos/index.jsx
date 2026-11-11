@@ -1,5 +1,6 @@
 import './index.scss';
 import { useCallback, useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import VincularCampanha from '../../componentes/vincular-campanha';
 
@@ -14,6 +15,8 @@ function listaDa(resposta, chave) {
 }
 
 export default function Grupos() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [grupos, setGrupos] = useState([]);
   const [meusIds, setMeusIds] = useState(new Set());
   const [meusGrupos, setMeusGrupos] = useState({});
@@ -29,6 +32,17 @@ export default function Grupos() {
   const [descricao, setDescricao] = useState('');
   const [codigo, setCodigo] = useState('');
   const [salvando, setSalvando] = useState(false);
+
+  useEffect(() => {
+    const id = location.state?.abrirGrupoId;
+    if (!id || carregando) return;
+    const encontrado = grupos.find(grupo => String(grupo.id_grupo) === String(id));
+    if (encontrado) {
+      setGrupoSelecionado(encontrado);
+      setModal('detalhes');
+    }
+    navigate('/grupos', { replace: true, state: null });
+  }, [carregando, grupos, location.state, navigate]);
 
   const carregar = useCallback(async () => {
     const token = tokenAtual();

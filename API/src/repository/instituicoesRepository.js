@@ -118,3 +118,20 @@ export async function excluirInstituicao(id) {
 
     return resultado.affectedRows;
 }
+
+export async function listarAdesaoPorCampanha(idUsuario) {
+    const [linhas] = await con.execute(`
+        SELECT c.id_campanha,
+               COUNT(DISTINCT CASE WHEN p.status_participacao = 'interessado' THEN p.id_usuario END) AS interessados,
+               COUNT(DISTINCT CASE WHEN p.status_participacao = 'pretende_ir' THEN p.id_usuario END) AS pretendem_ir,
+               COUNT(DISTINCT CASE WHEN p.status_participacao = 'comparecimento_informado' THEN p.id_usuario END) AS comparecimentos_informados,
+               COUNT(DISTINCT gc.id_grupo) AS grupos_vinculados
+        FROM campanhas c
+        JOIN hemocentros h ON h.id_hemocentro = c.id_hemocentro
+        LEFT JOIN participacoes p ON p.id_campanha = c.id_campanha
+        LEFT JOIN grupos_campanhas gc ON gc.id_campanha = c.id_campanha
+        WHERE h.id_usuario = ?
+        GROUP BY c.id_campanha
+    `, [idUsuario]);
+    return linhas;
+}

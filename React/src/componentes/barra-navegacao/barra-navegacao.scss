@@ -55,13 +55,19 @@ $vermelho: #a3262f;
     }
   }
 
-  .botao-menu {
+  .menu-container {
     position: absolute;
-    right: 40px;
+    right: 12px;
     top: 50%;
     transform: translateY(-50%);
-    width: 32px;
-    height: 32px;
+    width: 36px;
+  }
+
+  .botao-menu {
+    position: static;
+    transform: none;
+    width: 36px;
+    height: 36px;
     padding: 0;
     border: none;
     background: none;
@@ -139,13 +145,19 @@ $vermelho: #a3262f;
       }
     }
 
-    .botao-menu {
-      position: static;
+    .menu-container {
+      position: relative;
+      top: auto;
+      right: auto;
+      transform: none;
       flex: 0 0 40px;
       width: 40px;
-      height: 44px;
       margin-left: 2px;
-      transform: none;
+    }
+
+    .botao-menu {
+      width: 40px;
+      height: 44px;
 
       img {
         width: 30px;

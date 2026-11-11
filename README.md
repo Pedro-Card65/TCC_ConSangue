@@ -1,6 +1,6 @@
 # ConSangue 🩸
 
-**Conectando pessoas, grupos e instituições para fortalecer a doação de sangue.**
+**Conectando Vidas — tecnologia e mobilização coletiva para incentivar a doação de sangue.**
 
 O **ConSangue** é uma plataforma web desenvolvida como Trabalho de Conclusão de Curso (TCC) para facilitar a divulgação de campanhas de doação de sangue e estimular a mobilização coletiva. O sistema aproxima candidatos à doação, grupos de pessoas e instituições responsáveis pelas campanhas.
 
@@ -12,32 +12,50 @@ Centralizar informações sobre campanhas e hemocentros, permitir que usuários 
 
 > **Importante:** o ConSangue é uma plataforma de mobilização e acompanhamento. O registro de interesse, intenção ou comparecimento informado **não equivale à confirmação clínica de uma doação de sangue**.
 
-## Funcionalidades
+## Acesso ao projeto
 
-A documentação descreve o escopo funcional da versão prevista para a entrega do TCC.
+| Recurso | Endereço |
+| --- | --- |
+| Site publicado (Vercel) | https://tcc-consangue1.vercel.app |
+| API (Railway) | https://tccconsangue-production.up.railway.app |
+| Status HTTP da API | https://tccconsangue-production.up.railway.app/api/status |
+| Protótipo (Figma) | https://www.figma.com/design/bdDJZeDB4bHFSi6C6EUbuP/ConSangue |
+| Organização (Trello) | https://trello.com/b/aTNrT1IH/consangue |
 
-### Para candidatos à doação
+O código está publicado na branch principal. **Os registros de deploy bem-sucedido não substituem testes de acesso ao MySQL, autenticação e persistência em produção.**
 
-- Cadastro, autenticação e acesso ao perfil pessoal.
-- Consulta a campanhas de doação e informações de hemocentros.
-- Pesquisa de campanhas e visualização de detalhes.
-- Registro e acompanhamento de participações em campanhas.
-- Histórico das campanhas com as quais o usuário interagiu.
-- Criação e participação em grupos para mobilização coletiva.
+## Funcionalidades desenvolvidas
 
-### Para grupos
+### Candidatos à doação
 
-- Criação e gerenciamento de grupos.
-- Organização de membros e permissões de administração.
-- Associação de grupos a campanhas.
-- Definição e acompanhamento de metas de participação.
+- Cadastro, login, logout, JWT e rotas privadas protegidas.
+- Home com campanhas reais, informações de hemocentros e detalhes das campanhas.
+- **Busca global** por campanhas, hemocentros e grupos, com página de resultados.
+- Filtros disponíveis na página de campanhas (nome, cidade e status).
+- Registro e remoção de interesse em campanhas ativas; participação individual ou associada a grupo.
+- Histórico de participações com consulta e cancelamento dos registros.
+- Perfil com foto, informações da conta, contadores de participação e grupos.
 
-### Para instituições
+### Grupos de mobilização
 
-- Cadastro e gerenciamento de informações institucionais/hemocentros.
-- Criação, edição e gerenciamento de campanhas.
-- Divulgação de datas, horários, descrições e status das campanhas.
-- Acompanhamento de ações relacionadas às campanhas.
+- Consulta de grupos disponíveis e dos grupos do usuário.
+- Criação de grupos, com atribuição automática do papel de administrador ao criador.
+- **Entrada mediante código de convite alfanumérico de 8 caracteres**. A API atual **não permite entrar informando somente o ID numérico do grupo**.
+- Exibição dos integrantes somente para membros autorizados.
+- Edição do nome, descrição e foto do grupo pelo criador.
+- Saída e exclusão de grupos, respeitando permissões e relacionamentos existentes.
+- Vinculação de grupos às campanhas por administradores, com meta de participações.
+
+### Instituições e hemocentros
+
+- Cadastro do hemocentro por conta institucional autenticada.
+- Painel institucional com listagem das campanhas próprias.
+- Criação de campanhas com nome, descrição, datas, horários opcionais e status.
+- Indicadores de campanhas, grupos vinculados e intenções de comparecimento.
+- Indicadores agregados de interessados, usuários que pretendem ir, comparecimentos informados e grupos associados às campanhas.
+- API de atualização/exclusão de dados institucionais e campanhas com controle de titularidade.
+
+> Os indicadores representam registros feitos na plataforma, **não** doações de sangue clinicamente comprovadas. Nem todas as operações administrativas disponíveis na API possuem telas completas no frontend.
 
 ## Tecnologias utilizadas
 
@@ -49,8 +67,8 @@ A documentação descreve o escopo funcional da versão prevista para a entrega 
 | Banco de dados | MySQL, mysql2 |
 | Autenticação | JSON Web Token (JWT), bcrypt |
 | Configuração | dotenv |
-| Hospedagem prevista | Vercel (front-end) e Railway (API) |
-| Organização do projeto | GitHub, Trello e Figma |
+| Hospedagem | Vercel (front-end), Railway (API e MySQL) |
+| Organização e qualidade | GitHub, GitHub Actions, Trello, Figma e VS Code |
 
 ## Estrutura do repositório
 
@@ -58,6 +76,10 @@ A documentação descreve o escopo funcional da versão prevista para a entrega 
 TCC_ConSangue/
 ├── API/
 │   ├── .env.example
+│   ├── README.md
+│   ├── scripts/
+│   │   ├── preencher_codigos_grupos.mjs
+│   │   └── migrar_grupos_railway.mjs
 │   ├── package.json
 │   └── src/
 │       ├── api.js
@@ -69,18 +91,30 @@ TCC_ConSangue/
 ├── Database/
 │   ├── ConSangue.sql
 │   ├── dados_teste.sql
-│   └── migracao_foto_perfil.sql
+│   ├── migracao_foto_perfil.sql
+│   ├── migracao_foto_grupo.sql
+│   └── migracao_codigo_convite_grupo.sql
 ├── React/
 │   ├── .env.example
 │   ├── .env.production
+│   ├── vercel.json
 │   ├── package.json
 │   ├── public/
 │   └── src/
 │       ├── componentes/
 │       ├── layouts/
 │       ├── pages/
+│       │   ├── login/
+│       │   ├── home/
+│       │   ├── busca/
+│       │   ├── campanhas/
+│       │   ├── grupos/
+│       │   ├── participacoesHistorico/
+│       │   └── perfil/
 │       ├── services/
 │       └── routes.jsx
+├── .github/workflows/react-ci.yml
+├── API_ENDPOINTS.md
 └── README.md
 ```
 
@@ -116,15 +150,31 @@ O script cria o banco **`ConSangue`** e as tabelas necessárias.
 
 O arquivo **`Database/dados_teste.sql`** é opcional e deve ser executado **somente em ambiente local/de testes**, após o script principal. Seus registros são fictícios; a senha armazenada no usuário de demonstração não é um hash válido para autenticação. Para testar login, crie uma conta pelo formulário de cadastro.
 
-#### Atualizar um banco já existente (foto de perfil)
+#### Migrações para bancos já existentes
 
-Quem já tinha o banco criado antes da foto de perfil deve adicionar a coluna `foto_perfil` com o script **`Database/migracao_foto_perfil.sql`**:
+A criação de um banco novo pelo `Database/ConSangue.sql` já inclui fotos de perfil e grupo e códigos de convite. Para **bancos antigos**, existem migrações separadas:
+
+| Migração | Atualização |
+| --- | --- |
+| `Database/migracao_foto_perfil.sql` | Coluna `foto_perfil` em `usuarios` |
+| `Database/migracao_foto_grupo.sql` | Coluna `foto_grupo` em `grupos` |
+| `Database/migracao_codigo_convite_grupo.sql` | Coluna `codigo_convite` em `grupos` |
+
+**Faça backup e confira o schema antes de cada migração.** Os comandos `ALTER TABLE` não devem ser repetidos se as colunas já existirem. Para consultar as colunas, por exemplo:
 
 ```sql
-ALTER TABLE ConSangue.usuarios ADD COLUMN foto_perfil MEDIUMTEXT NULL;
+SHOW COLUMNS FROM ConSangue.usuarios LIKE 'foto_perfil';
+SHOW COLUMNS FROM ConSangue.grupos LIKE 'foto_grupo';
+SHOW COLUMNS FROM ConSangue.grupos LIKE 'codigo_convite';
 ```
 
-O script **não é idempotente**: se a coluna já existir, o MySQL retorna erro de coluna duplicada. Para conferir antes, use `SHOW COLUMNS FROM ConSangue.usuarios LIKE 'foto_perfil';`. Não há nada a fazer se a coluna já aparecer. Bancos novos criados com `ConSangue.sql` já têm a coluna.
+Após migrar os códigos de convite de um banco que já possuía grupos, preencha os códigos ausentes. Execute na pasta `API`, com as variáveis de conexão do **ambiente desejado**:
+
+```bash
+node scripts/preencher_codigos_grupos.mjs
+```
+
+Não execute scripts sobre o Railway sem backup e conferência do banco de destino. Detalhes em [API/README.md](API/README.md).
 
 ### 3. Configurar e iniciar a API
 
@@ -195,15 +245,20 @@ REACT_APP_API_URL=http://localhost:3001
 
 O arquivo **`React/.env.example`** contém um modelo dessa configuração. Reinicie o React após alterar variáveis de ambiente.
 
-### 5. Gerar a versão de produção do front-end
+### 5. Executar testes e gerar o build do React
 
-Dentro da pasta `React`:
+Na pasta `React`:
 
 ```bash
+npm test -- --watchAll=false --runInBand
 npm run build
 ```
 
-A compilação gera a pasta `React/build`. A URL pública da API deve estar definida corretamente nas variáveis usadas durante a compilação/deploy.
+O `prebuild` do React executa os testes antes do build. O repositório também possui o workflow `.github/workflows/react-ci.yml`, que executa os testes e a compilação em alterações relevantes da `master` e em pull requests. **Confira os resultados mais recentes em GitHub Actions**; a existência do workflow não significa que os testes tenham passado.
+
+O build gera a pasta `React/build`. A URL da API deve estar configurada corretamente por `REACT_APP_API_URL` durante a compilação/publicação.
+
+**Nota sobre a API:** o `npm test` de `API/package.json` ainda utiliza o script padrão de erro e não corresponde a uma suíte automatizada funcional na versão atual. O `npm start` da API utiliza `nodemon`; revisar o comando de produção no Railway.
 
 ## Banco de dados
 
@@ -211,62 +266,80 @@ O esquema relacional está definido em `Database/ConSangue.sql`.
 
 | Tabela | Finalidade |
 | --- | --- |
-| `usuarios` | Contas de candidatos e instituições, com a foto de perfil opcional (`foto_perfil`, em base64) |
+| `usuarios` | Candidatos e instituições, com foto de perfil opcional |
 | `hemocentros` | Informações das instituições/hemocentros |
 | `campanhas` | Dados e períodos das campanhas |
-| `grupos` | Comunidades de mobilização |
+| `grupos` | Comunidades, criadores, foto de grupo e códigos de convite |
 | `membros_grupo` | Vínculos e papéis dos participantes |
-| `grupos_campanhas` | Associação entre grupos e campanhas, com metas |
+| `grupos_campanhas` | Vínculos grupo–campanha e metas de participações |
 | `participacoes` | Registros de interesse, intenção e comparecimento informado |
 
 ## API — principais endpoints
 
-As rotas são agrupadas sob o prefixo `/api`. Alguns exemplos:
+A API utiliza o prefixo `/api`. A documentação detalhada está em [API_ENDPOINTS.md](API_ENDPOINTS.md) e [API/README.md](API/README.md).
 
 | Método | Rota | Descrição |
 | --- | --- | --- |
-| `GET` | `/api/status` | Verificar resposta da API |
-| `POST` | `/api/usuarios/cadastro` | Cadastrar usuário |
-| `POST` | `/api/usuarios/login` | Autenticar usuário |
-| `GET` | `/api/usuarios/me` | Consultar usuário autenticado (inclui `foto_perfil`) |
-| `PUT` | `/api/usuarios/foto` | Definir a foto de perfil do usuário autenticado (`{ "foto": "data:image/jpeg;base64,..." }`, JPEG, PNG ou WEBP, até 300 KB) ou removê-la com `{ "foto": null }`. O usuário vem do token, não do corpo |
-| `GET` | `/api/campanhas` | Listar ou pesquisar campanhas |
+| `GET` | `/api/status` | Resposta HTTP básica da API |
+| `POST` | `/api/usuarios/cadastro` | Cadastro de usuário |
+| `POST` | `/api/usuarios/login` | Login e emissão de JWT |
+| `GET` | `/api/usuarios/me` | Dados do usuário autenticado |
+| `PUT` | `/api/usuarios/foto` | Atualizar/remover foto de perfil |
+| `GET` | `/api/campanhas` | Listar campanhas |
 | `POST` | `/api/campanhas` | Criar campanha (instituição) |
-| `GET` | `/api/grupos` | Listar grupos |
-| `POST` | `/api/grupo` | Criar grupo (autenticado) |
-| `GET` | `/api/grupos/usuario/:id_usuario` | Listar grupos do usuário |
-| `GET` | `/api/instituicoes` | Listar instituições |
-| `GET` | `/api/participacoes` | Listar participações do candidato |
-| `POST` | `/api/participacoes` | Registrar participação do candidato |
+| `GET` | `/api/instituicoes` | Listar hemocentros |
+| `GET` | `/api/instituicoes/me` | Perfil e dados da instituição autenticada |
+| `GET` | `/api/instituicoes/me/adesao` | Indicadores de adesão às campanhas |
+| `GET` | `/api/grupos` | Lista pública de grupos |
+| `POST` | `/api/grupo` | Criar grupo |
+| `PUT` | `/api/grupo/:id` | Editar grupo (somente criador) |
+| `GET` | `/api/grupos/usuario/:id_usuario` | Listar os próprios grupos |
+| `POST` | `/api/membro` | Entrar com código de convite |
+| `GET` | `/api/membros/grupo/:id_grupo` | Ver integrantes (somente membros autorizados) |
+| `POST` | `/api/grupoCampanhas` | Vincular grupo a campanha |
+| `GET` | `/api/participacoes` | Consultar participações próprias |
+| `POST` | `/api/participacoes` | Registrar participação |
+| `DELETE` | `/api/participacoes/:id` | Cancelar participação |
 
-Rotas protegidas exigem token JWT, normalmente enviado em:
+As rotas protegidas exigem JWT, normalmente enviado como:
 
 ```http
 Authorization: Bearer SEU_TOKEN
 ```
 
-As permissões dependem do perfil do usuário e, conforme a operação, da titularidade do registro. Para detalhes de parâmetros e respostas, consulte os controllers e services em `API/src/`.
+No endpoint `POST /api/membro`, envie `codigo_convite` com 8 caracteres válidos. **Informar somente `id_grupo` não é aceito para ingresso.** A API valida autenticação, perfil e titularidade de cada operação.
 
 ## Segurança e privacidade
 
-- As senhas são tratadas com **bcrypt**.
-- A autenticação usa **JWT** e validações de perfil/permissão no back-end.
-- Variáveis de ambiente guardam as configurações locais e os segredos do servidor.
-- Credenciais reais não devem ser adicionadas ao Git.
-- Utilize dados fictícios nas capturas de tela, testes e demonstrações do TCC.
-- Informações de participação no sistema não substituem documentos ou comprovantes emitidos por hemocentros.
+- As senhas são tratadas com **bcrypt** e o acesso autenticado utiliza **JWT**.
+- O backend verifica perfis, titularidade de registros e permissões de administradores de grupos.
+- As rotas internas do React são protegidas; uma resposta `401` da API invalida a sessão, exceto na própria tentativa de login.
+- Códigos de convite e fotos privadas de grupos não são incluídos nas listagens públicas; a lista de membros exige participação no grupo.
+- Tokens, dados pessoais, segredos JWT e credenciais do MySQL não devem ser publicados no GitHub, Trello ou em capturas de tela.
+- Utilize dados fictícios e contas de teste nas demonstrações. Revise segredo JWT, CORS e configuração do serviço de produção antes da apresentação.
+- O uso de bcrypt, JWT e MySQL **não equivale automaticamente a conformidade integral com a LGPD**; uma implantação real exige avaliação específica de proteção, finalidade, retenção e exclusão de dados.
+- O status de comparecimento informado não é comprovante de doação efetiva.
+
+## Testes de aceitação e preparação para o TCC
+
+A demonstração deve ser validada com **contas fictícias**, na versão realmente publicada:
+
+1. Criar uma conta institucional, autenticar e cadastrar o hemocentro.
+2. Criar campanha, confirmar a listagem e recarregar a página.
+3. Entrar com uma conta de candidato, buscar campanha e registrar interesse.
+4. Abrir o histórico, verificar a participação e testar o cancelamento.
+5. Criar grupo, compartilhar o código de convite e ingressar com outro usuário fictício.
+6. Associar grupo e campanha, respeitando as permissões.
+7. Verificar persistência no MySQL após recarregar e testar logout, `401`, `403` e duplicidade.
+
+O endpoint `/api/status` confirma apenas que o servidor HTTP está respondendo. Use uma consulta real, como `GET /api/campanhas`, e operações com dados fictícios para verificar a integração com MySQL.
+
+**Situação em 11/11/2026:** o frontend está configurado para Vercel e a API/MySQL para Railway. A branch `master` contém busca global, grupos com convites, painel institucional, foto de grupos, indicadores e testes React. Permanecem necessários a confirmação das migrações no banco hospedado, os testes ponta a ponta e a verificação das execuções mais recentes do CI.
 
 ## Contexto acadêmico
 
-Projeto desenvolvido em equipe como **Trabalho de Conclusão de Curso (TCC)**, reunindo conhecimentos de desenvolvimento front-end, criação de APIs REST, banco de dados relacional, autenticação, design de interfaces e gestão de projeto.
+Projeto desenvolvido como **Trabalho de Conclusão de Curso (TCC) — Técnico em Informática, turma Informática D**, pelos integrantes Igor Prado, Miguel Costa, Miguel Ananias, Paulo Spínola e Pedro Cardoso.
 
-**ConSangue — uma iniciativa para incentivar a participação e a solidariedade por meio da tecnologia.**
+O projeto integra desenvolvimento frontend, API REST, banco relacional, autenticação, UI/UX, controle de versão, testes e implantação web.
 
-
-## Novidades dos grupos e painel institucional
-
-- Criadores podem editar nome, descrição e foto do grupo. A imagem é convertida para JPEG de 256 × 256 antes do envio.
-- Códigos de convite de 8 caracteres são gerados no backend, preservando o ingresso via IDs antigos.
-- O painel de hemocentros exibe contagens de interessados, intenções de comparecimento, comparecimentos informados e grupos vinculados por campanha. Esses números são registros no aplicativo, não doações confirmadas.
-- Em bancos já existentes, é necessário aplicar **`Database/migracao_foto_grupo.sql`** e **`Database/migracao_codigo_convite_grupo.sql`**, com backup prévio. Depois, execute `node scripts/preencher_codigos_grupos.mjs` a partir de `API/`.
-- Sem as migrações, as listagens continuam disponíveis e as operações que dependem das novas colunas retornam erro informativo. Veja `API/README.md`.
+**ConSangue — Conectando Vidas.**

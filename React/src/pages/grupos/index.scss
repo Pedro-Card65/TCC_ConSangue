@@ -111,7 +111,7 @@
   > p { color: #555; font-size: .9rem; }
   form { display: flex; flex-direction: column; gap: .55rem; margin-top: 1.2rem; }
   label { margin-top: .35rem; font-size: .85rem; }
-  input, textarea { width: 100%; box-sizing: border-box; padding: .65rem; border: 1px solid #d8d8d8; border-radius: .35rem; font: inherit; }
+  input, textarea, select { width: 100%; box-sizing: border-box; padding: .65rem; border: 1px solid #d8d8d8; border-radius: .35rem; font: inherit; }
   input:focus, textarea:focus { outline: 2px solid rgb(173 38 38 / 20%); border-color: #ad2626; }
   .botao-principal { align-self: flex-start; margin-top: .5rem; }
   .fechar-modal-grupos { position: absolute; top: .6rem; right: .8rem; border: 0; background: none; color: #666; font-size: 1.6rem; }

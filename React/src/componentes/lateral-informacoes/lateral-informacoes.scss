@@ -9,7 +9,14 @@ $secundario: #6b6264;
   align-items: flex-start;
   gap: 24px;
   padding: 32px 16px;
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
   font-family: 'Lexend', sans-serif;
+
+  > a {
+    flex: 0 0 auto;
+  }
 
   .logo-slogan {
     position: static;
@@ -20,11 +27,29 @@ $secundario: #6b6264;
     max-width: 291px;
     box-sizing: border-box;
     padding: 16px 14px;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
     background: #fff;
     border-radius: 8px;
     display: flex;
     flex-direction: column;
     gap: 16px;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    &:focus-visible {
+      outline: 2px solid #a3262f;
+      outline-offset: -2px;
+    }
+
+    > * {
+      flex-shrink: 0;
+    }
 
     h3, p {
       margin: 0;
@@ -204,12 +229,15 @@ $secundario: #6b6264;
 
   @media (max-width: 1023px) {
     width: 100%;
+    height: auto;
     padding: 16px;
     box-sizing: border-box;
     align-items: center;
 
     .cartao {
       max-width: 600px;
+      flex: none;
+      overflow: visible;
     }
   }
 }

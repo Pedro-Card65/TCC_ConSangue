@@ -12,6 +12,12 @@ function formatarHora(hora) {
   return hora ? hora.slice(0, 5) : '';
 }
 
+const ROTULO_PARTICIPACAO = {
+  interessado: 'Interesse',
+  pretende_ir: 'Planejada',
+  comparecimento_informado: 'Presença informada',
+};
+
 export default function ModalCampanha({ campanha, aoFechar }) {
   const caixa = useRef(null);
   const [participacao, setParticipacao] = useState(null);
@@ -145,7 +151,7 @@ export default function ModalCampanha({ campanha, aoFechar }) {
             </p>
           )}
 
-          <p><strong>Status:</strong> {campanha.status_campanha}</p>
+          <p><strong>Status:</strong> {campanha.status_campanha === 'ativa' ? 'Ativa' : 'Finalizada'}</p>
 
           {/* TODO A03: endereço, tipos sanguíneos, requisitos e engajamento (vêm da API) */}
         </div>
@@ -153,16 +159,18 @@ export default function ModalCampanha({ campanha, aoFechar }) {
         {erro && <p role="alert">{erro}</p>}
         {mensagem && <p role="status">{mensagem}</p>}
         {carregando && <p role="status">Consultando participação...</p>}
-        {participacao && <p role="status">Sua participação: {participacao.status_participacao.replaceAll('_', ' ')}{participacao.id_grupo_campanha ? ' (com grupo)' : ''}.</p>}
+        {participacao && <p role="status">Sua participação: {ROTULO_PARTICIPACAO[participacao.status_participacao] ?? participacao.status_participacao.replaceAll('_', ' ')}{participacao.id_grupo_campanha ? ' (com grupo)' : ''}.</p>}
         {!token && <p><Link to="/">Faça login</Link> para participar.</p>}
         {token && !candidato && <p>O registro de participação está disponível para candidatos.</p>}
         {campanha.status_campanha !== 'ativa' && <p>Esta campanha está finalizada.</p>}
         {candidato && campanha.status_campanha === 'ativa' && <>
           <div className="modal-acoes">
             <button type="button" disabled={carregando || salvando} onClick={carregarGrupos}>Participar com meu grupo</button>
-            <button type="button" disabled={carregando || salvando} onClick={participacao ? removerInteresse : () => participar()}>
-              {salvando ? 'Salvando...' : participacao ? 'Remover interesse' : 'Tenho interesse'}
-            </button>
+            {participacao?.status_participacao !== 'comparecimento_informado' && (
+              <button type="button" disabled={carregando || salvando} onClick={participacao ? removerInteresse : () => participar()}>
+                {salvando ? 'Salvando...' : participacao ? 'Remover interesse' : 'Tenho interesse'}
+              </button>
+            )}
           </div>
           {mostrarGrupos && <div className="selecao-grupo">
             <label htmlFor="grupo-participacao">Meu grupo vinculado à campanha</label>

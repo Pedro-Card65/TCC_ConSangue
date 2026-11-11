@@ -33,6 +33,7 @@ export default function Home() {
 
   return (
     <div className="pagina-home">
+      <h1 className="sr-only">Campanhas de doação</h1>
       {carregando && <p role="status">Carregando campanhas...</p>}
       {erro && <p role="alert">{erro}</p>}
 
@@ -48,7 +49,7 @@ export default function Home() {
                     {c.nome_hemo}
                     <img src="/assets/images/verificado.png" alt="Hemocentro verificado" title="Hemocentro verificado" />
                   </p>
-                  <p>Status: {c.status_campanha}</p>
+                  <p>Status: {c.status_campanha === 'ativa' ? 'Ativa' : 'Finalizada'}</p>
                 </div>
               </header>
               <div className="cartao-imagem">

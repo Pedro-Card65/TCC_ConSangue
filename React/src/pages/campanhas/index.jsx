@@ -55,7 +55,7 @@ export default function Campanhas() {
         if (!controle.signal.aborted) {
           setErro(
             error.response?.data?.erro ||
-            'Não foi possível carregar as campanhas. Verifique se a API está ligada.'
+            'Não foi possível carregar as campanhas. Tente novamente.'
           );
         }
       }

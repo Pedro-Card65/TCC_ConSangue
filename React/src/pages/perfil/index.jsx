@@ -213,6 +213,7 @@ export default function User() {
   return (
 
     <div className="pagina-user">
+      <h1 className="sr-only">Meu perfil</h1>
 
       <LogoSlogan />
       {campanhaAberta && <ModalCampanha campanha={campanhaAberta} aoFechar={fecharCampanha} />}
@@ -294,7 +295,7 @@ export default function User() {
                 <img src="/assets/icons/check-vermelho.png" alt="" />
                 <span>{estatisticas.participadas}</span>
               </div>
-              <p>Campanhas participadas</p>
+              <p>Participações informadas</p>
             </div>
 
             <div className="estatistica">

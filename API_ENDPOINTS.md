@@ -85,9 +85,9 @@ Arquivo: `API/src/controller/gruposController.js`. Montado com prefixo `/api`. V
 | Método | Caminho | Auth | Perfil / permissão | Corpo | Resposta | Códigos |
 |---|---|---|---|---|---|---|
 | POST | `/api/grupo` | JWT | Qualquer perfil. `id_criador` é injetado pelo servidor (`inserirMeuId`) | `{ nome_grupo (até 100), descricao (até 255) }` | `200 { id }` (observação: 200, não 201) | 200; 400 (`gruposService.js:15-38`); 401; 404 "Usuário ou grupo relacionado não encontrado."; 500 |
-| GET | `/api/grupos` | Pública | — | — | `200 { grupos }` | 200; 500 |
-| GET | `/api/grupos/:nome` | Pública | — | — | `200 { grupos }` (busca por nome; verificar no código: `gruposService.listarGruposPorNomeService`) | 200; 500 |
-| PUT | `/api/grupo/:id` | JWT + criador (`somenteCriadorGrupo`) | Só o criador do grupo | `{ nome_grupo (texto, até 100), descricao (texto, até 255) }`. Os dois são obrigatórios e não podem ficar vazios após `trim` (`gruposService.js:15-38`, `60-62`). O `id_criador` é definido pelo servidor (`permissoes.js:101`) | `200 { linhasAfetadas }` | 200; 400; 403; 404; 500 |
+| GET | `/api/grupos` | Pública | — | — | `200 { grupos }` com informações públicas; **sem** `codigo_convite` e `foto_grupo` | 200; 500 |
+| GET | `/api/grupos/:nome` | Pública | — | — | `200 { grupos }` filtrados por nome; **sem** `codigo_convite` e `foto_grupo` | 200; 500 |
+| PUT | `/api/grupo/:id` | JWT + criador (`somenteCriadorGrupo`) | Só o criador do grupo | `{ nome_grupo, descricao, foto_grupo? }`. `foto_grupo` opcional: JPEG base64 validado ou `null` para remover. `id_criador` vem do JWT. | `200 { linhasAfetadas }` | 200; 400; 403; 404; 500 |
 | DELETE | `/api/grupo/:id` | JWT + criador | Só o criador do grupo | — | `200 { linhasAfetadas }` | 200; 403; 409 `"Desvincule as campanhas antes de excluir o grupo."` (verificar no código: `gruposRepository.js:106-114`); 500 |
 
 ---
@@ -98,9 +98,9 @@ Arquivo: `API/src/controller/membros_grupoController.js`. Montado com prefixo `/
 
 | Método | Caminho | Auth | Perfil / permissão | Corpo | Resposta | Códigos |
 |---|---|---|---|---|---|---|
-| POST | `/api/membro` | JWT | Qualquer perfil. `id_usuario` vem do token e `papel` é sempre `"membro"` (`membros_grupoController.js:43`) | `{ id_grupo }` | `201 { id }` | 201; 400; 401; 404 `"Usuário ou grupo não encontrado."`; 409 `"Usuário já é membro deste grupo."`; 500 |
-| GET | `/api/membros/grupo/:id_grupo` | JWT | Qualquer perfil | — | `200 { membros }` | 200; 400; 401; 500 |
-| GET | `/api/grupos/usuario/:id_usuario` | JWT + dono (`somenteMeuId('id_usuario')`) | Só o próprio usuário | — | `200 { grupos }` | 200; 400; 403; 500 |
+| POST | `/api/membro` | JWT | Qualquer perfil autenticado. `id_usuario` é obtido do token; `papel` é forçado a `"membro"`. ID numérico não é convite. | `{ codigo_convite }` com 8 caracteres | `201 { id }` | 201; 400 para código ausente/inválido ou `id_grupo`; 401; 404 convite não encontrado; 409 membro existente; 500 |
+| GET | `/api/membros/grupo/:id_grupo` | JWT + membro (`somenteMembroGrupo`) | Somente integrante do grupo informado; não integrante recebe 403 | — | `200 { membros }` | 200; 400; 401; 403; 500 |
+| GET | `/api/grupos/usuario/:id_usuario` | JWT + dono (`somenteMeuId('id_usuario')`) | Somente o próprio usuário | — | `200 { grupos }` com `codigo_convite` e `foto_grupo` de seus próprios grupos | 200; 400; 403; 500 |
 | PUT | `/api/membro/:id` | JWT + permissão de membro (`permissaoMembro()`) | Administrador do grupo ou criador. Ninguém rebaixa o criador (403) | `{ papel: "administrador" \| "membro" }` | `200 { linhasAfetadas }` | 200; 400 `"Papel deve ser 'administrador' ou 'membro'"`; 403; 404 `"Membro não encontrado"`; 500 |
 | DELETE | `/api/membro/:id` | JWT + permissão de membro (`permissaoMembro(true)`) | O próprio membro pode sair; administrador ou criador pode remover. O criador não pode ser removido (403) | — | `200 { linhasAfetadas }` | 200; 403; 404; 409 `"Não é possível remover este vínculo porque existem registros relacionados."`; 500 |
 

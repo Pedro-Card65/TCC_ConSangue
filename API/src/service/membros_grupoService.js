@@ -16,22 +16,17 @@ function validarId(valor, campo) {
 
 export async function entrarGrupoService(membro) {
     const id_usuario = validarId(membro.id_usuario, 'ID do usuário');
-    let id_grupo;
-    if (membro.codigo_convite !== undefined) {
-        const codigo = String(membro.codigo_convite).trim().toUpperCase();
-        if (!/^[A-HJ-NP-Z2-9]{8}$/.test(codigo)) {
-            throw erroHttp(400, 'Código de convite inválido. Informe 8 caracteres.');
-        }
-        id_grupo = await buscarIdPorCodigoConvite(codigo);
-        if (!id_grupo) throw erroHttp(404, 'Código de convite não encontrado.');
-    } else {
-        id_grupo = validarId(membro.id_grupo, 'ID do grupo');
+    // Grupos fechados: ID numérico não é convite nem autorização.
+    if (membro.codigo_convite === undefined || membro.id_grupo !== undefined) {
+        throw erroHttp(400, 'Para entrar em um grupo, informe somente o código de convite de 8 caracteres.');
     }
-    const papel = membro.papel ?? 'membro';
-
-    if (!PAPEIS.includes(papel)) {
-        throw erroHttp(400, "Papel deve ser 'administrador' ou 'membro'");
+    const codigo = String(membro.codigo_convite).trim().toUpperCase();
+    if (!/^[A-HJ-NP-Z2-9]{8}$/.test(codigo)) {
+        throw erroHttp(400, 'Código de convite inválido. Informe 8 caracteres.');
     }
+    const id_grupo = await buscarIdPorCodigoConvite(codigo);
+    if (!id_grupo) throw erroHttp(404, 'Código de convite não encontrado.');
+    const papel = 'membro';
 
     return dbMembro.entrarGrupo({ id_usuario, id_grupo, papel });
 };

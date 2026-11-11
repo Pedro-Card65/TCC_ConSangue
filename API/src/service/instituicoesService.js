@@ -1,5 +1,19 @@
 import * as repository from '../repository/instituicoesRepository.js';
 
+export async function buscarMeuPainel(idUsuario) {
+    const registro = await repository.buscarPainelPorUsuario(validarId(idUsuario));
+    if (!registro) return { instituicao: null };
+    const { total_campanhas, total_grupos, total_agendamentos, ...instituicao } = registro;
+    return {
+        instituicao,
+        estatisticas: {
+            campanhas: Number(total_campanhas),
+            grupos: Number(total_grupos),
+            agendamentos: Number(total_agendamentos)
+        }
+    };
+}
+
 function erroHttp(mensagem, status = 400) {
     const erro = new Error(mensagem);
     erro.status = status;

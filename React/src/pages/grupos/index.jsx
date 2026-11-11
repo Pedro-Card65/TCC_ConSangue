@@ -1,6 +1,7 @@
 import './index.scss';
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '../../services/api.js';
+import VincularCampanha from '../../componentes/vincular-campanha';
 
 function tokenAtual() {
   return sessionStorage.getItem('token') || localStorage.getItem('token');
@@ -242,6 +243,9 @@ export default function Grupos() {
               <button className="botao-perigo" type="button" disabled={salvando} onClick={() => sairGrupo(grupoSelecionado)}>
                 {salvando ? 'Saindo...' : 'Sair do grupo'}
               </button>
+            )}
+            {meusIds.has(String(grupoSelecionado.id_grupo)) && String(grupoSelecionado.id_criador) === String(usuarioId) && (
+              <VincularCampanha key={grupoSelecionado.id_grupo} idGrupo={grupoSelecionado.id_grupo} />
             )}
           </>}
           {modal === 'confirmar-apagar' && grupoSelecionado && <>

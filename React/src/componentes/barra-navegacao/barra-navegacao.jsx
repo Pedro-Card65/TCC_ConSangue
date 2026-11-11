@@ -10,9 +10,23 @@ const itens = [
   { id: 5, rota: '/perfil', nome: 'Perfil', icone: 'perfil' }
 ];
 
+// Tipo de conta gravado no login (sessionStorage 'usuario'); sem chamada extra à API.
+function lerTipoUsuario() {
+  try {
+    return JSON.parse(sessionStorage.getItem('usuario') || 'null')?.tipo_usuario ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export default function BarraNavegacao() {
   const navigate = useNavigate();
   const [menuAberto, setMenuAberto] = useState(false);
+  const tipoUsuario = lerTipoUsuario();
+  // Histórico de participações é só para candidatos.
+  const itensVisiveis = tipoUsuario === 'instituicao'
+    ? itens.filter((item) => item.rota !== '/participacoesHistorico')
+    : itens;
 
   function irPara(rota) {
     setMenuAberto(false);
@@ -43,7 +57,7 @@ export default function BarraNavegacao() {
       <div className="conteudo-barra">
 
         <ul className="itens-navegacao">
-          {itens.map((item) => (
+          {itensVisiveis.map((item) => (
             <li key={item.id}>
               <NavLink to={item.rota} className="item" aria-label={item.nome}>
                 {({ isActive }) => (

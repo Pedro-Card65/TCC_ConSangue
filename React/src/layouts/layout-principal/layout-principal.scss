@@ -40,7 +40,7 @@
     min-width: 0;
     width: 100%;
     box-sizing: border-box;
-    padding: 32px 16px $reserva-barra;
+    padding: 32px clamp(24px, 2.5vw, 42px) $reserva-barra;
 
     > :first-child {
       margin-top: 0;
@@ -62,20 +62,31 @@
     }
 
     .coluna-centro {
-      width: min(100%, 860px);
-      padding: 24px 20px 32px;
+      width: min(100%, 940px);
+      padding: 28px clamp(24px, 4vw, 48px) 40px;
     }
   }
 
   @media (max-width: 600px) {
     .coluna-centro {
-      padding: 20px 12px 24px;
+      padding: 20px 20px 32px;
     }
 
     .coluna-esquerda,
     .coluna-direita {
-      padding-inline: 12px;
+      padding-inline: 20px;
       box-sizing: border-box;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .coluna-centro {
+      padding-inline: 16px;
+    }
+
+    .coluna-esquerda,
+    .coluna-direita {
+      padding-inline: 16px;
     }
   }
 

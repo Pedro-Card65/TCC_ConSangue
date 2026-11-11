@@ -87,8 +87,6 @@ export async function listarGrupos() {
                 descricao,
                 id_criador,
                 data_criacao
-                ${await colunaFotoDisponivel() ? ', foto_grupo' : ''}
-                ${await colunaConviteDisponivel() ? ', codigo_convite' : ''}
         FROM    grupos;
     `
     const [linhas] = await con.query(command, []);
@@ -102,8 +100,6 @@ export async function listarGruposPorNome(nome) {
                 descricao,
                 id_criador,
                 data_criacao
-                ${await colunaFotoDisponivel() ? ', foto_grupo' : ''}
-                ${await colunaConviteDisponivel() ? ', codigo_convite' : ''}
         FROM    grupos
         WHERE nome_grupo LIKE ?
     `

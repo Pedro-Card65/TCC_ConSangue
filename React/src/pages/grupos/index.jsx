@@ -67,6 +67,7 @@ export default function Grupos() {
   const [grupoSelecionado, setGrupoSelecionado] = useState(null);
   const [nome, setNome] = useState('');
   const [descricao, setDescricao] = useState('');
+  const [visibilidade, setVisibilidade] = useState('privado');
   const [codigo, setCodigo] = useState('');
   const [salvando, setSalvando] = useState(false);
   const [fotoGrupo, setFotoGrupo] = useState(null);
@@ -141,13 +142,14 @@ export default function Grupos() {
     setSalvando(true);
     setErro('');
     try {
-      await api.post('/api/grupo', { nome_grupo: nome.trim(), descricao: descricao.trim() }, {
+      await api.post('/api/grupo', { nome_grupo: nome.trim(), descricao: descricao.trim(), visibilidade }, {
         headers: { Authorization: `Bearer ${tokenAtual()}` }
       });
       window.dispatchEvent(new Event('consangue:grupo-atualizado'));
       setMensagem('Grupo criado com sucesso.');
       setNome('');
       setDescricao('');
+      setVisibilidade('privado');
       setModal('');
       await carregar();
     } catch (error) {
@@ -176,6 +178,30 @@ export default function Grupos() {
     } catch (error) {
       setErro(error.response?.data?.erro || error.message || 'Não foi possível entrar no grupo. Confira o código e tente novamente.');
     } finally { setSalvando(false); }
+  }
+
+  async function entrarGrupoPublico(grupo) {
+    if (grupo.visibilidade !== 'publico') {
+      setErro('Este grupo é privado. Utilize um código de convite.');
+      return;
+    }
+    setSalvando(true);
+    setErro('');
+    setMensagem('');
+    try {
+      await api.post('/api/membro/publico', { id_grupo: grupo.id_grupo }, {
+        headers: { Authorization: `Bearer ${tokenAtual()}` }
+      });
+      window.dispatchEvent(new Event('consangue:grupo-atualizado'));
+      setMensagem('Você entrou no grupo público com sucesso.');
+      setModal('');
+      setGrupoSelecionado(null);
+      await carregar();
+    } catch (error) {
+      setErro(error.response?.data?.erro || 'Não foi possível entrar no grupo público.');
+    } finally {
+      setSalvando(false);
+    }
   }
 
   async function sairGrupo(grupo) {
@@ -225,6 +251,7 @@ export default function Grupos() {
     setGrupoSelecionado(grupo);
     setNome(grupo.nome_grupo || '');
     setDescricao(grupo.descricao || '');
+    setVisibilidade(grupo.visibilidade || 'privado');
     setFotoGrupo(grupo.foto_grupo || null);
     setFotoAlterada(false);
     setNomeArquivoFoto('');
@@ -256,6 +283,7 @@ export default function Grupos() {
       await api.put(`/api/grupo/${grupoSelecionado.id_grupo}`, {
         nome_grupo: nome.trim(),
         descricao: descricao.trim(),
+        ...(visibilidade !== (grupoSelecionado.visibilidade || 'privado') ? { visibilidade } : {}),
         ...(fotoAlterada ? { foto_grupo: fotoGrupo } : {})
       }, { headers: { Authorization: `Bearer ${tokenAtual()}` } });
       window.dispatchEvent(new Event('consangue:grupo-atualizado'));
@@ -264,6 +292,7 @@ export default function Grupos() {
       setGrupoSelecionado(null);
       setNome('');
       setDescricao('');
+      setVisibilidade('privado');
       await carregar();
     } catch (error) {
       setErro(error.response?.data?.erro || 'Não foi possível atualizar o grupo.');
@@ -275,7 +304,7 @@ export default function Grupos() {
       <header className="cabecalho-grupos">
         <h1>MEUS GRUPOS</h1>
         <div className="acoes-grupos">
-          <button className="botao-principal" type="button" onClick={() => { setErro(''); setModal('criar'); }}>
+          <button className="botao-principal" type="button" onClick={() => { setErro(''); setVisibilidade('privado'); setModal('criar'); }}>
             Criar novo grupo <span aria-hidden="true">+</span>
           </button>
           <button className="botao-secundario" type="button" onClick={() => { setErro(''); setModal('entrar'); }}>
@@ -300,7 +329,7 @@ export default function Grupos() {
                 </div>
                 <div className="texto-grupo">
                   <h2>{grupo.nome_grupo}</h2>
-                  <p>{participando ? `${contagens[grupo.id_grupo] ?? '—'} ${contagens[grupo.id_grupo] === 1 ? 'membro' : 'membros'}` : 'Grupo fechado por convite'}</p>
+                  <p>{participando ? `${contagens[grupo.id_grupo] ?? '—'} ${contagens[grupo.id_grupo] === 1 ? 'membro' : 'membros'}` : (grupo.visibilidade === 'publico' ? 'Público · entrada livre' : 'Privado · entrada por convite')}</p>
                 </div>
                 
               </div>
@@ -324,7 +353,12 @@ export default function Grupos() {
               <label htmlFor="nome-grupo">Nome do grupo</label>
               <input id="nome-grupo" value={nome} onChange={(e) => setNome(e.target.value)} maxLength={100} required />
               <label htmlFor="descricao-grupo">Descrição</label>
-              <textarea id="descricao-grupo" value={descricao} onChange={(e) => setDescricao(e.target.value)} rows={3} />
+              <textarea id="descricao-grupo" value={descricao} onChange={(e) => setDescricao(e.target.value)} rows={3} required maxLength={255} />
+              <label htmlFor="visibilidade-grupo">Quem pode entrar no grupo?</label>
+              <select id="visibilidade-grupo" value={visibilidade} onChange={(e) => setVisibilidade(e.target.value)}>
+                <option value="privado">Privado — somente com convite</option>
+                <option value="publico">Público — qualquer usuário autenticado pode entrar</option>
+              </select>
               {erro && <p className="erro-modal" role="alert">{erro}</p>}
               <button className="botao-principal" type="submit" disabled={salvando}>{salvando ? 'Criando...' : 'Criar grupo'}</button>
             </form>
@@ -337,6 +371,11 @@ export default function Grupos() {
               <input id="editar-nome-grupo" value={nome} onChange={e => setNome(e.target.value)} maxLength={100} required />
               <label htmlFor="editar-descricao-grupo">Descrição</label>
               <textarea id="editar-descricao-grupo" value={descricao} onChange={e => setDescricao(e.target.value)} maxLength={255} rows={3} required />
+              <label htmlFor="editar-visibilidade-grupo">Visibilidade</label>
+              <select id="editar-visibilidade-grupo" value={visibilidade} onChange={e => setVisibilidade(e.target.value)}>
+                <option value="privado">Privado — entrada por convite</option>
+                <option value="publico">Público — entrada livre</option>
+              </select>
               <div className="editor-foto-grupo">
                 <div className="avatar-grupo avatar-preview" aria-hidden="true">
                   {fotoGrupo ? <img src={fotoGrupo} alt="" /> : (nome || 'G').trim().charAt(0).toUpperCase()}
@@ -408,6 +447,7 @@ export default function Grupos() {
               <h2 id="titulo-modal-grupos">{grupoSelecionado.nome_grupo}</h2>
             </div>
             <p>{grupoSelecionado.descricao || 'Grupo de doadores ConSangue.'}</p>
+            <p><strong>Visibilidade:</strong> {grupoSelecionado.visibilidade === 'publico' ? 'Público' : 'Privado'}</p>
             {meusIds.has(String(grupoSelecionado.id_grupo)) && grupoSelecionado.codigo_convite && (
               <div className="codigo-exibido">
                 <span>Código do grupo: <strong>{grupoSelecionado.codigo_convite}</strong></span>
@@ -424,7 +464,9 @@ export default function Grupos() {
             {erro && <p className="erro-modal" role="alert">{erro}</p>}
             {meusIds.has(String(grupoSelecionado.id_grupo))
               ? <p className="aviso-participacao">Você já participa deste grupo.</p>
-              : <button className="botao-principal" type="button" onClick={() => { setCodigo(''); setErro(''); setModal('entrar'); }}>Entrar com convite</button>}
+              : grupoSelecionado.visibilidade === 'publico'
+                ? <button className="botao-principal" type="button" disabled={salvando} onClick={() => entrarGrupoPublico(grupoSelecionado)}>{salvando ? 'Entrando...' : 'Entrar neste grupo público'}</button>
+                : <button className="botao-principal" type="button" onClick={() => { setCodigo(''); setErro(''); setModal('entrar'); }}>Entrar com convite</button>}
             {meusIds.has(String(grupoSelecionado.id_grupo)) && String(grupoSelecionado.id_criador) !== String(usuarioId) && (
               <button className="botao-perigo" type="button" disabled={salvando} onClick={() => sairGrupo(grupoSelecionado)}>
                 {salvando ? 'Saindo...' : 'Sair do grupo'}
@@ -454,8 +496,12 @@ export default function Grupos() {
                       </ul>}
               </section>
             )}
-            {meusIds.has(String(grupoSelecionado.id_grupo)) && String(grupoSelecionado.id_criador) === String(usuarioId) && (
-              <VincularCampanha key={grupoSelecionado.id_grupo} idGrupo={grupoSelecionado.id_grupo} />
+            {meusIds.has(String(grupoSelecionado.id_grupo)) && (
+              <VincularCampanha
+                key={grupoSelecionado.id_grupo}
+                idGrupo={grupoSelecionado.id_grupo}
+                podeAdministrar={String(grupoSelecionado.id_criador) === String(usuarioId) || meusGrupos[String(grupoSelecionado.id_grupo)]?.papel === 'administrador'}
+              />
             )}
             {meusIds.has(String(grupoSelecionado.id_grupo)) && String(grupoSelecionado.id_criador) === String(usuarioId) && (
               <div className="acoes-finais-grupo" aria-label="Gerenciar grupo">

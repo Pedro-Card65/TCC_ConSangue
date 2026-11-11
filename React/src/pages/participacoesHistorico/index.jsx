@@ -66,8 +66,12 @@ export default function ParticipacoesHistorico() {
         setParticipacoes(listaParticipacoes);
         setCampanhas(listaCampanhas);
         setGrupos(listaGrupos);
-      } catch {
-        if (ativo) setErro('Não foi possível carregar suas participações. Tente novamente mais tarde.');
+      } catch (erroRequisicao) {
+        if (ativo) {
+          setErro(erroRequisicao?.response?.status === 403
+            ? 'Esta página é só para candidatos.'
+            : 'Não foi possível carregar suas participações. Tente novamente mais tarde.');
+        }
       } finally {
         if (ativo) setCarregando(false);
       }

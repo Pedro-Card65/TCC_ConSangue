@@ -52,6 +52,16 @@ endpoints.post('/membro', getAuthentication(), inserirMeuId('id_usuario'), (req,
     }
 });
 
+// Entrar diretamente apenas em grupos marcados como públicos.
+endpoints.post('/membro/publico', getAuthentication(), inserirMeuId('id_usuario'), async (req, resp) => {
+    try {
+        const id = await service.entrarGrupoPublicoService(req.body);
+        resp.status(201).json({ id });
+    } catch (error) {
+        tratarErro(resp, error);
+    }
+});
+
 // Listar membros de um grupo
 endpoints.get('/membros/grupo/:id_grupo', getAuthentication(), somenteMembroGrupo, async (req, resp) => {
     try {

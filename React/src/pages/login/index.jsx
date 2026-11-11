@@ -108,6 +108,7 @@ if (def === 'Login'){
     <input
         type="text"
         placeholder="Digite seu CPF"
+        aria-label="CPF"
         required
         value={Cap}
         onChange={capturaCPF}
@@ -116,6 +117,7 @@ if (def === 'Login'){
     <input
         type="password"
         placeholder="Digite sua senha"
+        aria-label="Senha"
         required
         value={Senha}
         onChange={capturaSenha}
@@ -210,6 +212,7 @@ async function fazerCadastro(e) {
         <input
             type="text"
             name="usuario"
+            aria-label="Nome completo"
             placeholder="Digite seu nome completo"
             value={cadastro.usuario}
             onChange={alterarCadastro}
@@ -222,6 +225,7 @@ async function fazerCadastro(e) {
         <input
             type="text"
             name="cpf"
+            aria-label="CPF"
             placeholder="123.456.789-00"
             value={cadastro.cpf}
             onChange={alterarCadastro}
@@ -234,6 +238,7 @@ async function fazerCadastro(e) {
         <input
             type="date"
             name="nascimento"
+            aria-label="Data de nascimento"
             value={cadastro.nascimento}
             onChange={alterarCadastro}
             required
@@ -245,6 +250,7 @@ async function fazerCadastro(e) {
         <input
             type="tel"
             name="telefone"
+            aria-label="Telefone"
             placeholder="(11) 99999-9999"
             value={cadastro.telefone}
             onChange={alterarCadastro}
@@ -257,6 +263,7 @@ async function fazerCadastro(e) {
         <input
             type="email"
             name="email"
+            aria-label="E-mail"
             placeholder="Digite seu e-mail"
             value={cadastro.email}
             onChange={alterarCadastro}
@@ -269,6 +276,7 @@ async function fazerCadastro(e) {
         <input
             type="text"
             name="cidade"
+            aria-label="Cidade"
             placeholder="Digite sua cidade"
             value={cadastro.cidade}
             onChange={alterarCadastro}
@@ -280,6 +288,7 @@ async function fazerCadastro(e) {
         <p>Tipo Sanguíneo</p>
         <select
             name="tipo_sangue"
+            aria-label="Tipo sanguíneo"
             value={cadastro.tipo_sangue}
             onChange={alterarCadastro}
         >
@@ -299,6 +308,7 @@ async function fazerCadastro(e) {
         <p>Tipo de Usuário *</p>
         <select
             name="tipo_usuario"
+            aria-label="Tipo de usuário"
             value={cadastro.tipo_usuario}
             onChange={alterarCadastro}
             required
@@ -313,6 +323,7 @@ async function fazerCadastro(e) {
         <input
             type="password"
             name="senha"
+            aria-label="Senha"
             placeholder="Digite sua senha"
             value={cadastro.senha}
             onChange={alterarCadastro}
@@ -326,6 +337,7 @@ async function fazerCadastro(e) {
         <input
             type="password"
             placeholder="Digite sua senha novamente"
+            aria-label="Confirmação de senha"
             value={confirmarSenha}
             onChange={(e) => setConfirmarSenha(e.target.value)}
             required

@@ -3,9 +3,9 @@ import './index.scss';
 import { api } from '../../services/api.js';
 
 const STATUS = {
-  comparecimento_informado: 'Realizada',
+  comparecimento_informado: 'Presença informada',
   interessado: 'Tenho interesse',
-  pretende_ir: 'Agendada',
+  pretende_ir: 'Pretende ir',
 };
 
 function formatarData(data) {

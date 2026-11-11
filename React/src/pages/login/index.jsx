@@ -1,6 +1,5 @@
 
 import './index.scss';
-import './index2.scss';
 import { useState } from 'react'
 import { api } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
@@ -94,10 +93,21 @@ const [cadastro, setCadastro] = useState({
 ////////////////////////////////////////////////////////////////////////////////
 if (def === 'Login'){
   return (
+<<<<<<< HEAD
     <div className="Background">
-      <LogoSlogan/>
 
       <main className="Login">
+        <div className="Login-logo">
+          <LogoSlogan/>
+=======
+    <div className="Background auth-page auth-page--login">
+
+      <main className="Login">
+        <div className="Login-logo">
+          <div className="auth-brand"><LogoSlogan/></div>
+>>>>>>> 6af48690620e19056571256973665b83dce1f097
+        </div>
+
         <h1>Fazer Login na sua Conta</h1>
 
         <form onSubmit={fazerLogin}>
@@ -105,6 +115,7 @@ if (def === 'Login'){
     <input
         type="text"
         placeholder="Digite seu CPF"
+        aria-label="CPF"
         required
         value={Cap}
         onChange={capturaCPF}
@@ -113,6 +124,7 @@ if (def === 'Login'){
     <input
         type="password"
         placeholder="Digite sua senha"
+        aria-label="Senha"
         required
         value={Senha}
         onChange={capturaSenha}
@@ -130,7 +142,7 @@ if (def === 'Login'){
 
 </form>
 
-        <div className="Cadastro"><p>É a sua primeira vez por aqui?<p className='Troca' onClick={troca}>Faça o seu Cadastro!</p></p></div>
+        <div className="auth-switch"><p>É a sua primeira vez por aqui?</p><button type="button" className="Troca" onClick={troca}>Faça o seu cadastro!</button></div>
       </main>
     </div>
   )
@@ -194,7 +206,7 @@ async function fazerCadastro(e) {
 }
 // Tela de cadastro
     return (
-    <div className="Background">
+    <div className="Background auth-page auth-page--cadastro">
         <LogoSlogan/>
   
         <main className="Cadastro">
@@ -207,6 +219,7 @@ async function fazerCadastro(e) {
         <input
             type="text"
             name="usuario"
+            aria-label="Nome completo"
             placeholder="Digite seu nome completo"
             value={cadastro.usuario}
             onChange={alterarCadastro}
@@ -219,6 +232,7 @@ async function fazerCadastro(e) {
         <input
             type="text"
             name="cpf"
+            aria-label="CPF"
             placeholder="123.456.789-00"
             value={cadastro.cpf}
             onChange={alterarCadastro}
@@ -231,6 +245,7 @@ async function fazerCadastro(e) {
         <input
             type="date"
             name="nascimento"
+            aria-label="Data de nascimento"
             value={cadastro.nascimento}
             onChange={alterarCadastro}
             required
@@ -242,6 +257,7 @@ async function fazerCadastro(e) {
         <input
             type="tel"
             name="telefone"
+            aria-label="Telefone"
             placeholder="(11) 99999-9999"
             value={cadastro.telefone}
             onChange={alterarCadastro}
@@ -254,6 +270,7 @@ async function fazerCadastro(e) {
         <input
             type="email"
             name="email"
+            aria-label="E-mail"
             placeholder="Digite seu e-mail"
             value={cadastro.email}
             onChange={alterarCadastro}
@@ -266,6 +283,7 @@ async function fazerCadastro(e) {
         <input
             type="text"
             name="cidade"
+            aria-label="Cidade"
             placeholder="Digite sua cidade"
             value={cadastro.cidade}
             onChange={alterarCadastro}
@@ -277,6 +295,7 @@ async function fazerCadastro(e) {
         <p>Tipo Sanguíneo</p>
         <select
             name="tipo_sangue"
+            aria-label="Tipo sanguíneo"
             value={cadastro.tipo_sangue}
             onChange={alterarCadastro}
         >
@@ -296,6 +315,7 @@ async function fazerCadastro(e) {
         <p>Tipo de Usuário *</p>
         <select
             name="tipo_usuario"
+            aria-label="Tipo de usuário"
             value={cadastro.tipo_usuario}
             onChange={alterarCadastro}
             required
@@ -310,6 +330,7 @@ async function fazerCadastro(e) {
         <input
             type="password"
             name="senha"
+            aria-label="Senha"
             placeholder="Digite sua senha"
             value={cadastro.senha}
             onChange={alterarCadastro}
@@ -323,6 +344,7 @@ async function fazerCadastro(e) {
         <input
             type="password"
             placeholder="Digite sua senha novamente"
+            aria-label="Confirmação de senha"
             value={confirmarSenha}
             onChange={(e) => setConfirmarSenha(e.target.value)}
             required
@@ -341,7 +363,7 @@ async function fazerCadastro(e) {
 
 </form>
       
-          <div className="Cadastro"><p className='Troca' onClick={troca}>Voltar para a tela de Login</p></div>
+          <div className="auth-switch"><button type="button" className="Troca" onClick={troca}>Voltar para a tela de login</button></div>
         </main>
   
       </div>

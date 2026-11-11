@@ -36,6 +36,8 @@ CREATE TABLE grupos (
     id_grupo INT PRIMARY KEY AUTO_INCREMENT,
     nome_grupo VARCHAR(100) NOT NULL,
     descricao VARCHAR(255) NOT NULL,
+    foto_grupo MEDIUMTEXT NULL,
+    codigo_convite CHAR(8) NULL UNIQUE,
     id_criador INT NOT NULL,
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 

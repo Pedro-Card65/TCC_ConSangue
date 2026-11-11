@@ -440,4 +440,94 @@ $largura-central: 600px;
       color: #fff;
     }
   }
+<<<<<<< HEAD
 }
+=======
+}
+
+.pagina-user > a:first-child {
+  display: none;
+}
+
+@media (max-width: 1279px) {
+  .pagina-user > a:first-child {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    width: min(100%, 250px);
+    max-width: 100%;
+    margin: 0 0 18px;
+    text-decoration: none;
+  }
+
+  .pagina-user > a:first-child .logo-slogan {
+    position: static;
+    top: auto;
+    left: auto;
+    width: 100%;
+    max-width: 100%;
+    z-index: auto;
+  }
+
+  .pagina-user > a:first-child .logo-slogan .logo {
+    display: flex;
+    justify-content: center;
+  }
+
+  .pagina-user > a:first-child .logo-slogan .logo img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 76px;
+    object-fit: contain;
+  }
+
+  .pagina-user .pesquisa {
+    min-width: 0;
+  }
+
+  .pagina-user .pesquisa input {
+    min-width: 0;
+    max-width: 100%;
+    text-overflow: ellipsis;
+  }
+
+  .pagina-user .conteudo-informacoes-usuario .coluna-user-1,
+  .pagina-user .conteudo-informacoes-usuario .coluna-user-2 {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 600px) {
+  .pagina-user > a:first-child {
+    width: min(100%, 220px);
+    margin-bottom: 16px;
+  }
+
+  .pagina-user > a:first-child .logo-slogan .logo img {
+    max-height: 66px;
+  }
+
+  .pagina-user .user {
+    margin-top: 16px;
+  }
+}
+
+
+.pagina-user .busca-perfil {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 760px;
+  min-width: 0;
+  margin: 0 auto 20px;
+}
+
+@media (max-width: 600px) {
+  .pagina-user .busca-perfil {
+    margin-bottom: 14px;
+  }
+}
+>>>>>>> 6af48690620e19056571256973665b83dce1f097

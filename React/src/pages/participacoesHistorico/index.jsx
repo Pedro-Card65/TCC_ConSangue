@@ -3,9 +3,9 @@ import './index.scss';
 import { api } from '../../services/api.js';
 
 const STATUS = {
-  comparecimento_informado: 'Realizada',
+  comparecimento_informado: 'Presença informada',
   interessado: 'Tenho interesse',
-  pretende_ir: 'Agendada',
+  pretende_ir: 'Pretende ir',
 };
 
 function formatarData(data) {
@@ -66,8 +66,12 @@ export default function ParticipacoesHistorico() {
         setParticipacoes(listaParticipacoes);
         setCampanhas(listaCampanhas);
         setGrupos(listaGrupos);
-      } catch {
-        if (ativo) setErro('Não foi possível carregar suas participações. Tente novamente mais tarde.');
+      } catch (erroRequisicao) {
+        if (ativo) {
+          setErro(erroRequisicao?.response?.status === 403
+            ? 'Esta página é só para candidatos.'
+            : 'Não foi possível carregar suas participações. Tente novamente mais tarde.');
+        }
       } finally {
         if (ativo) setCarregando(false);
       }
@@ -150,4 +154,4 @@ export default function ParticipacoesHistorico() {
       </div>
     </div>
   );
-}
+};

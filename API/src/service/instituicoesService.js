@@ -1,5 +1,30 @@
 import * as repository from '../repository/instituicoesRepository.js';
 
+export async function buscarMinhaAdesao(idUsuario) {
+    const linhas = await repository.listarAdesaoPorCampanha(validarId(idUsuario));
+    return linhas.map(linha => ({
+        id_campanha: linha.id_campanha,
+        interessados: Number(linha.interessados),
+        pretendem_ir: Number(linha.pretendem_ir),
+        comparecimentos_informados: Number(linha.comparecimentos_informados),
+        grupos_vinculados: Number(linha.grupos_vinculados)
+    }));
+}
+
+export async function buscarMeuPainel(idUsuario) {
+    const registro = await repository.buscarPainelPorUsuario(validarId(idUsuario));
+    if (!registro) return { instituicao: null };
+    const { total_campanhas, total_grupos, total_agendamentos, ...instituicao } = registro;
+    return {
+        instituicao,
+        estatisticas: {
+            campanhas: Number(total_campanhas),
+            grupos: Number(total_grupos),
+            agendamentos: Number(total_agendamentos)
+        }
+    };
+}
+
 function erroHttp(mensagem, status = 400) {
     const erro = new Error(mensagem);
     erro.status = status;

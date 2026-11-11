@@ -51,6 +51,24 @@ export default function InformacoesLaterais() {
   useEffect(() => {
     let ativo = true;
 
+    async function atualizarGrupoRecente() {
+      const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+      if (!token) return;
+
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      try {
+        const respostaUsuario = await api.get('/api/usuarios/me', config);
+        const usuarioLogado = respostaUsuario.data?.usuario ?? respostaUsuario.data;
+        const respostaGrupos = await api.get(`/api/grupos/usuario/${usuarioLogado.id_usuario}`, config);
+        const grupos = respostaGrupos.data?.grupos ?? [];
+        if (ativo) setGrupoRecente(grupos[0] ?? null);
+      } catch {
+        // Mantém o último grupo exibido se uma atualização temporária falhar.
+      }
+    }
+
+    window.addEventListener('consangue:grupo-atualizado', atualizarGrupoRecente);
+
     async function buscarDadosLaterais() {
       const token = sessionStorage.getItem('token');
 
@@ -132,14 +150,17 @@ export default function InformacoesLaterais() {
     }
 
     buscarDadosLaterais();
-    return () => { ativo = false; };
+    return () => {
+      ativo = false;
+      window.removeEventListener('consangue:grupo-atualizado', atualizarGrupoRecente);
+    };
   }, []);
 
   return (
     <section className="informacoes-laterais">
       <LogoSlogan />
 
-      <div className="cartao" aria-busy={carregando}>
+      <div className="cartao" aria-busy={carregando} role="region" aria-label="Informações do usuário" tabIndex={0}>
         <div className="foto-nome-user">
           <div className="foto-perfil-reservada">
             <img src={usuario?.foto_perfil || '/assets/icons/perfil-vermelho.webp'} alt="" />

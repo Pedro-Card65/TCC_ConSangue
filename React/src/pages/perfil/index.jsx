@@ -3,6 +3,9 @@ import LogoSlogan from '../../componentes/logo-slogan/logo-slogan.jsx';
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api.js';
+import ModalCampanha from '../../componentes/modal-campanha/modal-campanha.jsx';
+import PainelInstitucional from '../../componentes/painel-institucional';
+import BuscaGlobal from '../../componentes/busca-global';
 
 const STATUS = {
   comparecimento_informado: { texto: 'Compareceu', classe: 'compareceu' },
@@ -10,7 +13,11 @@ const STATUS = {
   pretende_ir: { texto: 'Planejada', classe: 'planejada' },
 };
 
-const formatarData = (d) => (d ? new Date(d).toLocaleDateString('pt-BR') : '—');
+const formatarData = (d) => {
+  if (!d) return '—';
+  const valor = /^\d{4}-\d{2}-\d{2}$/.test(String(d)) ? `${d}T00:00:00` : d;
+  return new Date(valor).toLocaleDateString('pt-BR');
+};
 
 const AVATAR_PADRAO = '/assets/icons/perfil-vermelho.webp';
 const FOTO_TAMANHO = 256;
@@ -61,6 +68,11 @@ export default function User() {
   const [confirmandoExclusao, setConfirmandoExclusao] = useState(false);
   const [excluindo, setExcluindo] = useState(false);
   const [erroExclusao, setErroExclusao] = useState('');
+<<<<<<< HEAD
+=======
+  const [campanhaAberta, setCampanhaAberta] = useState(null);
+  const [atualizacao, setAtualizacao] = useState(0);
+>>>>>>> 6af48690620e19056571256973665b83dce1f097
 
   async function excluirConta() {
     const token = sessionStorage.getItem('token');
@@ -97,6 +109,12 @@ export default function User() {
       const me = (await api.get('/api/usuarios/me', { headers })).data;
       const id = me.id_usuario ?? me.usuario?.id_usuario;
 
+      const autenticado = me.usuario ?? me;
+      if (autenticado.tipo_usuario === 'instituicao') {
+        if (ativo) setUsuario(autenticado);
+        return;
+      }
+
       const [busca, grupos, parts, camps] = await Promise.all([
         api.get(`/api/usuarios/busca/${id}`, { headers }),
         api.get(`/api/grupos/usuario/${id}`, { headers }),
@@ -109,12 +127,13 @@ export default function User() {
       const u = busca.data.usuario ?? busca.data;
       const listaGrupos = grupos.data.grupos ?? [];
       const listaCamps = camps.data.campanhas ?? [];
-      const listaParts = (parts.data.participacoes ?? [])
-        .filter((p) => p.id_usuario === id); // remova se a API já filtra pelo token
+      const participacoes = Array.isArray(parts.data) ? parts.data : parts.data.participacoes;
+      if (!Array.isArray(participacoes)) throw new Error('Resposta de participações inválida');
+      const listaParts = participacoes.filter((p) => String(p.id_usuario) === String(id));
 
       const cruzadas = listaParts.map((p) => {
-        const c = listaCamps.find((x) => x.id_campanha === p.id_campanha) || {};
-        return { ...p, ...c, data: p.data_prevista || p.data_registro };
+        const c = listaCamps.find((x) => String(x.id_campanha) === String(p.id_campanha)) || {};
+        return { ...c, ...p, data: p.data_prevista || p.data_registro };
       });
 
       setUsuario(u);
@@ -124,9 +143,16 @@ export default function User() {
         participadas: listaParts.filter((p) => p.status_participacao === 'comparecimento_informado').length,
         interesse: listaParts.filter((p) => p.status_participacao === 'interessado').length,
       });
+      const hoje = new Date();
+      hoje.setHours(0, 0, 0, 0);
       setProximaCampanha(
         cruzadas
+<<<<<<< HEAD
           .filter((p) => p.status_participacao === 'pretende_ir' && new Date(p.data_prevista) > new Date())
+=======
+          .filter((p) => p.status_participacao === 'pretende_ir' && p.data_prevista &&
+            new Date(`${String(p.data_prevista).slice(0, 10)}T00:00:00`) >= hoje)
+>>>>>>> 6af48690620e19056571256973665b83dce1f097
           .sort((a, b) => new Date(a.data_prevista) - new Date(b.data_prevista))[0] || null
       );
       setHistorico(cruzadas);
@@ -139,7 +165,12 @@ export default function User() {
 
   carregar();
   return () => { ativo = false; };
-}, []);
+}, [atualizacao]);
+
+  function fecharCampanha() {
+    setCampanhaAberta(null);
+    setAtualizacao((valor) => valor + 1);
+  }
 
   async function enviarFoto(foto) {
     const token = sessionStorage.getItem('token');
@@ -185,20 +216,15 @@ export default function User() {
     if (carregando) return <p>Carregando perfil...</p>;
     if (!sessionStorage.getItem('token')) return <p>Faça login para ver seu perfil.</p>;
     if (erro || !usuario) return <p role="alert">Não foi possível carregar o perfil.</p>;
+    if (usuario.tipo_usuario === 'instituicao') return <PainelInstitucional />;
   return (
 
     <div className="pagina-user">
 
       <LogoSlogan />
+      {campanhaAberta && <ModalCampanha campanha={campanhaAberta} aoFechar={fecharCampanha} />}
 
-      <div className="pesquisa">
-        <img src="/assets/icons/LupaPesquisa.png" alt="" />
-        <input
-          type="text"
-          aria-label="Pesquisar"
-          placeholder="Pesquisar campanhas, hemocentros ou grupos..."
-        />
-      </div>
+      <div className="busca-perfil"><BuscaGlobal /></div>
 
       <section className="user">
 
@@ -313,7 +339,7 @@ export default function User() {
                 </div>
 
                 <div className="acessar-proxima-campanha">
-                  <button type="button">Ver detalhes da campanha</button>
+                  <button type="button" onClick={() => setCampanhaAberta(proximaCampanha)}>Ver detalhes da campanha</button>
                 </div>
               </>
             ) : (
@@ -331,7 +357,7 @@ export default function User() {
             {historico.length > 0 ? (
               <ul>
                 {historico.map((h) => (
-                  <li className="informacoes-historico-campanhas" key={h.id_participacao ?? h.id_campanha}>
+                  <li className="informacoes-historico-campanhas" key={h.id_registro}>
                     <p>
                       {h.nome_campanha} — {h.nome_hemo} •{' '}
                       {h.status_participacao === 'comparecimento_informado' ? 'Realizada em' : 'Interesse em'}{' '}

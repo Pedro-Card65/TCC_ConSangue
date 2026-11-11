@@ -1,0 +1,130 @@
+.pagina-busca {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  min-width: 0;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 4px 0 24px;
+  color: #35272b;
+  font-family: 'Lexend', sans-serif;
+
+  .cabecalho-resultados {
+    h1 { margin: 0 0 8px; color: #a3262f; font-size: clamp(1.35rem, 3vw, 1.9rem); font-weight: 600; }
+    p { margin: 0; color: #61585b; font-size: .9rem; line-height: 1.5; overflow-wrap: anywhere; }
+    strong { color: #a3262f; }
+  }
+
+  .quantidade-resultados {
+    margin: 0;
+    color: #6d5d62;
+    font-size: .86rem;
+  }
+
+  .estado-resultados, .aviso-resultados {
+    margin: 0;
+    padding: 18px;
+    border: 1px solid #ead9dc;
+    border-radius: 10px;
+    background: #fff;
+    line-height: 1.5;
+    color: #60575a;
+  }
+
+  .aviso-resultados { border-color: #e6aeb6; color: #9a2634; }
+
+  .secao-resultados {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #a3262f;
+
+      span { padding: 2px 8px; border-radius: 100px; background: #fbe9eb; font-size: .77rem; }
+    }
+  }
+
+  .grade-resultados {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    gap: 14px;
+    min-width: 0;
+  }
+
+  .cartao-resultado {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    min-width: 0;
+    padding: 18px;
+    border: 1px solid #ebd9dc;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 3px 12px rgb(87 18 30 / 4%);
+
+    .tipo-resultado { color: #a3262f; background: #faedef; border-radius: 30px; padding: 4px 9px; font-size: .73rem; font-weight: 600; }
+    h3 { margin: 0; color: #7e1b28; font-size: 1.02rem; line-height: 1.45; overflow-wrap: anywhere; }
+    p { margin: 0; color: #4c4447; font-size: .87rem; line-height: 1.5; overflow-wrap: anywhere; }
+    .detalhe-resultado { color: #6b6265; }
+
+    > button {
+      min-height: 40px;
+      margin-top: auto;
+      padding: 9px 14px;
+      border: 1px solid #ad1729;
+      border-radius: 8px;
+      background: #ad1729;
+      color: white;
+      font: inherit;
+      font-size: .84rem;
+      font-weight: 500;
+      cursor: pointer;
+
+      &:hover { background: #891223; }
+      &:focus-visible { outline: 3px solid #e8a0aa; outline-offset: 2px; }
+    }
+  }
+
+  .campanhas-do-hemocentro {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 7px;
+    width: 100%;
+    padding-top: 12px;
+    border-top: 1px solid #f2e1e4;
+
+    h4 { margin: 0 0 3px; font-size: .84rem; font-weight: 600; }
+    .link-campanha {
+      min-height: 36px;
+      padding: 7px 10px;
+      border: 1px solid #f0cbd1;
+      border-radius: 8px;
+      background: #fff8f9;
+      color: #9a1e2f;
+      font: inherit;
+      font-size: .82rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .link-campanha:hover { background: #fbecef; }
+  }
+}
+
+@media (max-width: 600px) {
+  .pagina-busca {
+    gap: 16px;
+    .cartao-resultado { padding: 16px; }
+    .cartao-resultado > button { width: 100%; }
+  }
+}

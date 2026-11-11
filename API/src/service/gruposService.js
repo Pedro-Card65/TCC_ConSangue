@@ -35,6 +35,26 @@ function validarDadosGrupo(grupo) {
         throw criarErro('A descrição pode ter até 255 caracteres.');
     }
 
+    if (Object.prototype.hasOwnProperty.call(grupo, 'foto_grupo')) {
+        const foto = grupo.foto_grupo;
+        if (foto !== null) {
+            if (typeof foto !== 'string' || !foto.startsWith('data:image/jpeg;base64,')
+                || foto.length > 300 * 1024) {
+                throw criarErro('A foto do grupo deve ser JPEG e ter até 300 KB.');
+            }
+            const dados = foto.slice('data:image/jpeg;base64,'.length);
+            if (!/^[A-Za-z0-9+/]+={0,2}$/.test(dados)) {
+                throw criarErro('Foto do grupo inválida.');
+            }
+            const bytes = Buffer.from(dados, 'base64');
+            if (bytes.length < 4 || bytes.length > 220 * 1024
+                || bytes[0] !== 0xff || bytes[1] !== 0xd8
+                || bytes[bytes.length - 2] !== 0xff || bytes[bytes.length - 1] !== 0xd9) {
+                throw criarErro('Formato ou tamanho de foto do grupo inválido.');
+            }
+        }
+    }
+
     return { ...grupo, nome_grupo, descricao };
 }
 

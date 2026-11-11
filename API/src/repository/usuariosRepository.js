@@ -33,7 +33,6 @@ export async function buscarPorID(id) {
             cidade,
             tipo_sanguineo,
             tipo_usuario,
-            cpf,
             telefone,
             foto_perfil,
             data_cadastro

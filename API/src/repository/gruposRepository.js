@@ -1,4 +1,31 @@
 import { con } from './connection.js';
+import { randomInt } from 'node:crypto';
+
+const ALFABETO_CONVITE = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+function gerarCodigo() {
+    let codigo;
+    do {
+        codigo = Array.from({ length: 8 }, () => ALFABETO_CONVITE[randomInt(ALFABETO_CONVITE.length)]).join('');
+    } while (/^\d+$/.test(codigo));
+    return codigo;
+}
+
+async function colunaConviteDisponivel() {
+    const [colunas] = await con.query(
+        "SELECT 1 AS existe FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'grupos' AND COLUMN_NAME = 'codigo_convite' LIMIT 1"
+    );
+    return colunas.length > 0;
+}
+
+
+async function colunaFotoDisponivel() {
+    const [colunas] = await con.query(
+        "SELECT 1 AS existe FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'grupos' AND COLUMN_NAME = 'foto_grupo' LIMIT 1"
+    );
+    return colunas.length > 0;
+}
+
 
 //Finalizado
 
@@ -8,16 +35,24 @@ export async function criarGrupo(grupo) {
     try {
         await conexao.beginTransaction();
 
-        const [resultado] = await conexao.execute(
-            `INSERT INTO grupos
-            (nome_grupo, descricao, id_criador)
-            VALUES (?, ?, ?)`,
-            [
-                grupo.nome_grupo,
-                grupo.descricao,
-                grupo.id_criador
-            ]
-        );
+        const comCodigo = await colunaConviteDisponivel();
+        let resultado;
+        for (let tentativa = 0; tentativa < (comCodigo ? 8 : 1); tentativa++) {
+            const valores = [grupo.nome_grupo, grupo.descricao, grupo.id_criador];
+            if (comCodigo) valores.push(gerarCodigo());
+            try {
+                [resultado] = await conexao.execute(
+                    comCodigo
+                        ? 'INSERT INTO grupos (nome_grupo, descricao, id_criador, codigo_convite) VALUES (?, ?, ?, ?)'
+                        : 'INSERT INTO grupos (nome_grupo, descricao, id_criador) VALUES (?, ?, ?)',
+                    valores
+                );
+                break;
+            } catch (erro) {
+                if (comCodigo && erro.code === 'ER_DUP_ENTRY' && tentativa < 7) continue;
+                throw erro;
+            }
+        }
 
         const idGrupo = resultado.insertId;
 
@@ -52,6 +87,8 @@ export async function listarGrupos() {
                 descricao,
                 id_criador,
                 data_criacao
+                ${await colunaFotoDisponivel() ? ', foto_grupo' : ''}
+                ${await colunaConviteDisponivel() ? ', codigo_convite' : ''}
         FROM    grupos;
     `
     const [linhas] = await con.query(command, []);
@@ -65,6 +102,8 @@ export async function listarGruposPorNome(nome) {
                 descricao,
                 id_criador,
                 data_criacao
+                ${await colunaFotoDisponivel() ? ', foto_grupo' : ''}
+                ${await colunaConviteDisponivel() ? ', codigo_convite' : ''}
         FROM    grupos
         WHERE nome_grupo LIKE ?
     `
@@ -75,20 +114,20 @@ export async function listarGruposPorNome(nome) {
 };
 
 export async function editarGrupo(grupo, id) {
-    const command = `
-        UPDATE  grupos
-        SET     nome_grupo = ?,
-                descricao = ?
-        WHERE   id_grupo = ?
-        AND     id_criador = ?
-    `
-
-    const [linhas] = await con.query(command, [
-        grupo.nome_grupo,
-        grupo.descricao,
-        id,
-        grupo.id_criador
-    ])
+    const alterarFoto = Object.prototype.hasOwnProperty.call(grupo, 'foto_grupo');
+    if (alterarFoto && !(await colunaFotoDisponivel())) {
+        const erro = new Error('O armazenamento de fotos dos grupos ainda precisa ser ativado no banco.');
+        erro.status = 503;
+        throw erro;
+    }
+    const parametros = [grupo.nome_grupo, grupo.descricao];
+    if (alterarFoto) parametros.push(grupo.foto_grupo);
+    parametros.push(id, grupo.id_criador);
+    const [linhas] = await con.query(
+        `UPDATE grupos SET nome_grupo = ?, descricao = ?${alterarFoto ? ', foto_grupo = ?' : ''}
+         WHERE id_grupo = ? AND id_criador = ?`,
+        parametros
+    )
 
     let linhasAfetadas = linhas.affectedRows;
     return linhasAfetadas;
@@ -137,4 +176,14 @@ export async function apagarGrupo(id) {
     } finally {
         conexao.release();
     }
+}
+
+export async function buscarIdPorCodigoConvite(codigo) {
+    if (!(await colunaConviteDisponivel())) {
+        const erro = new Error('Códigos alfanuméricos ainda não estão ativados no banco de dados.');
+        erro.status = 503;
+        throw erro;
+    }
+    const [linhas] = await con.execute('SELECT id_grupo FROM grupos WHERE codigo_convite = ? LIMIT 1', [codigo]);
+    return linhas[0]?.id_grupo ?? null;
 }

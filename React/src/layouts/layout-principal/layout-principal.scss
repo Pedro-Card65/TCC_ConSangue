@@ -1,50 +1,85 @@
 .layout-principal {
-  // Barra de navegação fixa: 48px de altura + 12px do rodapé + 12px de folga
-  $altura-barra: 48px;
-  $espaco-barra: 12px + 12px;
-  $reserva-barra: $altura-barra + $espaco-barra;
-  $espaco-topo: 32px; // mesmo respiro do topo que as laterais já usam
-
+  $reserva-barra: 92px;
   display: grid;
-  grid-template-columns: 323px 1fr 323px; // 291px do cartão + 16px de padding de cada lado
-  align-items: start; // sem isso as colunas esticam e o sticky não tem para onde andar
+  grid-template-columns: minmax(0, 323px) minmax(0, 1fr) minmax(0, 323px);
+  grid-template-areas: "esquerda centro direita";
+  align-items: start;
+  width: 100%;
   min-height: 100vh;
+  min-height: 100dvh;
+  box-sizing: border-box;
   background: #f3f3f3;
 
-  .coluna-esquerda,
-  .coluna-direita {
+  .coluna-esquerda {
+    grid-area: esquerda;
+    min-width: 0;
     position: sticky;
     top: 0;
-    max-height: calc(100vh - #{$reserva-barra});
-    overflow-y: auto; // rolagem própria quando a lateral é maior que a tela
-    // o 32px de cima vem do padding/margin dos próprios componentes
+    height: calc(100dvh - #{$reserva-barra});
+    overflow: hidden;
+  }
+
+  .coluna-direita {
+    grid-area: direita;
+    min-width: 0;
+    position: sticky;
+    top: 0;
+    max-height: calc(100dvh - #{$reserva-barra});
+    overflow-y: auto;
+  }
+
+  .area-busca-global {
+    width: 100%;
+    max-width: 760px;
+    min-width: 0;
+    margin: 0 auto 24px;
   }
 
   .coluna-centro {
+    grid-area: centro;
     min-width: 0;
-    padding-top: $espaco-topo;
-    padding-bottom: $reserva-barra; // o fim do conteúdo não some atrás da barra
+    width: 100%;
+    box-sizing: border-box;
+    padding: 32px 16px $reserva-barra;
 
-    // alinha o topo da página com as laterais (ex.: margin-top: 20% em participacoesHistorico)
     > :first-child {
       margin-top: 0;
     }
   }
 
-  // Telas estreitas: empilha as colunas e desliga o sticky
-  @media (max-width: 1023px) {
-    grid-template-columns: 1fr;
-    padding-bottom: $reserva-barra;
+  @media (max-width: 1279px) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "centro" "esquerda" "direita";
+    justify-items: center;
 
     .coluna-esquerda,
     .coluna-direita {
       position: static;
+      width: min(100%, 820px);
+      height: auto;
       max-height: none;
       overflow: visible;
     }
 
     .coluna-centro {
-      padding: 0 16px;
+      width: min(100%, 860px);
+      padding: 24px 20px 32px;
     }
+  }
+
+  @media (max-width: 600px) {
+    .coluna-centro {
+      padding: 20px 12px 24px;
+    }
+
+    .coluna-esquerda,
+    .coluna-direita {
+      padding-inline: 12px;
+      box-sizing: border-box;
+    }
+  }
+
+  @media (max-width: 1279px) {
+    padding-bottom: $reserva-barra;
   }
 }

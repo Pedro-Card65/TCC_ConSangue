@@ -4,7 +4,7 @@ import { api } from '../../services/api.js';
 
 const STATUS = {
   comparecimento_informado: 'Presença informada',
-  interessado: 'Tenho interesse',
+  interessado: 'Interesse registrado',
   pretende_ir: 'Pretende ir',
 };
 
@@ -14,6 +14,10 @@ function formatarData(data) {
     ? new Date(`${data}T00:00:00`)
     : new Date(data);
   return Number.isNaN(valor.getTime()) ? 'Data não informada' : valor.toLocaleDateString('pt-BR');
+}
+
+function dataISO(valor) {
+  return valor ? String(valor).slice(0, 10) : '';
 }
 
 function normalizarLista(resposta, chave) {
@@ -27,6 +31,8 @@ export default function ParticipacoesHistorico() {
   const [participacoes, setParticipacoes] = useState([]);
   const [campanhas, setCampanhas] = useState([]);
   const [grupos, setGrupos] = useState([]);
+  const [vinculos, setVinculos] = useState([]);
+  const [erroAcao, setErroAcao] = useState('');
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
 
@@ -43,10 +49,11 @@ export default function ParticipacoesHistorico() {
 
       const config = { headers: { Authorization: `Bearer ${token}` } };
       try {
-        const [resParticipacoes, resCampanhas, resUsuario] = await Promise.all([
+        const [resParticipacoes, resCampanhas, resUsuario, resVinculos] = await Promise.all([
           api.get('/api/participacoes', config),
           api.get('/api/campanhas'),
           api.get('/api/usuarios/me', config),
+          api.get('/api/gruposCampanhas'),
         ]);
         const listaParticipacoes = normalizarLista(resParticipacoes, 'participacoes');
         const listaCampanhas = normalizarLista(resCampanhas, 'campanhas');
@@ -66,6 +73,7 @@ export default function ParticipacoesHistorico() {
         setParticipacoes(listaParticipacoes);
         setCampanhas(listaCampanhas);
         setGrupos(listaGrupos);
+        setVinculos(normalizarLista(resVinculos, 'grupos'));
       } catch (erroRequisicao) {
         if (ativo) {
           setErro(erroRequisicao?.response?.status === 403
@@ -81,25 +89,43 @@ export default function ParticipacoesHistorico() {
     return () => { ativo = false; };
   }, []);
 
-  const campanhasPorId = new Map(campanhas.map((campanha) => [String(campanha.id_campanha), campanha]));
-  const gruposPorId = new Map(grupos.map((grupo) => [String(grupo.id_grupo), grupo]));
-  const registros = participacoes.map((participacao) => {
+  const campanhasPorId = new Map(campanhas.map(c => [String(c.id_campanha), c]));
+  const gruposPorId = new Map(grupos.map(g => [String(g.id_grupo), g]));
+  const vinculosPorId = new Map(vinculos.map(v => [String(v.id_grupo_campanha), v]));
+
+  const registros = participacoes.map(participacao => {
     const campanha = campanhasPorId.get(String(participacao.id_campanha)) ?? {};
-    const vinculo = campanha.id_grupo_campanha != null
-      ? grupos.find((grupo) => String(grupo.id_grupo_campanha) === String(campanha.id_grupo_campanha))
+    const vinculo = participacao.id_grupo_campanha != null
+      ? vinculosPorId.get(String(participacao.id_grupo_campanha))
       : null;
-    const grupo = vinculo
-      ? gruposPorId.get(String(vinculo.id_grupo))
-      : gruposPorId.get(String(participacao.id_grupo));
-    return { ...participacao, ...campanha, nomeGrupo: grupo?.nome_grupo ?? grupo?.nome ?? '' };
+    const grupo = vinculo ? gruposPorId.get(String(vinculo.id_grupo)) : null;
+    return {
+      ...campanha,
+      ...participacao,
+      nomeGrupo: grupo?.nome_grupo ?? '',
+      dataCampanha: dataISO(campanha.data_inicio),
+      fimCampanha: dataISO(campanha.data_fim)
+    };
   });
 
-  const agora = new Date();
+  const hoje = new Date();
+  const hojeISO = [hoje.getFullYear(), String(hoje.getMonth() + 1).padStart(2, '0'), String(hoje.getDate()).padStart(2, '0')].join('-');
+  // Um interesse também pode ser a próxima oportunidade; não equivale a presença agendada.
   const proximas = registros
-    .filter((item) => item.status_participacao === 'pretende_ir' && item.data_prevista && new Date(`${String(item.data_prevista).slice(0, 10)}T00:00:00`) >= new Date(agora.toDateString()))
-    .sort((a, b) => new Date(a.data_prevista) - new Date(b.data_prevista));
+    .filter(item => ['interessado', 'pretende_ir'].includes(item.status_participacao)
+      && item.status_campanha === 'ativa'
+      && (item.fimCampanha || dataISO(item.data_prevista)) >= hojeISO)
+    .map(item => ({
+      ...item,
+      dataOrdenacao: (dataISO(item.data_prevista) && dataISO(item.data_prevista) >= hojeISO)
+        ? dataISO(item.data_prevista)
+        : (item.dataCampanha > hojeISO ? item.dataCampanha : hojeISO)
+    }))
+    .sort((a, b) => a.dataOrdenacao.localeCompare(b.dataOrdenacao));
   const proxima = proximas[0];
-  const historico = registros.filter((item) => item !== proxima);
+  const outrasProximas = proximas.slice(1);
+  const idsFuturos = new Set(proximas.map(item => String(item.id_registro)));
+  const historico = registros.filter(item => !idsFuturos.has(String(item.id_registro)));
 
   function nomeHospital(item) {
     return item.nome_hemo ?? item.nome_instituicao ?? item.nome_hospital ?? 'Instituição não informada';
@@ -115,22 +141,25 @@ export default function ParticipacoesHistorico() {
       <div className="participacoes" key={item.id_registro}>
         <h2>{item.nome_campanha ?? 'Campanha sem nome'} - {nomeHospital(item)}</h2>
         {enderecoHospital(item) && <p>{enderecoHospital(item)}</p>}
-        <p>{formatarData(item.data_prevista)}{item.horario_previsto ? ` • ${String(item.horario_previsto).slice(0, 5)}` : ''}</p>
+        {item.data_prevista
+          ? <p>Data planejada: {formatarData(item.data_prevista)}{item.horario_previsto ? ` • ${String(item.horario_previsto).slice(0, 5)}` : ''}</p>
+          : <p>Período da campanha: {formatarData(item.dataCampanha)}{item.fimCampanha ? ` a ${formatarData(item.fimCampanha)}` : ''}</p>}
         {item.nomeGrupo && <p>Grupo: {item.nomeGrupo}</p>}
         <div className="partBaixo">
           <p>Status: {STATUS[item.status_participacao] ?? item.status_participacao ?? 'Não informado'}</p>
           {item.status_participacao !== 'comparecimento_informado' && (
             <button type="button" onClick={async () => {
               const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+              setErroAcao('');
               try {
                 await api.delete(`/api/participacoes/${item.id_registro}`, {
                   headers: { Authorization: `Bearer ${token}` },
                 });
                 setParticipacoes((atuais) => atuais.filter((registro) => registro.id_registro !== item.id_registro));
               } catch {
-                setErro('Não foi possível cancelar esta participação.');
+                setErroAcao('Não foi possível remover esta participação.');
               }
-            }}>Cancelar presença</button>
+            }}>{item.status_participacao === 'interessado' ? 'Remover interesse' : 'Cancelar intenção de participação'}</button>
           )}
         </div>
       </div>
@@ -141,11 +170,19 @@ export default function ParticipacoesHistorico() {
     <div className="pagina-participacaoHistorico">
       <h1>PARTICIPAÇÕES</h1>
       <div className="bloco-participacoes">
+        {erroAcao && <p role="alert">{erroAcao}</p>}
         {carregando ? <p>Carregando participações...</p> : erro ? <p role="alert">{erro}</p> : (
           <>
-            <h1>Próxima participação</h1>
-            {proxima ? cartao(proxima) : <p>Você não tem participações agendadas.</p>}
-            <h1>Histórico</h1>
+            <h2>{proxima?.status_participacao === 'interessado'
+              ? 'Próxima campanha de interesse' : 'Próxima participação planejada'}</h2>
+            {proxima ? cartao(proxima) : <p>Você ainda não registrou interesse em campanhas futuras.</p>}
+            {outrasProximas.length > 0 && (
+              <>
+                <h2>Outras campanhas de interesse</h2>
+                <div className="historico">{outrasProximas.map(cartao)}</div>
+              </>
+            )}
+            <h2>Histórico</h2>
             <div className="historico">
               {historico.length ? historico.map(cartao) : <p>Você ainda não tem histórico de participações.</p>}
             </div>

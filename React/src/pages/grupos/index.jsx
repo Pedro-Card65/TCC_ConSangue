@@ -286,7 +286,9 @@ export default function Grupos() {
           return (
             <article className="cartao-grupo" key={grupo.id_grupo}>
               <div className="titulo-grupo">
-                <div className={`avatar-grupo avatar-${indice % 3}`} aria-hidden="true">{(grupo.nome_grupo || 'G').trim().charAt(0).toUpperCase()}</div>
+                <div className={`avatar-grupo avatar-${indice % 3}`} aria-hidden="true">
+                  {grupo.foto_grupo ? <img src={grupo.foto_grupo} alt="" /> : (grupo.nome_grupo || 'G').trim().charAt(0).toUpperCase()}
+                </div>
                 <div className="texto-grupo">
                   <h2>{grupo.nome_grupo}</h2>
                   <p>{contagens[grupo.id_grupo] ?? '—'} {contagens[grupo.id_grupo] === 1 ? 'membro' : 'membros'}</p>
@@ -326,6 +328,16 @@ export default function Grupos() {
               <input id="editar-nome-grupo" value={nome} onChange={e => setNome(e.target.value)} maxLength={100} required />
               <label htmlFor="editar-descricao-grupo">Descrição</label>
               <textarea id="editar-descricao-grupo" value={descricao} onChange={e => setDescricao(e.target.value)} maxLength={255} rows={3} required />
+              <div className="editor-foto-grupo">
+                <div className="avatar-grupo avatar-preview" aria-hidden="true">
+                  {fotoGrupo ? <img src={fotoGrupo} alt="" /> : (nome || 'G').trim().charAt(0).toUpperCase()}
+                </div>
+                <div className="editor-foto-acoes">
+                  <label htmlFor="foto-grupo-editar">Foto do grupo (opcional)</label>
+                  <input id="foto-grupo-editar" type="file" accept="image/jpeg,image/png,image/webp" onChange={selecionarFotoGrupo} disabled={salvando} />
+                  {fotoGrupo && <button type="button" className="botao-secundario" disabled={salvando} onClick={() => { setFotoGrupo(null); setFotoAlterada(true); }}>Remover foto</button>}
+                </div>
+              </div>
               {erro && <p className="erro-modal" role="alert">{erro}</p>}
               <div className="acoes-confirmacao">
                 <button className="botao-secundario" type="button" disabled={salvando} onClick={() => setModal('detalhes')}>Cancelar</button>
@@ -344,7 +356,14 @@ export default function Grupos() {
             </form>
           </>}
           {modal === 'detalhes' && grupoSelecionado && <>
-            <h2 id="titulo-modal-grupos">{grupoSelecionado.nome_grupo}</h2>
+            <div className="cabecalho-detalhes-grupo">
+              <div className="avatar-grupo avatar-preview" aria-hidden="true">
+                {grupoSelecionado.foto_grupo
+                  ? <img src={grupoSelecionado.foto_grupo} alt="" />
+                  : (grupoSelecionado.nome_grupo || 'G').trim().charAt(0).toUpperCase()}
+              </div>
+              <h2 id="titulo-modal-grupos">{grupoSelecionado.nome_grupo}</h2>
+            </div>
             <p>{grupoSelecionado.descricao || 'Grupo de doadores ConSangue.'}</p>
             <p className="codigo-exibido">Código do grupo: <strong>{grupoSelecionado.id_grupo}</strong></p>
             {erro && <p className="erro-modal" role="alert">{erro}</p>}

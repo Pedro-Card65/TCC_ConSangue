@@ -275,3 +275,23 @@
     height: 72px;
   }
 }
+
+
+.modal-grupos .codigo-exibido {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  strong {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #a3262f;
+    letter-spacing: .07em;
+  }
+
+  button {
+    min-height: 40px;
+  }
+}

@@ -407,7 +407,16 @@ export default function Grupos() {
                     ? <p>Nenhum membro encontrado.</p>
                     : <ul>
                         {membrosPorGrupo[grupoSelecionado.id_grupo].map((membro) => (
-                          <li key={membro.id_membro}>{membro.nome || membro.usuario || 'Participante'} — {membro.papel === 'administrador' ? 'Administrador' : 'Membro'}</li>
+                          <li key={membro.id_membro} className="membro-item">
+                            <span className="membro-avatar" aria-hidden="true">{(membro.nome || membro.usuario || 'P').trim().charAt(0).toUpperCase()}</span>
+                            <span className="membro-dados">
+                              <strong>{membro.nome || membro.usuario || 'Participante'}</strong>
+                              <small>{membro.papel === 'administrador' ? 'Administrador' : 'Membro'}
+                                {membro.data_entrada && !Number.isNaN(new Date(membro.data_entrada).getTime())
+                                  ? ` · Desde ${new Date(membro.data_entrada).toLocaleDateString('pt-BR')}` : ''}
+                              </small>
+                            </span>
+                          </li>
                         ))}
                       </ul>}
               </section>

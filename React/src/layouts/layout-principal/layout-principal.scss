@@ -28,6 +28,13 @@
     overflow-y: auto;
   }
 
+  .area-busca-global {
+    width: 100%;
+    max-width: 760px;
+    min-width: 0;
+    margin: 0 auto 24px;
+  }
+
   .coluna-centro {
     grid-area: centro;
     min-width: 0;

@@ -29,7 +29,7 @@ Após revisão e publicação, entrar com uma conta institucional de teste, abri
 
 ## Fotos e convites de grupos
 
-O código aceita editar a foto de cada grupo (JPEG convertido para 256 × 256) e novos convites de 8 caracteres, mantendo compatibilidade com os IDs numéricos anteriores.
+O código permite editar a foto de cada grupo (JPEG convertido para 256 × 256) e usar convites de 8 caracteres. **IDs numéricos são somente identificadores internos e não permitem entrar em grupos fechados.**
 
 Em um banco **já existente**, faça backup e aplique, uma única vez, as migrações:
 
@@ -44,4 +44,4 @@ node scripts/preencher_codigos_grupos.mjs
 
 O preenchimento só altera códigos nulos, e pode ser repetido. Grupos, usuários, campanhas e vínculos são preservados. Até aplicar a migração, o código mantém a listagem antiga funcionando e retorna erro informativo ao tentar salvar foto ou entrar por código alfanumérico. Não exponha variáveis `DB_*` em mensagens ou commits.
 
-Os códigos de convite não são um mecanismo de autorização: o backend continua verificando autenticação e permissões para ações administrativas. Fotos devem ser de grupos, não de documentos pessoais.
+Códigos de convite permitem ingresso, mas não substituem a autorização: o backend valida autenticação, vínculo aos grupos e permissões administrativas. `GET /api/grupos` e `GET /api/grupos/:nome` são públicos **sem foto nem código**; `GET /api/grupos/usuario/:id_usuario` devolve esses campos somente ao próprio membro; `GET /api/membros/grupo/:id_grupo` exige participação. Os convites de produção expostos antes da correção S07 foram substituídos; compartilhar somente os códigos novos. Fotos devem representar grupos, não documentos pessoais.

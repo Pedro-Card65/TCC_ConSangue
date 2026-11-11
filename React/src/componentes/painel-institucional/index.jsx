@@ -132,10 +132,22 @@ export default function PainelInstitucional() {
               <p>{campanha.horario_inicio || 'Início não informado'} — {campanha.horario_fim || 'Término não informado'}</p>
               <p>Status: {campanha.status_campanha === 'ativa' ? 'Ativa' : 'Encerrada'}</p>
               {adesaoPorCampanha[campanha.id_campanha] && <div className="adesao-campanha">
+                <div className="progresso-meta">
+                  {adesaoPorCampanha[campanha.id_campanha].meta_participacoes == null ? <>
+                    <span><strong>{adesaoPorCampanha[campanha.id_campanha].total_participacoes}</strong> pessoas com intenção ou presença informada · Meta não definida</span>
+                  </> : <>
+                    <span>Mobilização da meta</span>
+                    <strong>{adesaoPorCampanha[campanha.id_campanha].total_participacoes} de {adesaoPorCampanha[campanha.id_campanha].meta_participacoes}</strong>
+                    <progress aria-label={'Progresso da meta da campanha ' + campanha.nome_campanha} max="100"
+                      value={Math.min(100, adesaoPorCampanha[campanha.id_campanha].progresso_percentual)} />
+                    <span>{adesaoPorCampanha[campanha.id_campanha].progresso_percentual}% · {adesaoPorCampanha[campanha.id_campanha].meta_atingida ? 'Meta atingida' : 'Em andamento'}</span>
+                  </>}
+                </div>
                 <span><strong>{adesaoPorCampanha[campanha.id_campanha].interessados}</strong> Interessados</span>
                 <span><strong>{adesaoPorCampanha[campanha.id_campanha].pretendem_ir}</strong> Pretendem ir</span>
                 <span><strong>{adesaoPorCampanha[campanha.id_campanha].comparecimentos_informados}</strong> Comparecimentos informados</span>
                 <span><strong>{adesaoPorCampanha[campanha.id_campanha].grupos_vinculados}</strong> Grupos vinculados</span>
+                <p className="nota-adesao">A meta conta pessoas únicas com intenção de ir ou comparecimento informado; interesse simples fica fora. Comparecimento é autodeclarado e não valida doação.</p>
               </div>}
             </li>)}
           </ul>}

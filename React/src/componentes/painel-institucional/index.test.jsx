@@ -10,7 +10,7 @@ jest.mock('react-router-dom', () => ({
 }));
 jest.mock('../logo-slogan/logo-slogan', () => () => null);
 
-let root, container, painel, campanhas;
+let root, container, painel, campanhas, adesao;
 const instituicao = { id_hemocentro: 4, nome_hemo: 'Instituição de teste', endereco: 'Rua de teste', cidade: 'São Paulo', estado: 'SP' };
 beforeEach(() => {
   global.IS_REACT_ACT_ENVIRONMENT = true;
@@ -19,11 +19,12 @@ beforeEach(() => {
   root = createRoot(container);
   painel = { instituicao, estatisticas: { campanhas: 0, grupos: 0, agendamentos: 0 } };
   campanhas = [];
+  adesao = [];
   api.get.mockImplementation(async url => {
     if (url === '/api/usuarios/me') return { data: { id_usuario: 7, tipo_usuario: 'instituicao' } };
     if (url === '/api/instituicoes/me') return { data: painel };
     if (url === '/api/campanhas/hemocentro/4') return { data: { campanhas } };
-    if (url === '/api/instituicoes/me/adesao') return { data: { campanhas: [] } };
+    if (url === '/api/instituicoes/me/adesao') return { data: { campanhas: adesao } };
     throw new Error(`Rota inesperada: ${url}`);
   });
 });
@@ -122,4 +123,22 @@ test('impede dois envios durante a mesma criação', async () => {
   expect(api.post).toHaveBeenCalledTimes(1);
   expect(container.querySelector('fieldset').disabled).toBe(true);
   await act(async () => resolver({ data: { id_campanha: 12 } }));
+});
+
+test('exibe progresso atingido e estado sem meta sem alegar doacao validada', async () => {
+  campanhas = [
+    { id_campanha: 22, nome_campanha: 'Campanha meta', descricao: '', data_inicio: '2026-12-01', data_fim: '2026-12-01', status_campanha: 'ativa' },
+    { id_campanha: 23, nome_campanha: 'Campanha sem meta', descricao: '', data_inicio: '2026-12-02', data_fim: '2026-12-02', status_campanha: 'ativa' }
+  ];
+  adesao = [
+    { id_campanha: 22, meta_participacoes: 2, total_participacoes: 2, progresso_percentual: 100, meta_atingida: true, interessados: 1, pretendem_ir: 1, comparecimentos_informados: 1, grupos_vinculados: 1 },
+    { id_campanha: 23, meta_participacoes: null, total_participacoes: 0, progresso_percentual: null, meta_atingida: false, interessados: 0, pretendem_ir: 0, comparecimentos_informados: 0, grupos_vinculados: 0 }
+  ];
+  await renderizar();
+  await clicar('Ver minhas campanhas');
+  expect(container.textContent).toContain('2 de 2');
+  expect(container.textContent).toContain('Meta atingida');
+  expect(container.textContent).toContain('0 pessoas com intenção ou presença informada');
+  expect(container.textContent).toContain('Meta não definida');
+  expect(container.textContent).toContain('não valida doação');
 });

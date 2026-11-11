@@ -18,7 +18,7 @@ Resposta 200 para uma instituição cadastrada:
 - Agendamentos: registros com `status_participacao = 'pretende_ir'`, inclusive de datas passadas. Não representa presença ou doação confirmada.
 - 401: sessão ausente, inválida ou expirada; 403: perfil sem permissão; 500: falha interna. Falha de consulta não representa instituição ausente.
 
-O formulário React usa o contrato existente de `POST /api/campanhas`: `id_hemocentro`, `nome_campanha`, `descricao`, `data_inicio`, `data_fim`, `horario_inicio`, `horario_fim`, `status_campanha`. Datas usam `YYYY-MM-DD`, horários são opcionais, status aceita `ativa` ou `encerrada`. O servidor valida titularidade do hemocentro e datas/horários. Sucesso retorna 200 com `{ "id_campanha": 12 }`; validações retornam 400, recurso alheio 403 e conflito 409. Não existe campo de meta de doações para campanha neste contrato.
+O formulário React usa o contrato existente de `POST /api/campanhas`: `id_hemocentro`, `nome_campanha`, `descricao`, `data_inicio`, `data_fim`, `horario_inicio`, `horario_fim`, `status_campanha`. Datas usam `YYYY-MM-DD`, horários são opcionais, status aceita `ativa` ou `encerrada`. O servidor valida titularidade do hemocentro e datas/horários. Sucesso retorna 200 com `{ "id_campanha": 12 }`; validações retornam 400, recurso alheio 403 e conflito 409. A meta operacional vem dos vínculos grupo-campanha e é agregada no endpoint institucional de adesão.
 
 ## Verificação local
 
@@ -49,3 +49,7 @@ node scripts/preencher_codigos_grupos.mjs
 O preenchimento só altera códigos nulos, e pode ser repetido. Grupos, usuários, campanhas e vínculos são preservados. Até aplicar a migração, o código mantém a listagem antiga funcionando e retorna erro informativo ao tentar salvar foto ou entrar por código alfanumérico. Não exponha variáveis `DB_*` em mensagens ou commits.
 
 Os códigos de convite não são um mecanismo de autorização: o backend continua verificando autenticação e permissões para ações administrativas. Fotos devem ser de grupos, não de documentos pessoais.
+
+### Meta de mobilização por campanha
+
+GET /api/instituicoes/me/adesao soma meta_participacoes dos grupos vinculados e retorna, por campanha, meta_participacoes, total_participacoes, progresso_percentual, estado_meta, meta_atingida, totais por status e grupos_vinculados. O total para a meta conta candidatos únicos com status pretende_ir ou comparecimento_informado; interessado aparece separado e não entra no progresso. A unicidade é por candidato/campanha. Sem grupos com meta, meta e progresso são null, estado sem_meta e o total permanece disponível. Comparecimento informado é autodeclarado e não confirma presença observada nem doação realizada.

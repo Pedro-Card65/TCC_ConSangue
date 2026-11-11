@@ -1,14 +1,9 @@
 import * as repository from '../repository/instituicoesRepository.js';
+import { agregarAdesaoPorCampanha } from './adesao.js';
 
 export async function buscarMinhaAdesao(idUsuario) {
     const linhas = await repository.listarAdesaoPorCampanha(validarId(idUsuario));
-    return linhas.map(linha => ({
-        id_campanha: linha.id_campanha,
-        interessados: Number(linha.interessados),
-        pretendem_ir: Number(linha.pretendem_ir),
-        comparecimentos_informados: Number(linha.comparecimentos_informados),
-        grupos_vinculados: Number(linha.grupos_vinculados)
-    }));
+    return agregarAdesaoPorCampanha(linhas);
 }
 
 export async function buscarMeuPainel(idUsuario) {

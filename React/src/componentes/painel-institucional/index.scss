@@ -118,3 +118,16 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+.painel-institucional .busca-painel-institucional {
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 28px;
+}
+
+@media (max-width: 600px) {
+  .painel-institucional .busca-painel-institucional {
+    margin-bottom: 18px;
+  }
+}

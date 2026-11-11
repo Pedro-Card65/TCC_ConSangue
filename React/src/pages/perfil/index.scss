@@ -511,3 +511,19 @@ $largura-central: 600px;
     margin-top: 16px;
   }
 }
+
+
+.pagina-user .busca-perfil {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 760px;
+  min-width: 0;
+  margin: 0 auto 20px;
+}
+
+@media (max-width: 600px) {
+  .pagina-user .busca-perfil {
+    margin-bottom: 14px;
+  }
+}

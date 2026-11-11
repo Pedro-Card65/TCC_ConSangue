@@ -8,9 +8,20 @@ html, body, #root {
   min-height: 100%;
 }
 
+html {
+  font-family: 'Lexend', sans-serif;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
   overflow-x: clip;
+  font-family: 'Lexend', sans-serif;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
 }
 
 img, video, svg {

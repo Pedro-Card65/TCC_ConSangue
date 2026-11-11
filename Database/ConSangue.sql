@@ -38,6 +38,7 @@ CREATE TABLE grupos (
     descricao VARCHAR(255) NOT NULL,
     foto_grupo MEDIUMTEXT NULL,
     codigo_convite CHAR(8) NULL UNIQUE,
+    visibilidade ENUM('publico', 'privado') NOT NULL DEFAULT 'privado',
     id_criador INT NOT NULL,
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 

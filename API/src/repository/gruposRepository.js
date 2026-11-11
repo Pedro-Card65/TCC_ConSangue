@@ -1,5 +1,13 @@
 import { con } from './connection.js';
 
+async function colunaFotoDisponivel() {
+    const [colunas] = await con.query(
+        "SELECT 1 AS existe FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'grupos' AND COLUMN_NAME = 'foto_grupo' LIMIT 1"
+    );
+    return colunas.length > 0;
+}
+
+
 //Finalizado
 
 export async function criarGrupo(grupo) {
@@ -52,6 +60,7 @@ export async function listarGrupos() {
                 descricao,
                 id_criador,
                 data_criacao
+                ${await colunaFotoDisponivel() ? ', foto_grupo' : ''}
         FROM    grupos;
     `
     const [linhas] = await con.query(command, []);
@@ -65,6 +74,7 @@ export async function listarGruposPorNome(nome) {
                 descricao,
                 id_criador,
                 data_criacao
+                ${await colunaFotoDisponivel() ? ', foto_grupo' : ''}
         FROM    grupos
         WHERE nome_grupo LIKE ?
     `
@@ -75,20 +85,20 @@ export async function listarGruposPorNome(nome) {
 };
 
 export async function editarGrupo(grupo, id) {
-    const command = `
-        UPDATE  grupos
-        SET     nome_grupo = ?,
-                descricao = ?
-        WHERE   id_grupo = ?
-        AND     id_criador = ?
-    `
-
-    const [linhas] = await con.query(command, [
-        grupo.nome_grupo,
-        grupo.descricao,
-        id,
-        grupo.id_criador
-    ])
+    const alterarFoto = Object.prototype.hasOwnProperty.call(grupo, 'foto_grupo');
+    if (alterarFoto && !(await colunaFotoDisponivel())) {
+        const erro = new Error('O armazenamento de fotos dos grupos ainda precisa ser ativado no banco.');
+        erro.status = 503;
+        throw erro;
+    }
+    const parametros = [grupo.nome_grupo, grupo.descricao];
+    if (alterarFoto) parametros.push(grupo.foto_grupo);
+    parametros.push(id, grupo.id_criador);
+    const [linhas] = await con.query(
+        `UPDATE grupos SET nome_grupo = ?, descricao = ?${alterarFoto ? ', foto_grupo = ?' : ''}
+         WHERE id_grupo = ? AND id_criador = ?`,
+        parametros
+    )
 
     let linhasAfetadas = linhas.affectedRows;
     return linhasAfetadas;

@@ -226,3 +226,24 @@
   button:disabled { cursor: wait; opacity: .6; }
   .cartao-campanha button { margin-top: 1rem; background: #ad2626; color: white; border: 0; }
 }
+
+@media (max-width: 480px) {
+  .pagina-campanhas {
+    min-width: 0;
+
+    .pesquisa {
+      .pesquisa-tipos .grupo-tipos-rapidos {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+      }
+
+      .barra-pesquisa {
+        min-width: 0;
+      }
+    }
+
+    .lista-campanhas .cartao-campanha {
+      padding: 1rem;
+    }
+  }
+}

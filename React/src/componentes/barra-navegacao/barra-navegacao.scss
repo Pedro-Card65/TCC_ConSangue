@@ -106,3 +106,41 @@ $vermelho: #a3262f;
     }
   }
 }
+
+// A barra continua acessivel em celulares com largura de 320px.
+@media (max-width: 480px) {
+  .barra-navegacao {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+
+    .conteudo-barra {
+      box-sizing: border-box;
+      justify-content: flex-start;
+      max-width: none;
+      padding-left: 12px;
+      padding-right: 44px; // preserva area para o botao de menu
+    }
+
+    .itens-navegacao {
+      min-width: 0;
+      gap: clamp(4px, 2vw, 12px);
+    }
+
+    .item {
+      width: 28px;
+      height: 28px;
+    }
+
+    .botao-menu {
+      right: 8px;
+      width: 28px;
+      height: 28px;
+    }
+
+    .menu-opcoes {
+      right: 4px;
+      max-width: calc(100vw - 32px);
+    }
+  }
+}

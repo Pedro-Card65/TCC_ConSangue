@@ -57,3 +57,16 @@ $fonte-logo: 'Lexend', sans-serif;
         }
     }
 }
+
+@media (max-width: 480px) {
+  .bloco-participacoes {
+    min-width: 0;
+    padding: 1rem;
+    gap: 1rem;
+
+    .partBaixo {
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+  }
+}

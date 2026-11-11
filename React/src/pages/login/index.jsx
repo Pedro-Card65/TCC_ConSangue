@@ -133,7 +133,10 @@ if (def === 'Login'){
 
 </form>
 
-        <div className="Cadastro"><p>É a sua primeira vez por aqui?<p className='Troca' onClick={troca}>Faça o seu Cadastro!</p></p></div>
+        <div className="Cadastro">
+          <p>É a sua primeira vez por aqui?</p>
+          <button type="button" className="Troca" onClick={troca}>Faça o seu Cadastro!</button>
+        </div>
       </main>
     </div>
   )

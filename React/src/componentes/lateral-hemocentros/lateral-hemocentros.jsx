@@ -10,6 +10,11 @@ export default function HemocentrosLaterais() {
   const [erro, setErro] = useState(false);
   const [aberto, setAberto] = useState(null);
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+  const [campanhas, setCampanhas] = useState([]);
+  const [campanhaAberta, setCampanhaAberta] = useState(null);
+>>>>>>> 6af48690620e19056571256973665b83dce1f097
 =======
   const [campanhas, setCampanhas] = useState([]);
   const [campanhaAberta, setCampanhaAberta] = useState(null);
@@ -86,7 +91,10 @@ export default function HemocentrosLaterais() {
                   <p>{h.endereco}, {h.cidade} - {h.estado}, {h.cep}</p>
                   {h.telefone_centro && <p>Telefone: {h.telefone_centro}</p>}
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 6af48690620e19056571256973665b83dce1f097
                   <h3>Campanhas deste hemocentro</h3>
                   {campanhas.filter(c => String(c.id_hemocentro) === String(h.id_hemocentro)).length === 0
                     ? <p>Nenhuma campanha disponível.</p>
@@ -98,6 +106,9 @@ export default function HemocentrosLaterais() {
                           </li>
                         ))}
                       </ul>}
+<<<<<<< HEAD
+>>>>>>> 6af48690620e19056571256973665b83dce1f097
+=======
 >>>>>>> 6af48690620e19056571256973665b83dce1f097
                 </div>
               )}

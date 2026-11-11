@@ -69,6 +69,11 @@ export default function User() {
   const [excluindo, setExcluindo] = useState(false);
   const [erroExclusao, setErroExclusao] = useState('');
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+  const [campanhaAberta, setCampanhaAberta] = useState(null);
+  const [atualizacao, setAtualizacao] = useState(0);
+>>>>>>> 6af48690620e19056571256973665b83dce1f097
 =======
   const [campanhaAberta, setCampanhaAberta] = useState(null);
   const [atualizacao, setAtualizacao] = useState(0);
@@ -148,7 +153,12 @@ export default function User() {
       setProximaCampanha(
         cruzadas
 <<<<<<< HEAD
+<<<<<<< HEAD
           .filter((p) => p.status_participacao === 'pretende_ir' && new Date(p.data_prevista) > new Date())
+=======
+          .filter((p) => p.status_participacao === 'pretende_ir' && p.data_prevista &&
+            new Date(`${String(p.data_prevista).slice(0, 10)}T00:00:00`) >= hoje)
+>>>>>>> 6af48690620e19056571256973665b83dce1f097
 =======
           .filter((p) => p.status_participacao === 'pretende_ir' && p.data_prevista &&
             new Date(`${String(p.data_prevista).slice(0, 10)}T00:00:00`) >= hoje)

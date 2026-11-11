@@ -62,6 +62,9 @@ export default function RotaProtegida() {
     return <Outlet />;
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
  */
+=======
+>>>>>>> 6af48690620e19056571256973665b83dce1f097
 =======
 >>>>>>> 6af48690620e19056571256973665b83dce1f097

@@ -4,7 +4,7 @@ import Perfil from '../../pages/perfil';
 import { api } from '../../services/api';
 
 jest.mock('../../services/api', () => ({ api: { get: jest.fn(), post: jest.fn() } }));
-jest.mock('react-router-dom', () => ({ useNavigate: () => jest.fn() }));
+jest.mock('react-router-dom', () => ({ useNavigate: () => jest.fn(), useLocation: () => ({ pathname: '/perfil', search: '' }) }));
 jest.mock('../logo-slogan/logo-slogan', () => () => null);
 
 let root, container, painel, campanhas;
@@ -20,6 +20,7 @@ beforeEach(() => {
     if (url === '/api/usuarios/me') return { data: { id_usuario: 7, tipo_usuario: 'instituicao' } };
     if (url === '/api/instituicoes/me') return { data: painel };
     if (url === '/api/campanhas/hemocentro/4') return { data: { campanhas } };
+    if (url === '/api/instituicoes/me/adesao') return { data: { campanhas: [] } };
     throw new Error(`Rota inesperada: ${url}`);
   });
 });
@@ -49,7 +50,7 @@ test('perfil institucional usa apenas suas rotas e mostra o estado vazio', async
   expect(container.textContent).toContain('Instituição de teste');
   expect(container.textContent).toContain('Nenhuma campanha cadastrada');
   expect([...container.querySelectorAll('dd')].map(el => el.textContent)).toEqual(['0', '0', '0']);
-  expect(api.get.mock.calls.map(c => c[0])).toEqual(['/api/usuarios/me', '/api/instituicoes/me', '/api/campanhas/hemocentro/4']);
+  expect(api.get.mock.calls.map(c => c[0])).toEqual(['/api/usuarios/me', '/api/instituicoes/me', '/api/campanhas/hemocentro/4', '/api/instituicoes/me/adesao']);
 });
 
 test('falha de consulta não é tratada como cadastro ausente e permite tentar novamente', async () => {

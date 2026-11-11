@@ -6,9 +6,9 @@
   $espaco-topo: 32px; // mesmo respiro do topo que as laterais já usam
 
   display: grid;
-  grid-template-columns: 323px 1fr 323px; // 291px do cartão + 16px de padding de cada lado
+  grid-template-columns: 323px minmax(0, 1fr) 323px; // 291px do cartão + 16px de padding de cada lado
   align-items: start; // sem isso as colunas esticam e o sticky não tem para onde andar
-  min-height: 100vh;
+  min-height: 100dvh;
   background: #f3f3f3;
 
   .coluna-esquerda,
@@ -32,8 +32,8 @@
   }
 
   // Telas estreitas: empilha as colunas e desliga o sticky
-  @media (max-width: 1023px) {
-    grid-template-columns: 1fr;
+  @media (max-width: 1279px) {
+    grid-template-columns: minmax(0, 1fr);
     padding-bottom: $reserva-barra;
 
     .coluna-esquerda,
@@ -44,7 +44,15 @@
     }
 
     .coluna-centro {
+      min-width: 0;
       padding: 0 16px;
     }
+  }
+}
+
+// O espaco reservado a barra inferior permanece mesmo em celulares estreitos.
+@media (max-width: 480px) {
+  .layout-principal .coluna-centro {
+    padding-inline: 12px;
   }
 }

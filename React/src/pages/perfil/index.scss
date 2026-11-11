@@ -441,3 +441,82 @@ $largura-central: 600px;
     }
   }
 }
+
+// O perfil preserva tres colunas em telas largas e reorganiza os dados em celulares.
+.pagina-user {
+  .pesquisa input,
+  .conteudo-informacoes-usuario > *,
+  .estatistica {
+    min-width: 0;
+  }
+
+  .conteudo-informacoes-usuario p,
+  .informacoes-historico-campanhas p {
+    overflow-wrap: anywhere;
+  }
+
+  .data-proxima-campanha {
+    flex: 0 0 92px;
+  }
+}
+
+@media (max-width: 600px) {
+  .pagina-user {
+    padding: 20px 12px 100px;
+
+    .user {
+      padding: 14px;
+    }
+
+    .conteudo-informacoes-usuario {
+      grid-template-columns: 64px minmax(0, 1fr);
+      gap: 12px;
+      padding: 12px;
+
+      .coluna-user-2 {
+        grid-column: 2;
+      }
+
+      p {
+        font-size: 12px;
+      }
+    }
+
+    .conteudo-grupos-comunidades {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
+      padding: 12px;
+    }
+
+    .informacoes-proxima-campanha {
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .confirmacao {
+      width: fit-content;
+    }
+
+    .informacoes-historico-campanhas {
+      flex-wrap: wrap;
+    }
+
+    .status-historico {
+      white-space: normal;
+    }
+
+    .excluir-caixa {
+      padding: 16px;
+    }
+  }
+}
+
+@media (max-width: 360px) {
+  .pagina-user .excluir-acoes {
+    flex-wrap: wrap;
+  }
+
+  .pagina-user .excluir-acoes button {
+    flex: 1 1 100%;
+  }
+}

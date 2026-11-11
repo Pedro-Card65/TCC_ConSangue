@@ -58,7 +58,7 @@
   text-align: center;
   z-index: 1;
 
-  // Logo centralizada acima do título (sobrescreve o posicionamento absoluto do canto)
+
   .Login-logo {
     display: flex;
     justify-content: center;
@@ -158,5 +158,73 @@
     &:hover {
       background-color: #8e1c20;
     }
+  }
+}
+// O acesso ao cadastro deve ser um botão acessível, não um <p> clicável.
+.Background .Cadastro button.Troca {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  color: #e42027;
+  cursor: pointer;
+}
+
+// Atalho visível apenas com npm start. Remover ao reativar o bloqueio de rotas.
+.Login .acesso-desenvolvimento {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: transparent;
+  color: #7d2729;
+  border: 1px dashed #bd9e9f;
+  border-radius: 5px;
+  font-size: 13px;
+  cursor: pointer;
+
+  &:hover, &:focus-visible {
+    background: #fff3f3;
+  }
+}
+
+// Garante altura minima, mas deixa os formularios longos rolarem normalmente.
+.Background {
+  min-height: 100dvh;
+  padding: 110px 24px 48px;
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+.Background .Login {
+  max-width: min(500px, 100%);
+  min-width: 0;
+}
+
+.Background .Login form,
+.Background .Login input {
+  min-width: 0;
+}
+
+@media (max-width: 600px) {
+  .Background {
+    padding: 100px 16px 32px;
+  }
+
+  .Background .Login h1 {
+    font-size: clamp(18px, 5vw, 23px);
+    margin-bottom: 22px;
+  }
+
+  .Background .Login input {
+    padding: 14px 16px;
+    font-size: 16px; // evita o zoom automatico em inputs no iOS
+  }
+
+  .Background .Login .Cadastro p {
+    line-height: 1.5;
+  }
+
+  .Background > .logo-slogan .logo img,
+  .Background > a .logo-slogan .logo img {
+    max-height: 58px;
   }
 }

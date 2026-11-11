@@ -97,3 +97,22 @@ $tamanho-gota: 14px;
     }
   }
 }
+
+@media (max-width: 1279px) {
+  .hemocentros-laterais {
+    width: min(600px, calc(100% - 32px));
+    max-width: none;
+    margin: 16px auto 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hemocentros-laterais {
+    padding-inline: 12px;
+  }
+
+  .hemocentros-laterais .nome-hemocentro {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}

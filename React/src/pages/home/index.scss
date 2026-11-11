@@ -244,3 +244,50 @@ $texto: #1d1d1d;
   from { background-position: 200% 0; }
   to { background-position: -200% 0; }
 }
+
+@media (max-width: 480px) {
+  .pagina-home {
+    .pesquisa {
+      gap: 8px;
+      padding-inline: 12px;
+    }
+
+    .pesquisa input,
+    .cartao-identificacao {
+      min-width: 0;
+    }
+
+    .cartao-identificacao {
+      overflow-wrap: anywhere;
+    }
+
+    .cartao-topo {
+      gap: 10px;
+    }
+
+    .cartao-periodo {
+      right: 8px;
+      bottom: 8px;
+      padding: 8px;
+      max-width: calc(100% - 16px);
+      box-sizing: border-box;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .cartao-acoes {
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .cartao-interacoes {
+      flex: 1 1 100%;
+      justify-content: space-around;
+      gap: 8px;
+    }
+
+    .cartao-saiba-mais {
+      flex: 1 1 100%;
+    }
+  }
+}

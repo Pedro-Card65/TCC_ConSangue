@@ -1,0 +1,30 @@
+.painel-institucional {
+  padding: 24px;
+  color: #352d2d;
+  .painel-conteudo { max-width: 860px; margin: 24px auto; background: #fff; padding: 32px; border-radius: 16px; box-shadow: 0 4px 20px #32000014; }
+  h1, h2 { color: #a51c30; margin-bottom: 16px; }
+  p { line-height: 1.5; overflow-wrap: anywhere; }
+  .indicadores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0; }
+  .indicadores div { background: #fff4f4; padding: 20px 12px; text-align: center; border-radius: 12px; }
+  dd { margin: 8px 0 0; font-size: 2rem; font-weight: 700; color: #a51c30; }
+  .ajuda { font-size: .9rem; color: #625757; margin-bottom: 24px; }
+  .acoes { display: flex; gap: 12px; flex-wrap: wrap; margin: 20px 0; }
+  button { padding: 12px 20px; border: 1px solid #a51c30; border-radius: 8px; background: #a51c30; color: #fff; cursor: pointer; font: inherit; }
+  button:disabled { opacity: .6; cursor: wait; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 3px solid #366aad; outline-offset: 3px; }
+  form { margin-top: 24px; }
+  fieldset { border: 0; padding: 0; min-width: 0; }
+  label { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
+  input, textarea, select { box-sizing: border-box; width: 100%; padding: 12px; border: 1px solid #a48c8c; border-radius: 6px; font: inherit; background: #fff; color: #352d2d; }
+  textarea { resize: vertical; }
+  .campos-duplos { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+  [role='alert'] { color: #a51c30; padding: 12px; background: #fff0f0; }
+  [role='status'] { padding: 12px; background: #eef7ef; }
+  .lista-campanhas { list-style: none; padding: 0; }
+  .lista-campanhas li { padding: 20px 0; border-bottom: 1px solid #eadcdc; overflow-wrap: anywhere; }
+  @media (max-width: 600px) {
+    padding: 12px;
+    .painel-conteudo { padding: 20px; }
+    .indicadores, .campos-duplos { grid-template-columns: 1fr; }
+  }
+}

@@ -40,11 +40,13 @@ O código está publicado na branch principal. **Os registros de deploy bem-suce
 
 - Consulta de grupos disponíveis e dos grupos do usuário.
 - Criação de grupos, com atribuição automática do papel de administrador ao criador.
-- **Entrada mediante código de convite alfanumérico de 8 caracteres**. A API atual **não permite entrar informando somente o ID numérico do grupo**.
+- **Grupos privados ou públicos:** grupo privado exige convite de 8 caracteres; grupo público permite entrada direta de usuário autenticado. Grupos antigos continuam privados por padrão.
+- Em `POST /api/membro`, o ID numérico ainda NÃO substitui convite. Apenas a rota separada `POST /api/membro/publico` aceita o ID de um grupo que o banco confirme como público.
 - Exibição dos integrantes somente para membros autorizados.
 - Edição do nome, descrição e foto do grupo pelo criador.
 - Saída e exclusão de grupos, respeitando permissões e relacionamentos existentes.
-- Vinculação de grupos às campanhas por administradores, com meta de participações.
+- Vinculação de grupos às campanhas por administradores, com meta de participações. O vínculo coletivo **não registra interesse ou presença individual automaticamente**: cada membro pode optar por `interessado` ou `pretende_ir`.
+- A tela Participações mostra a próxima campanha com base em interesse registrado e/ou intenção de comparecimento, sem equiparar interesse a presença agendada.
 
 ### Instituições e hemocentros
 
@@ -93,7 +95,8 @@ TCC_ConSangue/
 │   ├── dados_teste.sql
 │   ├── migracao_foto_perfil.sql
 │   ├── migracao_foto_grupo.sql
-│   └── migracao_codigo_convite_grupo.sql
+│   ├── migracao_codigo_convite_grupo.sql
+│   └── migracao_visibilidade_grupo.sql
 ├── React/
 │   ├── .env.example
 │   ├── .env.production
@@ -158,6 +161,7 @@ A criação de um banco novo pelo `Database/ConSangue.sql` já inclui fotos de p
 | --- | --- |
 | `Database/migracao_foto_perfil.sql` | Coluna `foto_perfil` em `usuarios` |
 | `Database/migracao_foto_grupo.sql` | Coluna `foto_grupo` em `grupos` |
+| `Database/migracao_visibilidade_grupo.sql` | Coluna `visibilidade` com padrão `privado` em `grupos` |
 | `Database/migracao_codigo_convite_grupo.sql` | Coluna `codigo_convite` em `grupos` |
 
 **Faça backup e confira o schema antes de cada migração.** Os comandos `ALTER TABLE` não devem ser repetidos se as colunas já existirem. Para consultar as colunas, por exemplo:
@@ -166,6 +170,7 @@ A criação de um banco novo pelo `Database/ConSangue.sql` já inclui fotos de p
 SHOW COLUMNS FROM ConSangue.usuarios LIKE 'foto_perfil';
 SHOW COLUMNS FROM ConSangue.grupos LIKE 'foto_grupo';
 SHOW COLUMNS FROM ConSangue.grupos LIKE 'codigo_convite';
+SHOW COLUMNS FROM ConSangue.grupos LIKE 'visibilidade';
 ```
 
 Após migrar os códigos de convite de um banco que já possuía grupos, preencha os códigos ausentes. Execute na pasta `API`, com as variáveis de conexão do **ambiente desejado**:
@@ -295,6 +300,7 @@ A API utiliza o prefixo `/api`. A documentação detalhada está em [API_ENDPOIN
 | `PUT` | `/api/grupo/:id` | Editar grupo (somente criador) |
 | `GET` | `/api/grupos/usuario/:id_usuario` | Listar os próprios grupos |
 | `POST` | `/api/membro` | Entrar com código de convite |
+| `POST` | `/api/membro/publico` | Entrar diretamente em grupo público autenticado |
 | `GET` | `/api/membros/grupo/:id_grupo` | Ver integrantes (somente membros autorizados) |
 | `POST` | `/api/grupoCampanhas` | Vincular grupo a campanha |
 | `GET` | `/api/participacoes` | Consultar participações próprias |
@@ -307,7 +313,7 @@ As rotas protegidas exigem JWT, normalmente enviado como:
 Authorization: Bearer SEU_TOKEN
 ```
 
-No endpoint `POST /api/membro`, envie `codigo_convite` com 8 caracteres válidos. **Informar somente `id_grupo` não é aceito para ingresso.** A API valida autenticação, perfil e titularidade de cada operação.
+No endpoint `POST /api/membro`, envie `codigo_convite` com 8 caracteres válidos; informar somente `id_grupo` nessa rota continua proibido. Para grupo **público**, `POST /api/membro/publico` recebe `{ "id_grupo": 123 }`, mas o backend confirma `visibilidade='publico'` no MySQL antes de permitir a entrada. **Para habilitar essa opção no banco existente, a migração de visibilidade deve ser aplicada com backup; até lá, a API retorna 503 para essas operações.** A API valida autenticação, perfil e titularidade de cada operação.
 
 ## Segurança e privacidade
 
@@ -328,13 +334,13 @@ A demonstração deve ser validada com **contas fictícias**, na versão realmen
 2. Criar campanha, confirmar a listagem e recarregar a página.
 3. Entrar com uma conta de candidato, buscar campanha e registrar interesse.
 4. Abrir o histórico, verificar a participação e testar o cancelamento.
-5. Criar grupo, compartilhar o código de convite e ingressar com outro usuário fictício.
-6. Associar grupo e campanha, respeitando as permissões.
+5. Criar grupo privado e comprovar entrada apenas por convite; criar grupo público e comprovar entrada direta somente quando a migração de visibilidade estiver aplicada.
+6. Associar grupo e campanha como administrador sem criar participação própria; testar interesse ou intenção de um membro autorizado, e verificar Próxima campanha de interesse no histórico.
 7. Verificar persistência no MySQL após recarregar e testar logout, `401`, `403` e duplicidade.
 
 O endpoint `/api/status` confirma apenas que o servidor HTTP está respondendo. Use uma consulta real, como `GET /api/campanhas`, e operações com dados fictícios para verificar a integração com MySQL.
 
-**Situação em 11/11/2026:** o frontend está configurado para Vercel e a API/MySQL para Railway. A branch `master` contém busca global, grupos com convites, painel institucional, foto de grupos, indicadores e testes React. As migrações de fotos e convites foram executadas no MySQL do Railway em 11/11/2026, com backup e rotação dos 3 códigos expostos. Os convites antigos não funcionam mais. Os testes automatizados de React e de política de convites passam no Vercel/Railway; ainda são necessários testes ponta a ponta com contas de demonstração, autorização entre membros e revisão visual em dispositivos reais.
+**Situação em 11/11/2026:** o frontend está configurado para Vercel e a API/MySQL para Railway. A branch `master` contém busca global, grupos com convites, painel institucional, foto de grupos, indicadores e testes React. As migrações de fotos e convites foram executadas no MySQL do Railway em 11/11/2026, com backup e rotação dos 3 códigos expostos. **A nova migração de visibilidade não foi confirmada no Railway nesta revisão e precisa ser aplicada separadamente.** Os convites antigos não funcionam mais. Os testes automatizados de React e de política de convites passam no Vercel/Railway; ainda são necessários testes ponta a ponta com contas de demonstração, autorização entre membros e revisão visual em dispositivos reais.
 
 ## Contexto acadêmico
 

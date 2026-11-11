@@ -1,5 +1,6 @@
 
 import * as dbGrupos from '../repository/gruposRepository.js';
+import { validarVisibilidadeGrupo } from '../utils/visibilidadeGrupo.js';
 
 
 function criarErro(mensagem, status = 400) {
@@ -55,7 +56,14 @@ function validarDadosGrupo(grupo) {
         }
     }
 
-    return { ...grupo, nome_grupo, descricao };
+    return {
+        ...grupo,
+        nome_grupo,
+        descricao,
+        ...(Object.prototype.hasOwnProperty.call(grupo, 'visibilidade')
+            ? { visibilidade: validarVisibilidadeGrupo(grupo.visibilidade) }
+            : {})
+    };
 }
 
 export async function criarGrupoService(grupo) {
@@ -66,7 +74,7 @@ export async function criarGrupoService(grupo) {
         throw criarErro('ID do criador inválido.');
     }
 
-    return dbGrupos.criarGrupo(dados);
+    return dbGrupos.criarGrupo({ ...dados, visibilidade: validarVisibilidadeGrupo(dados.visibilidade) });
 }
 
 export async function listarGruposService() {

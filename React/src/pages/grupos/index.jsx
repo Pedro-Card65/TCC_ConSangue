@@ -191,7 +191,7 @@ export default function Grupos() {
                   <h2>{grupo.nome_grupo}</h2>
                   <p>{contagens[grupo.id_grupo] ?? '—'} {contagens[grupo.id_grupo] === 1 ? 'membro' : 'membros'}</p>
                 </div>
-                <span className="gota-grupo" title="ConSangue" aria-hidden="true">♦</span>
+                
               </div>
               <p className="descricao-grupo">{grupo.descricao || 'Grupo de doadores ConSangue'}</p>
               <div className="rodape-cartao-grupo">

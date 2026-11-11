@@ -158,7 +158,9 @@ export default function Grupos() {
     setErro('');
     setMensagem('');
     try {
-      await api.post('/api/membro', { id_grupo: Number(id) }, {
+      const valor = String(id).trim().toUpperCase();
+      const convite = /^[A-HJ-NP-Z2-9]{8}$/.test(valor);
+      await api.post('/api/membro', convite ? { codigo_convite: valor } : { id_grupo: Number(valor) }, {
         headers: { Authorization: `Bearer ${tokenAtual()}` }
       });
       window.dispatchEvent(new Event('consangue:grupo-atualizado'));
@@ -347,10 +349,12 @@ export default function Grupos() {
           </>}
           {modal === 'entrar' && <>
             <h2 id="titulo-modal-grupos">Entrar com Código</h2>
-            <p>Informe o ID do grupo para participar.</p>
+            <p>Informe o código de 8 caracteres ou o ID antigo do grupo.</p>
             <form onSubmit={(e) => { e.preventDefault(); entrarGrupo(codigo); }}>
               <label htmlFor="codigo-grupo">Código do grupo</label>
-              <input id="codigo-grupo" inputMode="numeric" value={codigo} onChange={(e) => setCodigo(e.target.value.replace(/\D/g, ''))} required />
+              <input id="codigo-grupo" inputMode="text" autoCapitalize="characters" autoComplete="off" maxLength={16}
+                value={codigo} onChange={(e) => setCodigo(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
+                placeholder="Ex.: AB7K9M2P" required />
               {erro && <p className="erro-modal" role="alert">{erro}</p>}
               <button className="botao-principal" type="submit" disabled={salvando}>{salvando ? 'Entrando...' : 'Entrar no grupo'}</button>
             </form>
@@ -365,7 +369,17 @@ export default function Grupos() {
               <h2 id="titulo-modal-grupos">{grupoSelecionado.nome_grupo}</h2>
             </div>
             <p>{grupoSelecionado.descricao || 'Grupo de doadores ConSangue.'}</p>
-            <p className="codigo-exibido">Código do grupo: <strong>{grupoSelecionado.id_grupo}</strong></p>
+            <div className="codigo-exibido">
+              <span>Código do grupo: <strong>{grupoSelecionado.codigo_convite || grupoSelecionado.id_grupo}</strong></span>
+              <button type="button" className="botao-secundario" onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(String(grupoSelecionado.codigo_convite || grupoSelecionado.id_grupo));
+                  setMensagem('Código copiado.');
+                } catch {
+                  setMensagem('Selecione o código acima para copiar.');
+                }
+              }}>Copiar código</button>
+            </div>
             {erro && <p className="erro-modal" role="alert">{erro}</p>}
             {meusIds.has(String(grupoSelecionado.id_grupo))
               ? <p className="aviso-participacao">Você já participa deste grupo.</p>

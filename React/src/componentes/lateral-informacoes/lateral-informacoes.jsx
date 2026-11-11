@@ -50,6 +50,23 @@ export default function InformacoesLaterais() {
 
   useEffect(() => {
     let ativo = true;
+    let idUsuario = null;
+
+    async function atualizarGrupoRecente() {
+      const token = sessionStorage.getItem('token');
+      if (!token || !idUsuario) return;
+
+      try {
+        const resposta = await api.get(`/api/grupos/usuario/${idUsuario}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (ativo) setGrupoRecente(resposta.data.grupos?.[0] ?? null);
+      } catch (error) {
+        if (ativo) setErro(error.response?.data?.erro || 'Não foi possível atualizar seu grupo mais recente.');
+      }
+    }
+
+    window.addEventListener('grupos:atualizados', atualizarGrupoRecente);
 
     async function buscarDadosLaterais() {
       const token = sessionStorage.getItem('token');
@@ -70,6 +87,7 @@ export default function InformacoesLaterais() {
         // Nome, cidade e tipo sanguíneo vêm do usuário autenticado.
         const respostaUsuario = await api.get('/api/usuarios/me', config);
         const usuarioLogado = respostaUsuario.data;
+        idUsuario = usuarioLogado.id_usuario;
 
         if (ativo) setUsuario(usuarioLogado);
 
@@ -132,7 +150,10 @@ export default function InformacoesLaterais() {
     }
 
     buscarDadosLaterais();
-    return () => { ativo = false; };
+    return () => {
+      ativo = false;
+      window.removeEventListener('grupos:atualizados', atualizarGrupoRecente);
+    };
   }, []);
 
   return (

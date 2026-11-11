@@ -84,6 +84,7 @@ export default function Grupos() {
         await api.post('/api/membro', { id_grupo: Number(entrada) }, config);
         mostrarMensagem('Você entrou no grupo.');
       }
+      window.dispatchEvent(new CustomEvent('grupos:atualizados'));
       setModo(''); setAtualizacao(valor => valor + 1);
     } catch (error) { setErro(error.response?.data?.erro || 'Não foi possível salvar. Tente novamente.'); }
     finally { enviando.current = false; setSalvando(false); }

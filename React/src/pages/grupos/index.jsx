@@ -14,6 +14,43 @@ function listaDa(resposta, chave) {
   return Array.isArray(dados?.[chave]) ? dados[chave] : [];
 }
 
+
+function prepararFotoGrupo(arquivo) {
+  return new Promise((resolve, reject) => {
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(arquivo.type) || arquivo.size > 8 * 1024 * 1024) {
+      reject(new Error('Escolha uma imagem JPEG, PNG ou WEBP de até 8 MB.'));
+      return;
+    }
+    const endereco = URL.createObjectURL(arquivo);
+    const imagem = new Image();
+    imagem.onload = () => {
+      try {
+        const lado = Math.min(imagem.naturalWidth, imagem.naturalHeight);
+        const canvas = document.createElement('canvas');
+        canvas.width = 256;
+        canvas.height = 256;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('Não foi possível processar a imagem.');
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, 256, 256);
+        ctx.drawImage(imagem, (imagem.naturalWidth - lado) / 2, (imagem.naturalHeight - lado) / 2, lado, lado, 0, 0, 256, 256);
+        const foto = canvas.toDataURL('image/jpeg', 0.78);
+        if (foto.length > 300 * 1024) throw new Error('A foto ficou grande demais. Escolha outra imagem.');
+        resolve(foto);
+      } catch (erro) {
+        reject(erro);
+      } finally {
+        URL.revokeObjectURL(endereco);
+      }
+    };
+    imagem.onerror = () => {
+      URL.revokeObjectURL(endereco);
+      reject(new Error('Não foi possível abrir a imagem.'));
+    };
+    imagem.src = endereco;
+  });
+}
+
 export default function Grupos() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -32,6 +69,8 @@ export default function Grupos() {
   const [descricao, setDescricao] = useState('');
   const [codigo, setCodigo] = useState('');
   const [salvando, setSalvando] = useState(false);
+  const [fotoGrupo, setFotoGrupo] = useState(null);
+  const [fotoAlterada, setFotoAlterada] = useState(false);
 
   useEffect(() => {
     const id = location.state?.abrirGrupoId;
@@ -179,8 +218,24 @@ export default function Grupos() {
     setGrupoSelecionado(grupo);
     setNome(grupo.nome_grupo || '');
     setDescricao(grupo.descricao || '');
+    setFotoGrupo(grupo.foto_grupo || null);
+    setFotoAlterada(false);
     setErro('');
     setModal('editar');
+  }
+
+  async function selecionarFotoGrupo(evento) {
+    const arquivo = evento.target.files?.[0];
+    evento.target.value = '';
+    if (!arquivo) return;
+    setErro('');
+    try {
+      const novaFoto = await prepararFotoGrupo(arquivo);
+      setFotoGrupo(novaFoto);
+      setFotoAlterada(true);
+    } catch (erroFoto) {
+      setErro(erroFoto.message || 'Não foi possível processar a foto.');
+    }
   }
 
   async function editarGrupo(evento) {
@@ -191,7 +246,8 @@ export default function Grupos() {
     try {
       await api.put(`/api/grupo/${grupoSelecionado.id_grupo}`, {
         nome_grupo: nome.trim(),
-        descricao: descricao.trim()
+        descricao: descricao.trim(),
+        ...(fotoAlterada ? { foto_grupo: fotoGrupo } : {})
       }, { headers: { Authorization: `Bearer ${tokenAtual()}` } });
       window.dispatchEvent(new Event('consangue:grupo-atualizado'));
       setMensagem('Informações do grupo atualizadas.');

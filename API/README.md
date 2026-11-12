@@ -27,25 +27,28 @@ Publicar a API com a nova rota antes de disponibilizar o novo painel no React. N
 Após revisão e publicação, entrar com uma conta institucional de teste, abrir Perfil, cadastrar o hemocentro se necessário, criar campanha, conferir lista e indicadores, recarregar e verificar a campanha na listagem de candidato. Usar ambiente/dados de teste para esse fluxo, pois o formulário grava no banco da API configurada. Edição/exclusão de campanhas e metas permanecem fora destes blocos.
 
 
-## Visibilidade de grupos (público/privado)
+## Banco de dados — arquivo SQL consolidado
 
-A visibilidade do grupo (`publico` ou `privado`) depende da coluna `visibilidade` na tabela `grupos`, criada por `Database/migracao_visibilidade_grupo.sql`. Em um MySQL **já existente**, aplique essa migração uma única vez, após backup e conferência do schema (`SHOW COLUMNS FROM ConSangue.grupos LIKE 'visibilidade';`), **antes de usar grupos públicos**. Grupos existentes ficam `privado`. Enquanto a coluna não existir, a entrada direta em grupo público (`POST /api/membro/publico`) retorna 503 (`API/src/repository/membros_grupoRepository.js:11`). Bancos novos criados por `Database/ConSangue.sql` já incluem a coluna.
+A estrutura atual de um banco MySQL **novo** está em `Database/ConSangue.sql`. Esse arquivo único contém os campos `foto_perfil`, `foto_grupo`, `codigo_convite` e `visibilidade`; os quatro scripts `ALTER TABLE` separados foram incorporados ao esquema e removidos. Os INSERTs fictícios também foram preservados ali, mas ficam comentados e não são executados por padrão.
 
-## Fotos e convites de grupos
+**Não rode `ConSangue.sql` em um banco já existente**, especialmente no Railway: ele cria as tabelas e não é uma migração incremental. Para atualizar um banco antigo, faça backup, confira as colunas abaixo e prepare somente os ajustes ainda necessários, revisando cada `ALTER TABLE`:
 
-O código permite editar a foto de cada grupo (JPEG convertido para 256 × 256) e usar convites de 8 caracteres. **IDs numéricos são somente identificadores internos e não permitem entrar em grupos fechados.**
-
-Em um banco **já existente**, faça backup e aplique, uma única vez, as migrações:
-
-1. `Database/migracao_foto_grupo.sql`
-2. `Database/migracao_codigo_convite_grupo.sql`
-
-Depois, com o ambiente de conexão MySQL corretamente configurado, execute a partir da pasta `API`:
-
-```bash
-node scripts/preencher_codigos_grupos.mjs
+```sql
+SHOW COLUMNS FROM ConSangue.usuarios LIKE 'foto_perfil';
+SHOW COLUMNS FROM ConSangue.grupos LIKE 'foto_grupo';
+SHOW COLUMNS FROM ConSangue.grupos LIKE 'codigo_convite';
+SHOW COLUMNS FROM ConSangue.grupos LIKE 'visibilidade';
 ```
 
-O preenchimento só altera códigos nulos, e pode ser repetido. Grupos, usuários, campanhas e vínculos são preservados. Até aplicar a migração, o código mantém a listagem antiga funcionando e retorna erro informativo ao tentar salvar foto ou entrar por código alfanumérico. Não exponha variáveis `DB_*` em mensagens ou commits.
+As alterações de fotos e convites já foram executadas no Railway em 11/11/2026. A aplicação da coluna `visibilidade` no Railway **ainda deve ser conferida**. Se ela estiver ausente, a criação/entrada em grupos públicos pode retornar 503, conforme os repositórios da API. Os grupos existentes permanecem privados por padrão ao adicionar esse campo.
 
-Códigos de convite permitem ingresso, mas não substituem a autorização: o backend valida autenticação, vínculo aos grupos e permissões administrativas. `GET /api/grupos` e `GET /api/grupos/:nome` são públicos **sem foto nem código**; `GET /api/grupos/usuario/:id_usuario` devolve esses campos somente ao próprio membro; `GET /api/membros/grupo/:id_grupo` exige participação. Os convites de produção expostos antes da correção S07 foram substituídos; compartilhar somente os códigos novos. Fotos devem representar grupos, não documentos pessoais.
+## Fotos, convites e grupos
+
+- Fotos de grupos são convertidas para JPEG 256 × 256 no frontend e salvas na coluna `foto_grupo`.
+- Convites têm 8 caracteres. O ID numérico não é convite e não permite entrar em grupos privados.
+- A consulta pública de grupos não expõe `foto_grupo` nem `codigo_convite`. Esses dados são acessíveis apenas ao próprio integrante.
+- A lista de integrantes exige autenticação e vínculo com o grupo.
+- Para grupos públicos, há uma rota separada que exige autenticação e confirma `visibilidade = 'publico'` no banco.
+- Os convites expostos anteriormente foram rotacionados; os códigos antigos foram invalidados.
+
+Os scripts em `API/scripts/` são ferramentas operacionais históricas para bancos existentes, **não** fazem parte da criação de um novo banco e não devem ser executados em produção sem verificar o estado atual e garantir backup. Para dados de demonstração, use somente um banco local separado.

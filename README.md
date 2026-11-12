@@ -81,7 +81,8 @@ TCC_ConSangue/
 │   ├── README.md
 │   ├── scripts/
 │   │   ├── preencher_codigos_grupos.mjs
-│   │   └── migrar_grupos_railway.mjs
+│   │   ├── migrar_grupos_railway.mjs
+│   │   └── rotacionar_convites_s07.mjs
 │   ├── package.json
 │   └── src/
 │       ├── api.js
@@ -263,7 +264,7 @@ O `prebuild` do React executa os testes antes do build. O repositório também p
 
 O build gera a pasta `React/build`. A URL da API deve estar configurada corretamente por `REACT_APP_API_URL` durante a compilação/publicação.
 
-**Nota sobre a API:** o `npm test` de `API/package.json` ainda utiliza o script padrão de erro e não corresponde a uma suíte automatizada funcional na versão atual. O `npm start` da API utiliza `nodemon`; revisar o comando de produção no Railway.
+**Nota sobre a API:** o `npm test` de `API/package.json` executa `node --test test/*.test.mjs`. Há 2 arquivos de teste (`API/test/seguranca-grupos.test.mjs` e `API/test/http-seguranca-grupos.test.mjs`), focados em segurança de grupos; a cobertura da API é **parcial** e não abrange as demais rotas. O `npm start` da API utiliza `nodemon`; revisar o comando de produção no Railway.
 
 ## Banco de dados
 
@@ -325,6 +326,15 @@ No endpoint `POST /api/membro`, envie `codigo_convite` com 8 caracteres válidos
 - Utilize dados fictícios e contas de teste nas demonstrações. Revise segredo JWT, CORS e configuração do serviço de produção antes da apresentação.
 - O uso de bcrypt, JWT e MySQL **não equivale automaticamente a conformidade integral com a LGPD**; uma implantação real exige avaliação específica de proteção, finalidade, retenção e exclusão de dados.
 - O status de comparecimento informado não é comprovante de doação efetiva.
+
+## Limitações conhecidas
+
+- **Cadastro de instituição aberto:** `POST /api/usuarios/cadastro` aceita `tipo_usuario='instituicao'` de qualquer pessoa, sem verificação (`API/src/service/usuariosService.js:140`). Não há validação de que a conta pertence a um hemocentro real.
+- **CORS aberto:** a API usa `cors()` sem restrição de origem (`API/src/api.js:7`).
+- **Sem limite de tentativas de login:** não há rate limit na API (nenhuma biblioteca de limitação nas dependências de `API/package.json`).
+- **Cobertura de testes da API parcial:** apenas 2 arquivos de teste, focados em segurança de grupos.
+- **Participação e presença são informadas pelo usuário:** interesse, intenção e comparecimento informado não são confirmação de doação de sangue.
+- **Identificadores internos em listagens públicas:** `GET /api/grupos` e `GET /api/grupos/:nome` devolvem `id_criador` (`API/src/repository/gruposRepository.js:97`, `:108`). `GET /api/instituicoes` e `GET /api/instituicoes/:id` usam `SELECT *` e devolvem `id_usuario` do dono (`API/src/repository/instituicoesRepository.js:22`, `:41`).
 
 ## Testes de aceitação e preparação para o TCC
 

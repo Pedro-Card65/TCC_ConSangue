@@ -27,6 +27,10 @@ Publicar a API com a nova rota antes de disponibilizar o novo painel no React. N
 Após revisão e publicação, entrar com uma conta institucional de teste, abrir Perfil, cadastrar o hemocentro se necessário, criar campanha, conferir lista e indicadores, recarregar e verificar a campanha na listagem de candidato. Usar ambiente/dados de teste para esse fluxo, pois o formulário grava no banco da API configurada. Edição/exclusão de campanhas e metas permanecem fora destes blocos.
 
 
+## Visibilidade de grupos (público/privado)
+
+A visibilidade do grupo (`publico` ou `privado`) depende da coluna `visibilidade` na tabela `grupos`, criada por `Database/migracao_visibilidade_grupo.sql`. Em um MySQL **já existente**, aplique essa migração uma única vez, após backup e conferência do schema (`SHOW COLUMNS FROM ConSangue.grupos LIKE 'visibilidade';`), **antes de usar grupos públicos**. Grupos existentes ficam `privado`. Enquanto a coluna não existir, a entrada direta em grupo público (`POST /api/membro/publico`) retorna 503 (`API/src/repository/membros_grupoRepository.js:11`). Bancos novos criados por `Database/ConSangue.sql` já incluem a coluna.
+
 ## Fotos e convites de grupos
 
 O código permite editar a foto de cada grupo (JPEG convertido para 256 × 256) e usar convites de 8 caracteres. **IDs numéricos são somente identificadores internos e não permitem entrar em grupos fechados.**

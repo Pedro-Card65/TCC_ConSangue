@@ -81,7 +81,7 @@ Arquivo: `API/src/controller/campanhasController.js`. Montado com prefixo `/api`
 
 ## Grupos
 
-**Visibilidade (11/11/2026):** grupos antigos permanecem `privado`. Aplicar `Database/migracao_visibilidade_grupo.sql` **após backup e verificação de schema** no MySQL existente; a criação de grupos públicos e entrada direta exigem essa coluna. A lista pública mostra a visibilidade, mas não código de convite nem foto privada. Administradores podem vincular grupos a campanhas sem criar participação individual; somente o membro que clicar em Interesse/Pretendo ir terá registro em `participacoes`.
+**Visibilidade:** grupos antigos permanecem `privado`. O esquema de bancos novos está consolidado em `Database/ConSangue.sql`, que já contém a coluna `visibilidade`. Para um banco MySQL existente, é preciso conferir o schema e aplicar somente a alteração ausente após backup, **sem executar o script completo de criação**. A lista pública mostra a visibilidade, mas não código de convite nem foto privada. A migração de visibilidade do Railway ainda precisa ser confirmada. Administradores podem vincular grupos a campanhas sem criar participação individual; somente o membro que clicar em Interesse/Pretendo ir terá registro em `participacoes`.
 
 Arquivo: `API/src/controller/gruposController.js`. Montado com prefixo `/api`. Validações em `API/src/service/gruposService.js`.
 

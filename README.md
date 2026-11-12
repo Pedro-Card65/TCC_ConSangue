@@ -164,7 +164,7 @@ SHOW COLUMNS FROM ConSangue.grupos LIKE 'codigo_convite';
 SHOW COLUMNS FROM ConSangue.grupos LIKE 'visibilidade';
 ```
 
-O Railway já recebeu a migração de foto e convite em 11/11/2026. A aplicação da coluna de visibilidade nesse banco precisa ser confirmada separadamente antes de depender de grupos públicos. Os scripts administrativos existentes em `API/scripts/` permanecem independentes do SQL principal e **não devem ser executados sem revisar o banco de destino**. Consulte [API/README.md](API/README.md).
+O Railway já recebeu as alterações de foto e convite em 11/11/2026. A API agora verifica e adiciona automaticamente a coluna `visibilidade` na primeira criação/edição de grupo ou entrada em grupo público, caso esteja ausente. Grupos existentes ficam privados por padrão. Esse ajuste não exige script manual, mas a conta da API no MySQL precisa de permissão `ALTER`. Os scripts administrativos existentes em `API/scripts/` permanecem independentes do SQL principal e **não devem ser executados sem revisar o banco de destino**. Consulte [API/README.md](API/README.md).
 
 ### 3. Configurar e iniciar a API
 
@@ -295,7 +295,7 @@ As rotas protegidas exigem JWT, normalmente enviado como:
 Authorization: Bearer SEU_TOKEN
 ```
 
-No endpoint `POST /api/membro`, envie `codigo_convite` com 8 caracteres válidos; informar somente `id_grupo` nessa rota continua proibido. Para grupo **público**, `POST /api/membro/publico` recebe `{ "id_grupo": 123 }`, mas o backend confirma `visibilidade='publico'` no MySQL antes de permitir a entrada. **Para habilitar essa opção no banco existente, a migração de visibilidade deve ser aplicada com backup; até lá, a API retorna 503 para essas operações.** A API valida autenticação, perfil e titularidade de cada operação.
+No endpoint `POST /api/membro`, envie `codigo_convite` com 8 caracteres válidos; informar somente `id_grupo` nessa rota continua proibido. Para grupo **público**, `POST /api/membro/publico` recebe `{ "id_grupo": 123 }`, mas o backend confirma `visibilidade='publico'` no MySQL antes de permitir a entrada. **A API prepara automaticamente a coluna em bancos antigos.** O erro 503 pode ocorrer se o MySQL impedir a alteração (por exemplo, falta de permissão `ALTER`). Em produção, mantenha backup antes de publicar versões que possam modificar a estrutura do banco. A API valida autenticação, perfil e titularidade de cada operação.
 
 ## Segurança e privacidade
 

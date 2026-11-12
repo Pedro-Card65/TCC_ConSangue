@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import VincularCampanha from '../../componentes/vincular-campanha';
+import useEscapeFechar from '../../hooks/useEscapeFechar.js';
 
 function tokenAtual() {
   return sessionStorage.getItem('token') || localStorage.getItem('token');
@@ -70,6 +71,7 @@ export default function Grupos() {
   const [visibilidade, setVisibilidade] = useState('privado');
   const [codigo, setCodigo] = useState('');
   const [salvando, setSalvando] = useState(false);
+  useEscapeFechar(modal === 'confirmar-apagar' && !salvando, () => { setErro(''); setModal('detalhes'); });
   const [fotoGrupo, setFotoGrupo] = useState(null);
   const [fotoAlterada, setFotoAlterada] = useState(false);
   const [nomeArquivoFoto, setNomeArquivoFoto] = useState('');

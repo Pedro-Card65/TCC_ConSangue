@@ -6,6 +6,7 @@ import { api } from '../../services/api.js';
 import ModalCampanha from '../../componentes/modal-campanha/modal-campanha.jsx';
 import PainelInstitucional from '../../componentes/painel-institucional';
 import BuscaGlobal from '../../componentes/busca-global';
+import useEscapeFechar from '../../hooks/useEscapeFechar.js';
 
 const STATUS = {
   comparecimento_informado: { texto: 'Presença informada', classe: 'compareceu' },
@@ -69,6 +70,7 @@ export default function User() {
   const navigate = useNavigate();
   const [confirmandoExclusao, setConfirmandoExclusao] = useState(false);
   const [excluindo, setExcluindo] = useState(false);
+  useEscapeFechar(confirmandoExclusao && !excluindo, () => setConfirmandoExclusao(false));
   const [erroExclusao, setErroExclusao] = useState('');
   const [campanhaAberta, setCampanhaAberta] = useState(null);
   const [atualizacao, setAtualizacao] = useState(0);
@@ -268,7 +270,7 @@ export default function User() {
               <p>{usuario.nome}</p>
               <p>{usuario.email}</p>
               <p>{usuario.cidade}</p>
-              <p>Tipo Sanguíneo: {usuario.tipo_sanguineo}</p>
+              <p>Tipo Sanguíneo: {(usuario.tipo_sanguineo || '').trim() || 'Não informado'}</p>
             </div>
 
             <div className="coluna-user-2">

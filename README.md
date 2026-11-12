@@ -92,12 +92,7 @@ TCC_ConSangue/
 │       ├── repository/
 │       └── utils/
 ├── Database/
-│   ├── ConSangue.sql
-│   ├── dados_teste.sql
-│   ├── migracao_foto_perfil.sql
-│   ├── migracao_foto_grupo.sql
-│   ├── migracao_codigo_convite_grupo.sql
-│   └── migracao_visibilidade_grupo.sql
+│   └── ConSangue.sql
 ├── React/
 │   ├── .env.example
 │   ├── .env.production
@@ -152,20 +147,15 @@ mysql -u root -p < Database/ConSangue.sql
 
 O script cria o banco **`ConSangue`** e as tabelas necessárias.
 
-O arquivo **`Database/dados_teste.sql`** é opcional e deve ser executado **somente em ambiente local/de testes**, após o script principal. Seus registros são fictícios; a senha armazenada no usuário de demonstração não é um hash válido para autenticação. Para testar login, crie uma conta pelo formulário de cadastro.
+O arquivo **`Database/ConSangue.sql`** é a única fonte SQL de criação do banco. Ele já contém as sete tabelas e incorpora as antigas alterações de estrutura: foto de perfil, foto de grupo, código único de convite e visibilidade público/privado.
 
-#### Migrações para bancos já existentes
+Os **dados fictícios opcionais** que estavam em `dados_teste.sql` foram preservados **no final do mesmo arquivo, dentro de um comentário SQL**. Eles **não são executados por padrão**. Para usá-los, crie um banco de teste local e execute exclusivamente o trecho após remover os delimitadores de comentário indicados. A senha do usuário fictício não é um hash válido; para testar o login, faça o cadastro pela aplicação. **Nunca rode os INSERTs fictícios no Railway.**
 
-A criação de um banco novo pelo `Database/ConSangue.sql` já inclui fotos de perfil e grupo e códigos de convite. Para **bancos antigos**, existem migrações separadas:
+#### Banco novo x banco já existente
 
-| Migração | Atualização |
-| --- | --- |
-| `Database/migracao_foto_perfil.sql` | Coluna `foto_perfil` em `usuarios` |
-| `Database/migracao_foto_grupo.sql` | Coluna `foto_grupo` em `grupos` |
-| `Database/migracao_visibilidade_grupo.sql` | Coluna `visibilidade` com padrão `privado` em `grupos` |
-| `Database/migracao_codigo_convite_grupo.sql` | Coluna `codigo_convite` em `grupos` |
+O `ConSangue.sql` cria a estrutura **de um banco novo**. Não o reexecute sobre o MySQL já utilizado pelo projeto: isso não é um procedimento de atualização e pode gerar conflitos de tabelas existentes. Para bancos antigos, compare o schema atual com o SQL consolidado, faça backup e aplique **somente as alterações realmente ausentes**, após revisão.
 
-**Faça backup e confira o schema antes de cada migração.** Os comandos `ALTER TABLE` não devem ser repetidos se as colunas já existirem. Para consultar as colunas, por exemplo:
+As migrações antigas de estrutura foram incorporadas às definições `CREATE TABLE`; seus arquivos SQL separados foram removidos por redundância. Para inspecionar as colunas de um banco existente sem alterá-lo:
 
 ```sql
 SHOW COLUMNS FROM ConSangue.usuarios LIKE 'foto_perfil';
@@ -174,13 +164,7 @@ SHOW COLUMNS FROM ConSangue.grupos LIKE 'codigo_convite';
 SHOW COLUMNS FROM ConSangue.grupos LIKE 'visibilidade';
 ```
 
-Após migrar os códigos de convite de um banco que já possuía grupos, preencha os códigos ausentes. Execute na pasta `API`, com as variáveis de conexão do **ambiente desejado**:
-
-```bash
-node scripts/preencher_codigos_grupos.mjs
-```
-
-Não execute scripts sobre o Railway sem backup e conferência do banco de destino. Detalhes em [API/README.md](API/README.md).
+O Railway já recebeu a migração de foto e convite em 11/11/2026. A aplicação da coluna de visibilidade nesse banco precisa ser confirmada separadamente antes de depender de grupos públicos. Os scripts administrativos existentes em `API/scripts/` permanecem independentes do SQL principal e **não devem ser executados sem revisar o banco de destino**. Consulte [API/README.md](API/README.md).
 
 ### 3. Configurar e iniciar a API
 

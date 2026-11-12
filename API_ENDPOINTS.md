@@ -81,7 +81,7 @@ Arquivo: `API/src/controller/campanhasController.js`. Montado com prefixo `/api`
 
 ## Grupos
 
-**Visibilidade:** grupos antigos permanecem `privado`. O esquema de bancos novos está consolidado em `Database/ConSangue.sql`, que já contém a coluna `visibilidade`. Para um banco MySQL existente, é preciso conferir o schema e aplicar somente a alteração ausente após backup, **sem executar o script completo de criação**. A lista pública mostra a visibilidade, mas não código de convite nem foto privada. A migração de visibilidade do Railway ainda precisa ser confirmada. Administradores podem vincular grupos a campanhas sem criar participação individual; somente o membro que clicar em Interesse/Pretendo ir terá registro em `participacoes`.
+**Visibilidade:** grupos antigos permanecem `privado`. O esquema de bancos novos está consolidado em `Database/ConSangue.sql`, que já contém a coluna `visibilidade`. Em bancos MySQL existentes, a API verifica e cria automaticamente a coluna `visibilidade` na primeira criação/edição de grupo ou entrada em grupo público, sem executar o script completo de criação. A conta MySQL precisa de permissão `ALTER`; caso contrário, a operação pode retornar 503. A lista pública mostra a visibilidade, mas não código de convite nem foto privada. O comportamento automático no Railway ainda precisa ser validado em teste real. Administradores podem vincular grupos a campanhas sem criar participação individual; somente o membro que clicar em Interesse/Pretendo ir terá registro em `participacoes`.
 
 Arquivo: `API/src/controller/gruposController.js`. Montado com prefixo `/api`. Validações em `API/src/service/gruposService.js`.
 
@@ -101,7 +101,7 @@ Arquivo: `API/src/controller/membros_grupoController.js`. Montado com prefixo `/
 
 | Método | Caminho | Auth | Perfil / permissão | Corpo | Resposta | Códigos |
 |---|---|---|---|---|---|---|
-| POST | `/api/membro/publico` | JWT | Entrada direta exclusivamente em grupo com `visibilidade='publico'`; `id_usuario` do JWT | `{ id_grupo }` | `201 { id }` | 201; 400; 401; 403 grupo privado/ausente; 409 duplicado; 503 migração ausente |
+| POST | `/api/membro/publico` | JWT | Entrada direta exclusivamente em grupo com `visibilidade='publico'`; `id_usuario` do JWT | `{ id_grupo }` | `201 { id }` | 201; 400; 401; 403 grupo privado/ausente; 409 duplicado; 503 erro de permissão/estrutura |
 | POST | `/api/membro` | JWT | Qualquer perfil autenticado. `id_usuario` é obtido do token; `papel` é forçado a `"membro"`. ID numérico não é convite. | `{ codigo_convite }` com 8 caracteres | `201 { id }` | 201; 400 para código ausente/inválido ou `id_grupo`; 401; 404 convite não encontrado; 409 membro existente; 500 |
 | GET | `/api/membros/grupo/:id_grupo` | JWT + membro (`somenteMembroGrupo`) | Somente integrante do grupo informado; não integrante recebe 403 | — | `200 { membros }` | 200; 400; 401; 403; 500 |
 | GET | `/api/grupos/usuario/:id_usuario` | JWT + dono (`somenteMeuId('id_usuario')`) | Somente o próprio usuário | — | `200 { grupos }` com `codigo_convite` e `foto_grupo` de seus próprios grupos | 200; 400; 403; 500 |

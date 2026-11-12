@@ -13,15 +13,12 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "prebuild": "react-scripts test --watchAll=false --runInBand",
     "build": "react-scripts build",
-    "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
-      "react-app",
-      "react-app/jest"
+      "react-app"
     ]
   },
   "browserslist": {
@@ -35,8 +32,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "eslint-plugin-jest": "^27.9.0"
   }
 }

@@ -20,16 +20,16 @@ Resposta 200 para uma instituição cadastrada:
 
 O formulário React usa o contrato existente de `POST /api/campanhas`: `id_hemocentro`, `nome_campanha`, `descricao`, `data_inicio`, `data_fim`, `horario_inicio`, `horario_fim`, `status_campanha`. Datas usam `YYYY-MM-DD`, horários são opcionais, status aceita `ativa` ou `encerrada`. O servidor valida titularidade do hemocentro e datas/horários. Sucesso retorna 200 com `{ "id_campanha": 12 }`; validações retornam 400, recurso alheio 403 e conflito 409. Não existe campo de meta de doações para campanha neste contrato.
 
-## Publicação e teste funcional
+## Publicação e conferência manual
 
 Publicar a API com a nova rota antes de disponibilizar o novo painel no React. Nenhuma migração de banco é exigida por esses dois blocos. O preview React usa a URL de API configurada no ambiente: enquanto essa API estiver na versão anterior, o painel novo não estará disponível.
 
-Após revisão e publicação, entrar com uma conta institucional de teste, abrir Perfil, cadastrar o hemocentro se necessário, criar campanha, conferir lista e indicadores, recarregar e verificar a campanha na listagem de candidato. Usar ambiente/dados de teste para esse fluxo, pois o formulário grava no banco da API configurada. Edição/exclusão de campanhas e metas permanecem fora destes blocos.
+Após revisão e publicação, entrar com uma conta institucional criada para a demonstração, abrir Perfil, cadastrar o hemocentro se necessário, criar campanha, conferir lista e indicadores, recarregar e verificar a campanha na listagem de candidato. Usar um ambiente apropriado para esse fluxo, pois o formulário grava no banco da API configurada. Edição/exclusão de campanhas e metas permanecem fora destes blocos.
 
 
 ## Banco de dados — arquivo SQL consolidado
 
-A estrutura atual de um banco MySQL **novo** está em `Database/ConSangue.sql`. Esse arquivo único contém os campos `foto_perfil`, `foto_grupo`, `codigo_convite` e `visibilidade`; os quatro scripts `ALTER TABLE` separados foram incorporados ao esquema e removidos. Os INSERTs fictícios também foram preservados ali, mas ficam comentados e não são executados por padrão.
+A estrutura atual de um banco MySQL **novo** está em `Database/ConSangue.sql`. Esse arquivo único contém os campos `foto_perfil`, `foto_grupo`, `codigo_convite` e `visibilidade`; os quatro scripts `ALTER TABLE` separados foram incorporados ao esquema e removidos. O arquivo SQL contém somente o esquema de tabelas, sem comandos de preenchimento de registros fictícios.
 
 **Não rode `ConSangue.sql` em um banco já existente**, especialmente no Railway: ele cria as tabelas e não é uma migração incremental. Para atualizar um banco antigo, faça backup, confira as colunas abaixo e prepare somente os ajustes ainda necessários, revisando cada `ALTER TABLE`:
 
@@ -51,4 +51,4 @@ As alterações de fotos e convites já foram executadas no Railway em 11/11/202
 - Para grupos públicos, há uma rota separada que exige autenticação e confirma `visibilidade = 'publico'` no banco.
 - Os convites expostos anteriormente foram rotacionados; os códigos antigos foram invalidados.
 
-Os scripts em `API/scripts/` são ferramentas operacionais históricas para bancos existentes, **não** fazem parte da criação de um novo banco e não devem ser executados em produção sem verificar o estado atual e garantir backup. Para dados de demonstração, use somente um banco local separado.
+Os scripts em `API/scripts/` são ferramentas operacionais históricas para bancos existentes, **não** fazem parte da criação de um novo banco e não devem ser executados em produção sem verificar o estado atual e garantir backup. Não há dados de demonstração incluídos no SQL consolidado.

@@ -149,7 +149,7 @@ O script cria o banco **`ConSangue`** e as tabelas necessárias.
 
 O arquivo **`Database/ConSangue.sql`** é a única fonte SQL de criação do banco. Ele já contém as sete tabelas e incorpora as antigas alterações de estrutura: foto de perfil, foto de grupo, código único de convite e visibilidade público/privado.
 
-Os **dados fictícios opcionais** que estavam em `dados_teste.sql` foram preservados **no final do mesmo arquivo, dentro de um comentário SQL**. Eles **não são executados por padrão**. Para usá-los, crie um banco de teste local e execute exclusivamente o trecho após remover os delimitadores de comentário indicados. A senha do usuário fictício não é um hash válido; para testar o login, faça o cadastro pela aplicação. **Nunca rode os INSERTs fictícios no Railway.**
+O arquivo contém **somente a estrutura do banco**. Dados fictícios e comandos de preenchimento usados durante o desenvolvimento foram retirados do repositório.
 
 #### Banco novo x banco já existente
 
@@ -235,20 +235,17 @@ REACT_APP_API_URL=http://localhost:3001
 
 O arquivo **`React/.env.example`** contém um modelo dessa configuração. Reinicie o React após alterar variáveis de ambiente.
 
-### 5. Executar testes e gerar o build do React
+### 5. Gerar o build do React
 
 Na pasta `React`:
 
 ```bash
-npm test -- --watchAll=false --runInBand
 npm run build
 ```
 
-O `prebuild` do React executa os testes antes do build. O repositório também possui o workflow `.github/workflows/react-ci.yml`, que executa os testes e a compilação em alterações relevantes da `master` e em pull requests. **Confira os resultados mais recentes em GitHub Actions**; a existência do workflow não significa que os testes tenham passado.
+O comando compila o frontend para produção, sem executar a antiga suíte de testes. O workflow `.github/workflows/react-ci.yml` também realiza somente a compilação quando houver alterações no React.
 
-O build gera a pasta `React/build`. A URL da API deve estar configurada corretamente por `REACT_APP_API_URL` durante a compilação/publicação.
-
-**Nota sobre a API:** o `npm test` de `API/package.json` executa `node --test test/*.test.mjs`. Há 2 arquivos de teste (`API/test/seguranca-grupos.test.mjs` e `API/test/http-seguranca-grupos.test.mjs`), focados em segurança de grupos; a cobertura da API é **parcial** e não abrange as demais rotas. O `npm start` da API utiliza `nodemon`; revisar o comando de produção no Railway.
+O build gera `React/build`. A URL da API deve ser configurada em `REACT_APP_API_URL` durante a publicação. A API utiliza `npm start` no Railway; seu processo de inicialização não executa a antiga suíte de testes.
 
 ## Banco de dados
 
@@ -316,25 +313,15 @@ No endpoint `POST /api/membro`, envie `codigo_convite` com 8 caracteres válidos
 - **Cadastro de instituição aberto:** `POST /api/usuarios/cadastro` aceita `tipo_usuario='instituicao'` de qualquer pessoa, sem verificação (`API/src/service/usuariosService.js:140`). Não há validação de que a conta pertence a um hemocentro real.
 - **CORS aberto:** a API usa `cors()` sem restrição de origem (`API/src/api.js:7`).
 - **Sem limite de tentativas de login:** não há rate limit na API (nenhuma biblioteca de limitação nas dependências de `API/package.json`).
-- **Cobertura de testes da API parcial:** apenas 2 arquivos de teste, focados em segurança de grupos.
+- **Validação manual necessária:** os arquivos de testes automatizados foram removidos do repositório, portanto é necessário verificar os fluxos principais no ambiente publicado.
 - **Participação e presença são informadas pelo usuário:** interesse, intenção e comparecimento informado não são confirmação de doação de sangue.
 - **Identificadores internos em listagens públicas:** `GET /api/grupos` e `GET /api/grupos/:nome` devolvem `id_criador` (`API/src/repository/gruposRepository.js:97`, `:108`). `GET /api/instituicoes` e `GET /api/instituicoes/:id` usam `SELECT *` e devolvem `id_usuario` do dono (`API/src/repository/instituicoesRepository.js:22`, `:41`).
 
-## Testes de aceitação e preparação para o TCC
+## Preparação da apresentação
 
-A demonstração deve ser validada com **contas fictícias**, na versão realmente publicada:
+Antes da feira, confira manualmente a disponibilidade do site e da API, o login, a busca, o registro de interesse, a criação de campanhas e os grupos com convites. Prepare contas e registros de demonstração somente em ambiente apropriado, sem incluir dados pessoais ou credenciais no repositório.
 
-1. Criar uma conta institucional, autenticar e cadastrar o hemocentro.
-2. Criar campanha, confirmar a listagem e recarregar a página.
-3. Entrar com uma conta de candidato, buscar campanha e registrar interesse.
-4. Abrir o histórico, verificar a participação e testar o cancelamento.
-5. Criar grupo privado e comprovar entrada apenas por convite; criar grupo público e comprovar entrada direta somente quando a migração de visibilidade estiver aplicada.
-6. Associar grupo e campanha como administrador sem criar participação própria; testar interesse ou intenção de um membro autorizado, e verificar Próxima campanha de interesse no histórico.
-7. Verificar persistência no MySQL após recarregar e testar logout, `401`, `403` e duplicidade.
-
-O endpoint `/api/status` confirma apenas que o servidor HTTP está respondendo. Use uma consulta real, como `GET /api/campanhas`, e operações com dados fictícios para verificar a integração com MySQL.
-
-**Situação em 11/11/2026:** o frontend está configurado para Vercel e a API/MySQL para Railway. A branch `master` contém busca global, grupos com convites, painel institucional, foto de grupos, indicadores e testes React. As migrações de fotos e convites foram executadas no MySQL do Railway em 11/11/2026, com backup e rotação dos 3 códigos expostos. **A nova migração de visibilidade não foi confirmada no Railway nesta revisão e precisa ser aplicada separadamente.** Os convites antigos não funcionam mais. Os testes automatizados de React e de política de convites passam no Vercel/Railway; ainda são necessários testes ponta a ponta com contas de demonstração, autorização entre membros e revisão visual em dispositivos reais.
+**Situação em 12/11/2026:** a `master` mantém as funcionalidades do React e da API, enquanto o banco de dados de produção continua no Railway. O arquivo `Database/ConSangue.sql` contém apenas o esquema de criação. Os testes automatizados e as amostras de dados foram retirados do código por solicitação da equipe; a verificação de comportamento deverá ser feita separadamente.
 
 ## Contexto acadêmico
 

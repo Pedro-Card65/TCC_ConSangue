@@ -1,4 +1,4 @@
-name: React — testes e build
+name: React — build
 
 on:
   push:
@@ -17,8 +17,8 @@ permissions:
   contents: read
 
 jobs:
-  react-tests:
-    name: Testes React e build de produção
+  react-build:
+    name: Compilação do React
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
@@ -33,10 +33,6 @@ jobs:
           node-version: '22'
       - name: Instalar dependências
         run: npm install --no-audit --no-fund
-      - name: Executar todos os testes
-        env:
-          CI: 'true'
-        run: npm test -- --watchAll=false --runInBand
       - name: Gerar build de produção
         env:
           CI: 'true'

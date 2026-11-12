@@ -51,4 +51,4 @@ As alterações de fotos e convites já foram executadas no Railway em 11/11/202
 - Para grupos públicos, há uma rota separada que exige autenticação e confirma `visibilidade = 'publico'` no banco.
 - Os convites expostos anteriormente foram rotacionados; os códigos antigos foram invalidados.
 
-Os scripts em `API/scripts/` são ferramentas operacionais históricas para bancos existentes, **não** fazem parte da criação de um novo banco e não devem ser executados em produção sem verificar o estado atual e garantir backup. Não há dados de demonstração incluídos no SQL consolidado.
+Os antigos utilitários de migração e rotação de códigos foram retirados do repositório; suas versões permanecem recuperáveis no histórico Git. A API não depende deles para iniciar. **O `ConSangue.sql` serve para banco novo e não deve ser executado sobre o MySQL existente.** Não há dados de demonstração no SQL consolidado.

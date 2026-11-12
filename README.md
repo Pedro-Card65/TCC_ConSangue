@@ -79,10 +79,6 @@ TCC_ConSangue/
 ├── API/
 │   ├── .env.example
 │   ├── README.md
-│   ├── scripts/
-│   │   ├── preencher_codigos_grupos.mjs
-│   │   ├── migrar_grupos_railway.mjs
-│   │   └── rotacionar_convites_s07.mjs
 │   ├── package.json
 │   └── src/
 │       ├── api.js
@@ -164,7 +160,7 @@ SHOW COLUMNS FROM ConSangue.grupos LIKE 'codigo_convite';
 SHOW COLUMNS FROM ConSangue.grupos LIKE 'visibilidade';
 ```
 
-O Railway já recebeu as alterações de foto e convite em 11/11/2026. A API agora verifica e adiciona automaticamente a coluna `visibilidade` na primeira criação/edição de grupo ou entrada em grupo público, caso esteja ausente. Grupos existentes ficam privados por padrão. Esse ajuste não exige script manual, mas a conta da API no MySQL precisa de permissão `ALTER`. Os scripts administrativos existentes em `API/scripts/` permanecem independentes do SQL principal e **não devem ser executados sem revisar o banco de destino**. Consulte [API/README.md](API/README.md).
+O Railway já recebeu as alterações de foto e convite em 11/11/2026. A API agora verifica e adiciona automaticamente a coluna `visibilidade` na primeira criação/edição de grupo ou entrada em grupo público, caso esteja ausente. Grupos existentes ficam privados por padrão. Esse ajuste não exige script manual, mas a conta da API no MySQL precisa de permissão `ALTER`. Os scripts administrativos antigos foram retirados do projeto por não participarem da execução da API ou da instalação. O histórico Git preserva as versões anteriores; **nunca execute o `ConSangue.sql` completo em um banco existente**. Consulte [API/README.md](API/README.md).
 
 ### 3. Configurar e iniciar a API
 

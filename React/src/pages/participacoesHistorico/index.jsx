@@ -10,8 +10,9 @@ const STATUS = {
 
 function formatarData(data) {
   if (!data) return 'Data não informada';
-  const valor = typeof data === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(data)
-    ? new Date(`${data}T00:00:00`)
+  const iso = String(data).slice(0, 10);
+  const valor = /^\d{4}-\d{2}-\d{2}$/.test(iso)
+    ? new Date(`${iso}T00:00:00`)
     : new Date(data);
   return Number.isNaN(valor.getTime()) ? 'Data não informada' : valor.toLocaleDateString('pt-BR');
 }

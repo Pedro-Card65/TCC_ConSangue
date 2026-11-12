@@ -15,7 +15,9 @@ const STATUS = {
 
 const formatarData = (d) => {
   if (!d) return '—';
-  const valor = /^\d{4}-\d{2}-\d{2}$/.test(String(d)) ? `${d}T00:00:00` : d;
+  // Colunas DATE chegam como "YYYY-MM-DD" ou "YYYY-MM-DDT00:00:00.000Z"; timestamps reais (ex.: data_cadastro) seguem como instante.
+  const dataSemHora = String(d).match(/^(\d{4}-\d{2}-\d{2})(?:T00:00:00(?:\.000)?Z)?$/);
+  const valor = dataSemHora ? `${dataSemHora[1]}T00:00:00` : d;
   return new Date(valor).toLocaleDateString('pt-BR');
 };
 

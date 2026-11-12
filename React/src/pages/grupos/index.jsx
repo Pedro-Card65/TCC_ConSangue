@@ -483,7 +483,18 @@ export default function Grupos() {
                     : <ul>
                         {membrosPorGrupo[grupoSelecionado.id_grupo].map((membro) => (
                           <li key={membro.id_membro} className="membro-item">
-                            <span className="membro-avatar" aria-hidden="true">{(membro.nome || membro.usuario || 'P').trim().charAt(0).toUpperCase()}</span>
+                            <span className="membro-avatar" aria-hidden="true">
+                              {(membro.nome || membro.usuario || 'P').trim().charAt(0).toUpperCase()}
+                              {typeof membro.foto_perfil === 'string' && membro.foto_perfil.startsWith('data:image/') && (
+                                <img
+                                  src={membro.foto_perfil}
+                                  alt=""
+                                  loading="lazy"
+                                  decoding="async"
+                                  onError={(evento) => { evento.currentTarget.style.display = 'none'; }}
+                                />
+                              )}
+                            </span>
                             <span className="membro-dados">
                               <strong>{membro.nome || membro.usuario || 'Participante'}</strong>
                               <small>{membro.papel === 'administrador' ? 'Administrador' : 'Membro'}

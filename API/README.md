@@ -31,7 +31,7 @@ Após revisão e publicação, entrar com uma conta institucional criada para a 
 
 A estrutura atual de um banco MySQL **novo** está em `Database/ConSangue.sql`. Esse arquivo único contém os campos `foto_perfil`, `foto_grupo`, `codigo_convite` e `visibilidade`; os quatro scripts `ALTER TABLE` separados foram incorporados ao esquema e removidos. O arquivo SQL contém somente o esquema de tabelas, sem comandos de preenchimento de registros fictícios.
 
-**Não rode `ConSangue.sql` em um banco já existente**, especialmente no Railway: ele cria as tabelas e não é uma migração incremental. Para atualizar um banco antigo, faça backup, confira as colunas abaixo e prepare somente os ajustes ainda necessários, revisando cada `ALTER TABLE`:
+**Não rode `ConSangue.sql` em um banco já existente**, especialmente no Railway: ele cria as tabelas e não é uma migração incremental. Para bancos antigos, mantenha backup e confira as colunas abaixo. A API prepara automaticamente apenas `visibilidade` quando essa coluna faltar, na primeira criação/edição de grupo ou entrada em grupo público, desde que a conta tenha permissão `ALTER`. Demais ajustes precisam ser revisados separadamente:
 
 ```sql
 SHOW COLUMNS FROM ConSangue.usuarios LIKE 'foto_perfil';
@@ -40,7 +40,7 @@ SHOW COLUMNS FROM ConSangue.grupos LIKE 'codigo_convite';
 SHOW COLUMNS FROM ConSangue.grupos LIKE 'visibilidade';
 ```
 
-As alterações de fotos e convites já foram executadas no Railway em 11/11/2026. A aplicação da coluna `visibilidade` no Railway **ainda deve ser conferida**. Se ela estiver ausente, a criação/entrada em grupos públicos pode retornar 503, conforme os repositórios da API. Os grupos existentes permanecem privados por padrão ao adicionar esse campo.
+As alterações de fotos e convites já foram executadas no Railway em 11/11/2026. Não foi confirmado se a coluna `visibilidade` já existe no Railway. A API atual tenta adicioná-la automaticamente quando necessário; uma resposta 503 pode indicar falta de permissão `ALTER` ou outro problema estrutural. Os grupos existentes permanecem privados por padrão ao adicionar esse campo.
 
 ## Fotos, convites e grupos
 

@@ -41,6 +41,7 @@ export async function listarMembrosPorGrupo(idGrupo) {
         SELECT  m.id_membro,
                 m.id_usuario,
                 u.nome,
+                u.foto_perfil,
                 m.papel,
                 m.data_entrada
         FROM    membros_grupo m

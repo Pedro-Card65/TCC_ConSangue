@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node src/api.js",
-    "dev": "nodemon src/api.js"
+    "start": "nodemon src/api.js"
   },
   "keywords": [],
   "author": "",
@@ -16,15 +15,12 @@
     "cors": "^2.8.6",
     "dotenv": "^18.0.9",
     "express": "^5.3.0",
-    "express-rate-limit": "^8.7.4",
     "jsonwebtoken": "^9.0.3",
-    "mysql2": "^3.24.6"
+    "mysql2": "^3.24.6",
+    "nodemon": "^3.1.14"
   },
   "allowScripts": {
     "node-gyp-build@4.8.4": true,
     "bcrypt@6.0.0": true
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.14"
   }
 }

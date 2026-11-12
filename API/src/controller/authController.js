@@ -1,21 +1,11 @@
 import { Router } from 'express';
-import { rateLimit } from 'express-rate-limit';
 import { fazerLogin } from '../service/authService.js';
 import { getAuthentication } from '../utils/jwt.js';
 import * as usuariosService from '../service/usuariosService.js';
 
 const endpoints = Router();
 
-const limiteLogin = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    limit: 20,
-    standardHeaders: 'draft-8',
-    legacyHeaders: false,
-    skipSuccessfulRequests: true,
-    message: { erro: 'Muitas tentativas de login. Tente novamente em alguns minutos.' }
-});
-
-endpoints.post('/api/usuarios/login', limiteLogin, async (req, resp) => {
+endpoints.post('/api/usuarios/login', async (req, resp) => {
     try {
         const { cpf, senha } = req.body || {};
         const resultado = await fazerLogin(cpf, senha);
@@ -47,4 +37,21 @@ endpoints.get('/api/usuarios/me', getAuthentication(), async (req, resp) => {
 
         resp.status(200).json({
             id_usuario,
- ¶»§q«^
+            nome,
+            email,
+            cidade,
+            tipo_sanguineo,
+            tipo_usuario,
+            foto_perfil
+        });
+
+    } catch (erro) {
+        resp.status(erro.status || 500).json({
+            erro: erro.status
+                ? erro.message
+                : 'Erro interno ao buscar informaÃ§Ãµes do usuÃ¡rio.'
+        });
+    }
+});
+
+export default endpoints;

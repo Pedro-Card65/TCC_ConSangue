@@ -19,7 +19,7 @@ export async function buscarPainelPorUsuario(idUsuario) {
 
 export async function listarInstituicoes(cidade) {
     let sql = `
-        SELECT id_hemocentro, nome_hemo, cep, endereco, cidade, estado, telefone_centro, data_cadastro FROM hemocentros
+        SELECT * FROM hemocentros
     `;
 
     const parametros = [];
@@ -38,5 +38,100 @@ export async function listarInstituicoes(cidade) {
 
 export async function buscarInstituicao(id) {
     const sql = `
-        SELECT id_hemocentro, nome_hemo, cep, endereco, cidade, estado, telefone_centro, data_cadastro FROM hemocentros
-        WHE¶»§q«^
+        SELECT * FROM hemocentros
+        WHERE id_hemocentro = ?
+    `;
+
+    const [registros] = await con.execute(sql, [id]);
+
+    return registros[0] ?? null;
+}
+
+export async function buscarUsuario(id) {
+    const sql = `
+        SELECT id_usuario, tipo_usuario
+        FROM usuarios
+        WHERE id_usuario = ?
+        `;
+
+    const [registros] = await con.execute(sql, [id]);
+
+    return registros[0] ?? null;
+}
+
+export async function inserirInstituicao(dados) {
+    const sql = `
+        INSERT INTO hemocentros
+        (id_usuario, nome_hemo, cep, endereco, cidade, estado, telefone_centro)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        `;
+
+    const valores = [
+        dados.id_usuario,
+        dados.nome_hemo,
+        dados.cep,
+        dados.endereco,
+        dados.cidade,
+        dados.estado,
+        dados.telefone_centro
+    ];
+
+    const [resultado] = await con.execute(sql, valores);
+
+    return resultado.insertId;
+}
+
+export async function atualizarInstituicao(id, dados) {
+    const sql = `
+        UPDATE hemocentros
+        SET nome_hemo = ?,
+            cep = ?,
+            endereco = ?,
+            cidade = ?,
+            estado = ?,
+            telefone_centro = ?
+        WHERE id_hemocentro = ?
+        `;
+
+    const valores = [
+        dados.nome_hemo,
+        dados.cep,
+        dados.endereco,
+        dados.cidade,
+        dados.estado,
+        dados.telefone_centro,
+        id
+    ];
+
+    const [resultado] = await con.execute(sql, valores);
+
+    return resultado.affectedRows;
+}
+
+export async function excluirInstituicao(id) {
+    const sql = `
+        DELETE FROM hemocentros
+        WHERE id_hemocentro = ?
+    `;
+
+    const [resultado] = await con.execute(sql, [id]);
+
+    return resultado.affectedRows;
+}
+
+export async function listarAdesaoPorCampanha(idUsuario) {
+    const [linhas] = await con.execute(`
+        SELECT c.id_campanha,
+               COUNT(DISTINCT CASE WHEN p.status_participacao = 'interessado' THEN p.id_usuario END) AS interessados,
+               COUNT(DISTINCT CASE WHEN p.status_participacao = 'pretende_ir' THEN p.id_usuario END) AS pretendem_ir,
+               COUNT(DISTINCT CASE WHEN p.status_participacao = 'comparecimento_informado' THEN p.id_usuario END) AS comparecimentos_informados,
+               COUNT(DISTINCT gc.id_grupo) AS grupos_vinculados
+        FROM campanhas c
+        JOIN hemocentros h ON h.id_hemocentro = c.id_hemocentro
+        LEFT JOIN participacoes p ON p.id_campanha = c.id_campanha
+        LEFT JOIN grupos_campanhas gc ON gc.id_campanha = c.id_campanha
+        WHERE h.id_usuario = ?
+        GROUP BY c.id_campanha
+    `, [idUsuario]);
+    return linhas;
+}

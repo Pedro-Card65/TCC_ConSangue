@@ -47,7 +47,6 @@ export default function Home() {
                   <h2>{c.nome_campanha}</h2>
                   <p className="cartao-hemo">
                     {c.nome_hemo}
-                    <img src="/assets/images/verificado.png" alt="Hemocentro verificado" title="Hemocentro verificado" />
                   </p>
                   <p>Status: {c.status_campanha === 'ativa' ? 'Ativa' : 'Finalizada'}</p>
                 </div>

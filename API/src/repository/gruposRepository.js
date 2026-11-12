@@ -123,7 +123,7 @@ export async function listarGrupos() {
         ? 'visibilidade'
         : "'privado' AS visibilidade";
     const [linhas] = await con.query(
-        `SELECT id_grupo, nome_grupo, descricao, id_criador, data_criacao, ${visibilidade}
+        `SELECT id_grupo, nome_grupo, descricao, data_criacao, ${visibilidade}
          FROM grupos`
     );
     return linhas;
@@ -134,7 +134,7 @@ export async function listarGruposPorNome(nome) {
         ? 'visibilidade'
         : "'privado' AS visibilidade";
     const [linhas] = await con.query(
-        `SELECT id_grupo, nome_grupo, descricao, id_criador, data_criacao, ${visibilidade}
+        `SELECT id_grupo, nome_grupo, descricao, data_criacao, ${visibilidade}
          FROM grupos WHERE nome_grupo LIKE ?`,
         [`%${nome}%`]
     );

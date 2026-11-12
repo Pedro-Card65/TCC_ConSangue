@@ -19,7 +19,7 @@ export async function buscarPainelPorUsuario(idUsuario) {
 
 export async function listarInstituicoes(cidade) {
     let sql = `
-        SELECT * FROM hemocentros
+        SELECT id_hemocentro, nome_hemo, cep, endereco, cidade, estado, telefone_centro, data_cadastro FROM hemocentros
     `;
 
     const parametros = [];
@@ -38,7 +38,7 @@ export async function listarInstituicoes(cidade) {
 
 export async function buscarInstituicao(id) {
     const sql = `
-        SELECT * FROM hemocentros
+        SELECT id_hemocentro, nome_hemo, cep, endereco, cidade, estado, telefone_centro, data_cadastro FROM hemocentros
         WHERE id_hemocentro = ?
     `;
 

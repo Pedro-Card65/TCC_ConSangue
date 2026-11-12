@@ -307,11 +307,11 @@ No endpoint `POST /api/membro`, envie `codigo_convite` com 8 caracteres válidos
 ## Limitações conhecidas
 
 - **Cadastro de instituição aberto:** `POST /api/usuarios/cadastro` aceita `tipo_usuario='instituicao'` de qualquer pessoa, sem verificação (`API/src/service/usuariosService.js:140`). Não há validação de que a conta pertence a um hemocentro real.
-- **CORS aberto:** a API usa `cors()` sem restrição de origem (`API/src/api.js:7`).
-- **Sem limite de tentativas de login:** não há rate limit na API (nenhuma biblioteca de limitação nas dependências de `API/package.json`).
+- **CORS restrito:** origens autorizadas são configuradas em API/src/api.js e pela variável CORS_ORIGENS.
+- **Limite de tentativas de login:** até 20 senhas incorretas por endereço IP em 15 minutos (controle em memória por instância).
 - **Validação manual necessária:** os arquivos de testes automatizados foram removidos do repositório, portanto é necessário verificar os fluxos principais no ambiente publicado.
 - **Participação e presença são informadas pelo usuário:** interesse, intenção e comparecimento informado não são confirmação de doação de sangue.
-- **Identificadores internos em listagens públicas:** `GET /api/grupos` e `GET /api/grupos/:nome` devolvem `id_criador` (`API/src/repository/gruposRepository.js:97`, `:108`). `GET /api/instituicoes` e `GET /api/instituicoes/:id` usam `SELECT *` e devolvem `id_usuario` do dono (`API/src/repository/instituicoesRepository.js:22`, `:41`).
+- **Listagens públicas minimizadas:** grupos não devolvem id_criador, foto ou código de convite; hemocentros não devolvem id_usuario.
 
 ## Preparação da apresentação
 

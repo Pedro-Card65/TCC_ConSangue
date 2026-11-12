@@ -40,7 +40,7 @@ SHOW COLUMNS FROM ConSangue.grupos LIKE 'codigo_convite';
 SHOW COLUMNS FROM ConSangue.grupos LIKE 'visibilidade';
 ```
 
-As alterações de fotos e convites já foram executadas no Railway em 11/11/2026. Não foi confirmado se a coluna `visibilidade` já existe no Railway. A API atual tenta adicioná-la automaticamente quando necessário; uma resposta 503 pode indicar falta de permissão `ALTER` ou outro problema estrutural. Os grupos existentes permanecem privados por padrão ao adicionar esse campo.
+A coluna de visibilidade foi confirmada no MySQL do Railway em 12/11/2026: um grupo público e quatro privados. Não é necessário rodar ALTER em produção.
 
 ## Fotos, convites e grupos
 
@@ -52,3 +52,11 @@ As alterações de fotos e convites já foram executadas no Railway em 11/11/202
 - Os convites expostos anteriormente foram rotacionados; os códigos antigos foram invalidados.
 
 Os antigos utilitários de migração e rotação de códigos foram retirados do repositório; suas versões permanecem recuperáveis no histórico Git. A API não depende deles para iniciar. **O `ConSangue.sql` serve para banco novo e não deve ser executado sobre o MySQL existente.** Não há dados de demonstração no SQL consolidado.
+
+
+## Segurança da API em produção
+
+- CORS só libera os domínios oficiais do ConSangue e os definidos opcionalmente em CORS_ORIGENS, separados por vírgula.
+- O login bloqueia novas tentativas após 20 senhas incorretas pelo mesmo IP em 15 minutos. O limite fica em memória por instância; sistemas distribuídos devem usar armazenamento compartilhado.
+- npm start usa Node.js diretamente; npm run dev usa nodemon.
+- A lista pública de hemocentros não devolve id_usuario e a de grupos não devolve id_criador.

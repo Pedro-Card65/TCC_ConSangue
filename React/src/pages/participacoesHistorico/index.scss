@@ -46,6 +46,8 @@ $fonte-logo: 'Lexend', sans-serif;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
 
         button {
             color: $vermelho-botao;
@@ -53,7 +55,6 @@ $fonte-logo: 'Lexend', sans-serif;
             background-color: $branco;
             border: solid 0.1rem $vermelho-botao;
             border-radius: 0.5em;
-            border: 0.2em 0.2em 0.2em solid $vermelho-botao;
             padding: 0.3em;
             cursor: pointer;
         }

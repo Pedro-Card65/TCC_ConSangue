@@ -34,15 +34,48 @@ async function colunaVisibilidadeDisponivel() {
     return colunas.length > 0;
 }
 
+let preparacaoVisibilidade = null;
+
+// Atualiza apenas a coluna ausente, sem recriar ou apagar grupos existentes.
+// Uma Promise compartilhada impede duas alterações simultâneas nesta instância da API.
+export async function garantirVisibilidadeGrupos() {
+    if (!preparacaoVisibilidade) {
+        preparacaoVisibilidade = (async () => {
+            if (await colunaVisibilidadeDisponivel()) return;
+
+            try {
+                await con.query(
+                    "ALTER TABLE grupos ADD COLUMN visibilidade ENUM('publico', 'privado') NOT NULL DEFAULT 'privado'"
+                );
+            } catch (erro) {
+                // Outra instância pode ter adicionado a coluna enquanto esta verificava.
+                if (erro.code !== 'ER_DUP_FIELDNAME') {
+                    console.error('Erro ao preparar visibilidade dos grupos:', erro.code || 'desconhecido');
+                    const falha = new Error(
+                        'O banco não permitiu configurar a visibilidade dos grupos. Verifique a permissão ALTER.'
+                    );
+                    falha.status = 503;
+                    throw falha;
+                }
+            }
+
+            if (!(await colunaVisibilidadeDisponivel())) {
+                const falha = new Error('Não foi possível confirmar a visibilidade dos grupos no banco.');
+                falha.status = 503;
+                throw falha;
+            }
+        })().catch(erro => {
+            preparacaoVisibilidade = null;
+            throw erro;
+        });
+    }
+    return preparacaoVisibilidade;
+}
+
 //Finalizado
 
 export async function criarGrupo(grupo) {
-    const comVisibilidade = await colunaVisibilidadeDisponivel();
-    if (!comVisibilidade && grupo.visibilidade === 'publico') {
-        const erro = new Error('Ative a migração de visibilidade antes de criar grupos públicos.');
-        erro.status = 503;
-        throw erro;
-    }
+    await garantirVisibilidadeGrupos();
     const comCodigo = await colunaConviteDisponivel();
     const conexao = await con.getConnection();
 
@@ -50,15 +83,11 @@ export async function criarGrupo(grupo) {
         await conexao.beginTransaction();
         let resultado;
         for (let tentativa = 0; tentativa < (comCodigo ? 8 : 1); tentativa++) {
-            const colunas = ['nome_grupo', 'descricao', 'id_criador'];
-            const valores = [grupo.nome_grupo, grupo.descricao, grupo.id_criador];
+            const colunas = ['nome_grupo', 'descricao', 'id_criador', 'visibilidade'];
+            const valores = [grupo.nome_grupo, grupo.descricao, grupo.id_criador, grupo.visibilidade];
             if (comCodigo) {
                 colunas.push('codigo_convite');
                 valores.push(gerarCodigo());
-            }
-            if (comVisibilidade) {
-                colunas.push('visibilidade');
-                valores.push(grupo.visibilidade);
             }
 
             try {
@@ -121,10 +150,8 @@ export async function editarGrupo(grupo, id) {
         erro.status = 503;
         throw erro;
     }
-    if (alterarVisibilidade && !(await colunaVisibilidadeDisponivel())) {
-        const erro = new Error('Ative a migração de visibilidade no banco antes de alterar o tipo de grupo.');
-        erro.status = 503;
-        throw erro;
+    if (alterarVisibilidade) {
+        await garantirVisibilidadeGrupos();
     }
 
     const valores = [grupo.nome_grupo, grupo.descricao];

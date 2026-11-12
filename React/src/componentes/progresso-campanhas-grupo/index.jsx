@@ -1,0 +1,10 @@
+import { useEffect, useState } from 'react';
+import { api } from '../../services/api.js';
+import './index.scss';
+function lista(resposta, chave) { const dados=resposta?.data; if(Array.isArray(dados)) return dados; return Array.isArray(dados?.[chave])?dados[chave]:[]; }
+export default function ProgressoCampanhasGrupo({idGrupo}) {
+ const [vinculos,setVinculos]=useState([]),[campanhas,setCampanhas]=useState([]),[carregando,setCarregando]=useState(true),[erro,setErro]=useState('');
+ useEffect(()=>{let ativo=true; Promise.all([api.get('/api/gruposCampanhas'),api.get('/api/campanhas')]).then(([rv,rc])=>{if(!ativo)return;setVinculos(lista(rv,'grupos').filter(v=>String(v.id_grupo)===String(idGrupo)));setCampanhas(lista(rc,'campanhas'));}).catch(()=>{if(ativo)setErro('Nao foi possivel consultar as metas deste grupo.');}).finally(()=>{if(ativo)setCarregando(false);});return()=>{ativo=false;};},[idGrupo]);
+ const porId=new Map(campanhas.map(c=>[String(c.id_campanha),c]));
+ return <section className="progresso-campanhas-grupo" aria-label="Progresso das campanhas do grupo"><h3>Mobilizacao do grupo</h3>{carregando&&<p role="status">Carregando progresso...</p>}{erro&&<p role="alert">{erro}</p>}{!carregando&&!erro&&vinculos.length===0&&<p>Este grupo ainda nao esta vinculado a campanhas.</p>}{!carregando&&!erro&&vinculos.map(v=>{const meta=v.meta_participacoes,total=Number(v.total_participacoes||0),nome=porId.get(String(v.id_campanha))?.nome_campanha||'Campanha '+v.id_campanha;return <article className="progresso-campanha-item" key={v.id_grupo_campanha}><h4>{nome}</h4>{meta==null?<p><strong>{total}</strong> adesoes individuais - Sem meta definida</p>:<><p><strong>{total} de {meta}</strong> adesoes individuais</p><progress aria-label={'Progresso de '+nome} value={Math.min(total,Number(meta))} max={Number(meta)}/><small>{Math.round(total/Number(meta)*100)}% da meta{total>Number(meta)?' (meta superada)':''}</small></>}<p className="nota-progresso">Conta intencao de ir e comparecimento informado. Comparecimento e autodeclarado; nao confirma doacao. Interesse simples nao entra na meta.</p></article>;})}</section>;
+}

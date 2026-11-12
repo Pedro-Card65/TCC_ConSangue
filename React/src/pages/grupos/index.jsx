@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import VincularCampanha from '../../componentes/vincular-campanha';
+import ProgressoCampanhasGrupo from '../../componentes/progresso-campanhas-grupo';
 
 function tokenAtual() {
   return sessionStorage.getItem('token') || localStorage.getItem('token');
@@ -448,6 +449,9 @@ export default function Grupos() {
                         ))}
                       </ul>}
               </section>
+            )}
+            {meusIds.has(String(grupoSelecionado.id_grupo)) && (
+              <ProgressoCampanhasGrupo idGrupo={grupoSelecionado.id_grupo} />
             )}
             {meusIds.has(String(grupoSelecionado.id_grupo)) && String(grupoSelecionado.id_criador) === String(usuarioId) && (
               <VincularCampanha key={grupoSelecionado.id_grupo} idGrupo={grupoSelecionado.id_grupo} />

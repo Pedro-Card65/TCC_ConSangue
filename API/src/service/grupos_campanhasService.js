@@ -1,4 +1,6 @@
 import * as repository from '../repository/grupos_campanhasRepository.js';
+import { comProgressoMeta } from './adesao.js';
+export { comProgressoMeta };
 
 function validarId(valor, nome = 'ID') {
     const id = Number(valor);
@@ -23,7 +25,7 @@ export async function criarGrupoCampanhasService(dados) {
 }
 
 export async function listarGruposCampanhasService() {
-    return repository.listarGruposCampanha();
+    return (await repository.listarGruposCampanha()).map(comProgressoMeta);
 }
 
 export async function listarGruposCampanhasPorIdService(id) {
@@ -33,7 +35,7 @@ export async function listarGruposCampanhasPorIdService(id) {
         erro.status = 404;
         throw erro;
     }
-    return resultado;
+    return comProgressoMeta(resultado);
 }
 
 export async function editarGrupoCampanhasService(dados, id) {

@@ -41,3 +41,13 @@ export function agregarAdesaoPorCampanha(linhas) {
         };
     });
 }
+
+export function comProgressoMeta(vinculo) {
+    const meta = vinculo.meta_participacoes == null ? null : Number(vinculo.meta_participacoes);
+    const total = Number(vinculo.total_participacoes ?? 0);
+    return { ...vinculo, meta_participacoes: meta, total_participacoes: total,
+        total_interessados: Number(vinculo.total_interessados ?? 0),
+        progresso_percentual: meta === null ? null : Math.round(total / meta * 100),
+        estado_meta: meta === null ? 'sem_meta' : total >= meta ? 'atingida' : 'em_andamento',
+        meta_atingida: meta !== null && total >= meta };
+}

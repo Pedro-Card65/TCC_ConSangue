@@ -1,16 +1,10 @@
 import { con } from './connection.js';
+import { garantirVisibilidadeGrupos } from './gruposRepository.js';
 
 // Entrada pública não utiliza convite, mas só é possível quando o próprio banco
 // confirma que o grupo está marcado como público. Os grupos privados continuam fechados.
 export async function entrarGrupoPublico(idUsuario, idGrupo) {
-    const [colunas] = await con.query(
-        "SELECT 1 AS existe FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'grupos' AND COLUMN_NAME = 'visibilidade' LIMIT 1"
-    );
-    if (!colunas.length) {
-        const erro = new Error('A entrada em grupos públicos ainda não está ativa no banco.');
-        erro.status = 503;
-        throw erro;
-    }
+    await garantirVisibilidadeGrupos();
 
     const [resultado] = await con.execute(
         `INSERT INTO membros_grupo (id_usuario, id_grupo, papel)

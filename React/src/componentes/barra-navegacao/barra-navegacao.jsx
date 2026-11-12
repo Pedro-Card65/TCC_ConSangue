@@ -53,6 +53,8 @@ export default function BarraNavegacao() {
   function sair() {
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('usuario');
+    localStorage.removeItem('token');
+    localStorage.removeItem('usuario');
     setMenuAberto(false);
     navigate('/', { replace: true });
   }

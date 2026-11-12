@@ -10,6 +10,7 @@ export default function HemocentrosLaterais() {
   const [erro, setErro] = useState(false);
   const [aberto, setAberto] = useState(null);
   const [campanhas, setCampanhas] = useState([]);
+  const [erroCampanhas, setErroCampanhas] = useState(false);
   const [campanhaAberta, setCampanhaAberta] = useState(null);
 
   useEffect(() => {
@@ -33,7 +34,9 @@ export default function HemocentrosLaterais() {
     carregarHemocentros();
     api.get('/api/campanhas').then(resposta => {
       if (ativo) setCampanhas(resposta.data?.campanhas ?? []);
-    }).catch(() => {});
+    }).catch(() => {
+      if (ativo) setErroCampanhas(true);
+    });
 
     return () => {
       ativo = false;
@@ -61,7 +64,7 @@ export default function HemocentrosLaterais() {
               <div className="cabecalho-cartao">
 
                 <div className="nome-hemocentro">
-                  <p>{h.nome_hemo}</p>
+                  <p>{h.nome_hemo || 'Hemocentro sem nome'}</p>
                   <img src="/assets/icons/mini-gota-sangue.webp" alt="" />
                 </div>
 
@@ -80,10 +83,14 @@ export default function HemocentrosLaterais() {
 
               {aberto === h.id_hemocentro && (
                 <div className="detalhes-hemocentro" id={`detalhes-hemo-${h.id_hemocentro}`}>
-                  <p>{h.endereco}, {h.cidade} - {h.estado}, {h.cep}</p>
+                  {[h.endereco, [h.cidade, h.estado].filter(Boolean).join(' - '), h.cep].filter(Boolean).join(', ') && (
+                    <p>{[h.endereco, [h.cidade, h.estado].filter(Boolean).join(' - '), h.cep].filter(Boolean).join(', ')}</p>
+                  )}
                   {h.telefone_centro && <p>Telefone: {h.telefone_centro}</p>}
                   <h3>Campanhas deste hemocentro</h3>
-                  {campanhas.filter(c => String(c.id_hemocentro) === String(h.id_hemocentro)).length === 0
+                  {erroCampanhas
+                    ? <p role="alert">Não foi possível carregar as campanhas.</p>
+                    : campanhas.filter(c => String(c.id_hemocentro) === String(h.id_hemocentro)).length === 0
                     ? <p>Nenhuma campanha disponível.</p>
                     : <ul className="campanhas-hemocentro">
                         {campanhas.filter(c => String(c.id_hemocentro) === String(h.id_hemocentro)).map(c => (

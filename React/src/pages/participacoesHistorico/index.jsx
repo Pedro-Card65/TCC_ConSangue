@@ -49,12 +49,18 @@ export default function ParticipacoesHistorico() {
 
       const config = { headers: { Authorization: `Bearer ${token}` } };
       try {
-        const [resParticipacoes, resCampanhas, resUsuario, resVinculos] = await Promise.all([
+        const [resParticipacoes, resCampanhas, resUsuario] = await Promise.all([
           api.get('/api/participacoes', config),
           api.get('/api/campanhas'),
           api.get('/api/usuarios/me', config),
-          api.get('/api/gruposCampanhas'),
         ]);
+        let listaVinculos = [];
+        try {
+          const resVinculos = await api.get('/api/gruposCampanhas');
+          listaVinculos = normalizarLista(resVinculos, 'grupos');
+        } catch {
+          // Sem os vínculos, o histórico continua disponível, apenas sem o nome do grupo.
+        }
         const listaParticipacoes = normalizarLista(resParticipacoes, 'participacoes');
         const listaCampanhas = normalizarLista(resCampanhas, 'campanhas');
         const usuario = resUsuario.data?.usuario ?? resUsuario.data;
@@ -73,7 +79,7 @@ export default function ParticipacoesHistorico() {
         setParticipacoes(listaParticipacoes);
         setCampanhas(listaCampanhas);
         setGrupos(listaGrupos);
-        setVinculos(normalizarLista(resVinculos, 'grupos'));
+        setVinculos(listaVinculos);
       } catch (erroRequisicao) {
         if (ativo) {
           setErro(erroRequisicao?.response?.status === 403
@@ -125,7 +131,10 @@ export default function ParticipacoesHistorico() {
   const proxima = proximas[0];
   const outrasProximas = proximas.slice(1);
   const idsFuturos = new Set(proximas.map(item => String(item.id_registro)));
-  const historico = registros.filter(item => !idsFuturos.has(String(item.id_registro)));
+  const dataDoRegistro = item => dataISO(item.data_prevista) || item.dataCampanha || item.fimCampanha || '';
+  const historico = registros
+    .filter(item => !idsFuturos.has(String(item.id_registro)))
+    .sort((a, b) => dataDoRegistro(b).localeCompare(dataDoRegistro(a)));
 
   function nomeHospital(item) {
     return item.nome_hemo ?? item.nome_instituicao ?? item.nome_hospital ?? 'Instituição não informada';
@@ -146,7 +155,7 @@ export default function ParticipacoesHistorico() {
           : <p>Período da campanha: {formatarData(item.dataCampanha)}{item.fimCampanha ? ` a ${formatarData(item.fimCampanha)}` : ''}</p>}
         {item.nomeGrupo && <p>Grupo: {item.nomeGrupo}</p>}
         <div className="partBaixo">
-          <p>Status: {STATUS[item.status_participacao] ?? item.status_participacao ?? 'Não informado'}</p>
+          <p>Status: {STATUS[item.status_participacao] ?? 'Status não informado'}</p>
           {item.status_participacao !== 'comparecimento_informado' && (
             <button type="button" onClick={async () => {
               const token = sessionStorage.getItem('token') || localStorage.getItem('token');

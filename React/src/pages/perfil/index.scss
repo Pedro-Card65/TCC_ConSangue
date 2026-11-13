@@ -558,3 +558,80 @@ $largura-central: 600px;
     width: calc(100% - 20px);
   }
 }
+
+
+/* Cabeçalho consistente: logo à esquerda e busca centralizada na largura da página. */
+.pagina-user {
+  .cabecalho-perfil {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 600px) minmax(0, 1fr);
+    align-items: center;
+    column-gap: 18px;
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto 20px;
+  }
+
+  .cabecalho-perfil > a {
+    justify-self: start;
+    width: min(100%, 240px);
+    max-width: 240px;
+    min-width: 0;
+    flex: none;
+  }
+
+  .cabecalho-perfil .busca-perfil {
+    grid-column: 2;
+    width: 100%;
+    min-width: 0;
+    max-width: 600px;
+    justify-self: center;
+  }
+
+  .cabecalho-perfil .espaco-cabecalho-perfil {
+    grid-column: 3;
+  }
+
+  .acoes-informacoes-perfil {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .acoes-informacoes-perfil .botao-excluir-conta {
+    border: 2px solid #a3262f;
+    background: #fff;
+    color: #a3262f;
+    text-decoration: none;
+    min-height: 42px;
+    font-size: .86rem;
+    font-weight: 600;
+    border-radius: 8px;
+  }
+  .acoes-informacoes-perfil .botao-excluir-conta:hover {
+    background: #fff1f3;
+  }
+}
+
+@media (max-width: 767px) {
+  .pagina-user .cabecalho-perfil {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+  .pagina-user .cabecalho-perfil > a {
+    justify-self: start;
+    width: min(100%, 220px);
+  }
+  .pagina-user .cabecalho-perfil .busca-perfil {
+    grid-column: 1;
+    max-width: 600px;
+  }
+  .pagina-user .cabecalho-perfil .espaco-cabecalho-perfil {
+    display: none;
+  }
+}
+@media (max-width: 420px) {
+  .pagina-user .acoes-informacoes-perfil button {
+    flex: 1 1 100%;
+  }
+}

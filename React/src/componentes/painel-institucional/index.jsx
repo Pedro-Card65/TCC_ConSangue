@@ -228,9 +228,7 @@ export default function PainelInstitucional() {
         <FormularioInstituicao aoSalvar={atualizado} />
         <div className="acoes-cadastro-institucional">
           <button type="button" onClick={() => setVersao(valor => valor + 1)}>Atualizar painel</button>
-          <button type="button" className="botao-perigo" onClick={abrirExclusao}>
-            Excluir minha conta institucional
-          </button>
+
         </div>
       </> : <>
         <h2>{dados.instituicao.nome_hemo}</h2>
@@ -239,9 +237,7 @@ export default function PainelInstitucional() {
           <button type="button" onClick={() => setEditandoDados(valor => !valor)}>
             {editandoDados ? 'Fechar edição' : 'Editar dados institucionais'}
           </button>
-          <button type="button" className="botao-perigo" onClick={abrirExclusao}>
-            Excluir minha conta institucional
-          </button>
+
         </div>
         {editandoDados && <FormularioInstituicao key={dados.instituicao.id_hemocentro}
           instituicao={dados.instituicao}
@@ -285,9 +281,14 @@ export default function PainelInstitucional() {
         <section className="secao-dados-conta-institucional">
           <h2>Dados da conta</h2>
           <p>{usuarioConta.nome} · {usuarioConta.email}</p>
-          <button type="button" onClick={() => setEditandoConta(valor => !valor)}>
-            {editandoConta ? 'Fechar edição da conta' : 'Editar meus dados de usuário'}
-          </button>
+          <div className="acoes-conta-institucional">
+            <button type="button" onClick={() => setEditandoConta(valor => !valor)}>
+              {editandoConta ? 'Fechar edição' : 'Editar dados'}
+            </button>
+            <button type="button" className="botao-perigo" onClick={abrirExclusao}>
+              Excluir conta
+            </button>
+          </div>
           {editandoConta && <EditarDadosUsuario key={usuarioConta.id_usuario}
             usuario={usuarioConta}
             aoSalvar={atualizado => {

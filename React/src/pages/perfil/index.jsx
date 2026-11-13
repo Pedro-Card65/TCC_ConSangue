@@ -226,6 +226,7 @@ export default function User() {
       <header className="cabecalho-perfil">
         <LogoSlogan />
         <div className="busca-perfil"><BuscaGlobal /></div>
+        <div className="espaco-cabecalho-perfil" aria-hidden="true" />
       </header>
       {campanhaAberta && <ModalCampanha campanha={campanhaAberta} aoFechar={fecharCampanha} />}
       <Notificacao mensagem={mensagemPerfil} aoFechar={setMensagemPerfil} />
@@ -287,8 +288,10 @@ export default function User() {
           </div>
           <div className="acoes-informacoes-perfil">
             <button type="button" onClick={() => setEditandoDados(valor => !valor)}>
-              {editandoDados ? 'Fechar edição' : 'Editar meus dados'}
+              {editandoDados ? 'Fechar edição' : 'Editar dados'}
             </button>
+            <button type="button" className="botao-excluir-conta"
+              onClick={() => setConfirmandoExclusao(true)}>Excluir conta</button>
           </div>
           {editandoDados && <EditarDadosUsuario key={usuario.id_usuario}
             usuario={usuario}
@@ -395,12 +398,6 @@ export default function User() {
         </div>
 
       </section>
-
-      <div className="area-excluir">
-        <button type="button" className="botao-excluir-conta" onClick={() => setConfirmandoExclusao(true)}>
-          Excluir conta
-        </button>
-      </div>
 
       {confirmandoExclusao && (
         <div className="excluir-fundo" onClick={() => { if (!excluindo) setConfirmandoExclusao(false); }}>

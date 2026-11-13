@@ -59,8 +59,13 @@ export function inserirMeuId(campo) {
 export function somenteMembroGrupo(req, resp, next) {
     const idGrupo = idValido(req.params.id_grupo);
     verificarPermissao(req, resp, next,
-        'SELECT id_membro FROM membros_grupo WHERE id_grupo = ? AND id_usuario = ? LIMIT 1',
-        [idGrupo, req.user.id_usuario]);
+        `SELECT g.id_grupo FROM grupos g
+         LEFT JOIN membros_grupo m ON m.id_grupo = g.id_grupo
+           AND m.id_usuario = ?
+         WHERE g.id_grupo = ?
+           AND (g.id_criador = ? OR m.id_membro IS NOT NULL)
+         LIMIT 1`,
+        [req.user.id_usuario, idGrupo, req.user.id_usuario]);
 }
 
 export function somenteDonoInstituicao(req, resp, next) {

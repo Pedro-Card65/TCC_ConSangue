@@ -47,10 +47,25 @@ export async function listarMembrosPorGrupo(idGrupo) {
         FROM    membros_grupo m
         JOIN    usuarios u ON u.id_usuario = m.id_usuario
         WHERE   m.id_grupo = ?
-        ORDER BY m.data_entrada
+        UNION ALL
+        SELECT  NULL AS id_membro,
+                g.id_criador AS id_usuario,
+                u.nome,
+                u.foto_perfil,
+                'administrador' AS papel,
+                g.data_criacao AS data_entrada
+        FROM    grupos g
+        JOIN    usuarios u ON u.id_usuario = g.id_criador
+        WHERE   g.id_grupo = ?
+            AND NOT EXISTS (
+                SELECT 1 FROM membros_grupo m
+                WHERE m.id_grupo = g.id_grupo
+                  AND m.id_usuario = g.id_criador
+            )
+        ORDER BY data_entrada
     `
 
-    const [linhas] = await con.query(command, [idGrupo]);
+    const [linhas] = await con.query(command, [idGrupo, idGrupo]);
     return linhas;
 };
 
@@ -60,6 +75,9 @@ export async function listarGruposPorUsuario(idUsuario) {
         "SELECT 1 AS existe FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'grupos' AND COLUMN_NAME = 'visibilidade' LIMIT 1"
     );
     const visibilidade = colunas.length ? 'g.visibilidade' : "'privado' AS visibilidade";
+    // O criador tem acesso ao próprio grupo mesmo em registros legados sem
+    // linha correspondente em membros_grupo. Outros usuários só enxergam
+    // grupos nos quais realmente possuem vínculo de participação.
     const command = `
         SELECT  m.id_membro,
                 g.id_grupo,
@@ -69,15 +87,16 @@ export async function listarGruposPorUsuario(idUsuario) {
                 g.codigo_convite,
                 g.foto_grupo,
                 ${visibilidade},
-                m.papel,
-                m.data_entrada
-        FROM    membros_grupo m
-        JOIN    grupos g ON g.id_grupo = m.id_grupo
-        WHERE   m.id_usuario = ?
-        ORDER BY m.data_entrada DESC
+                CASE WHEN g.id_criador = ? THEN 'administrador' ELSE m.papel END AS papel,
+                COALESCE(m.data_entrada, g.data_criacao) AS data_entrada
+        FROM    grupos g
+        LEFT JOIN membros_grupo m
+               ON m.id_grupo = g.id_grupo AND m.id_usuario = ?
+        WHERE   g.id_criador = ? OR m.id_membro IS NOT NULL
+        ORDER BY COALESCE(m.data_entrada, g.data_criacao) DESC
     `;
 
-    const [linhas] = await con.query(command, [idUsuario]);
+    const [linhas] = await con.query(command, [idUsuario, idUsuario, idUsuario]);
 
     return linhas;
 };

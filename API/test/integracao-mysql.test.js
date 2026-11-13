@@ -61,7 +61,47 @@ test('MySQL isolado: preserva terceiros, bloqueia vínculos e só então permite
       "INSERT INTO grupos (nome_grupo, descricao, visibilidade, id_criador) VALUES (?, ?, 'privado', ?)",
       ['Grupo Privado Teste', 'Acesso por convite', titular]
     );
+    // Regressão: grupos privados antigos podem não ter registro do criador
+    // em membros_grupo. O criador ainda deve ver e administrar o grupo.
+    const { listarGruposPorUsuario, listarMembrosPorGrupo } =
+      await import('../src/repository/membros_grupoRepository.js');
+    const gruposDoCriador = await listarGruposPorUsuario(titular);
+    const privadoCriado = gruposDoCriador.find(g => g.id_grupo === grupo.insertId);
+    assert.ok(privadoCriado, 'criador enxerga seu grupo privado sem registro em membros');
+    assert.equal(privadoCriado.papel, 'administrador');
+    assert.equal(privadoCriado.visibilidade, 'privado');
+    assert.equal(privadoCriado.id_membro, null);
+
+    const gruposAntesDoConvite = await listarGruposPorUsuario(terceiro);
+    assert.equal(gruposAntesDoConvite.some(g => g.id_grupo === grupo.insertId), false,
+      'usuário de fora não deve encontrar grupo privado');
+    const membrosLegados = await listarMembrosPorGrupo(grupo.insertId);
+    assert.equal(membrosLegados.filter(m => m.id_usuario === titular).length, 1,
+      'criador aparece na contagem de membros mesmo com registro legado');
+
+    const { somenteMembroGrupo } = await import('../src/utils/permissoes.js');
+    const consultarAcesso = idUsuario => new Promise(resolve => {
+      const resposta = {
+        status(status) { this.codigo = status; return this; },
+        json(dados) { resolve({ permitido: false, status: this.codigo, dados }); }
+      };
+      somenteMembroGrupo(
+        { params: { id_grupo: String(grupo.insertId) }, user: { id_usuario: idUsuario } },
+        resposta,
+        () => resolve({ permitido: true })
+      );
+    });
+    assert.equal((await consultarAcesso(titular)).permitido, true,
+      'criador legado acessa os membros do próprio grupo');
+    assert.equal((await consultarAcesso(terceiro)).permitido, false,
+      'usuário externo não acessa membros do grupo privado');
+
     await pool.execute('INSERT INTO membros_grupo (id_usuario, id_grupo) VALUES (?, ?)', [terceiro, grupo.insertId]);
+    const gruposDoMembro = await listarGruposPorUsuario(terceiro);
+    assert.equal(gruposDoMembro.some(g => g.id_grupo === grupo.insertId), true,
+      'participante convidado encontra o grupo privado');
+    assert.equal((await consultarAcesso(terceiro)).permitido, true,
+      'participante convidado pode consultar membros do grupo privado');
     await assert.rejects(
       () => excluirContaInstitucionalComPool(pool, titular), { status: 409 }
     );

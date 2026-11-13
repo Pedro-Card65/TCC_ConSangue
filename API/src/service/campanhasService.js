@@ -1,6 +1,33 @@
 import * as dbCampanhas from '../repository/campanhasRepository.js';
 import { erroHttp } from '../utils/erroHttp.js';
 
+const fotosExemplo = new Set([
+    '/assets/images/campanha-solidariedade.webp',
+    '/assets/images/campanha-comunidade.webp'
+]);
+
+export function validarFotoCampanha(foto) {
+    if (foto === null) return null;
+    if (typeof foto !== 'string') throw erroHttp(400, 'Foto da campanha inválida.');
+    if (fotosExemplo.has(foto)) return foto;
+    if (foto.length > 300 * 1024) throw erroHttp(400, 'A foto deve ocupar no máximo 300 KB.');
+    const partes = /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/]+={0,2})$/.exec(foto);
+    if (!partes) throw erroHttp(400, 'Envie uma imagem JPEG, PNG ou WEBP.');
+    const bytes = Buffer.from(partes[2], 'base64');
+    const formatoValido = partes[1] === 'jpeg'
+        ? bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff
+        : partes[1] === 'png'
+            ? bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
+            : bytes.toString('ascii', 0, 4) === 'RIFF' && bytes.toString('ascii', 8, 12) === 'WEBP';
+    if (!formatoValido) throw erroHttp(400, 'O conteúdo da foto não corresponde ao formato informado.');
+    return foto;
+}
+
+export async function atualizarFotoCampanhaService(id, foto) {
+    const idCampanha = validarId(id, 'ID da campanha');
+    return dbCampanhas.atualizarFotoCampanha(idCampanha, validarFotoCampanha(foto));
+}
+
 function validarId(valor, campo = 'ID') {
     const id = Number(valor);
 
@@ -153,7 +180,7 @@ function validarDadosCampanha(campanha) {
 
 export async function criarCampanhaService(campanha) {
     const dados = validarDadosCampanha(campanha);
-
+    dados.foto_campanha = campanha.foto_campanha == null ? null : validarFotoCampanha(campanha.foto_campanha);
     return dbCampanhas.criarCampanha(dados);
 }
 

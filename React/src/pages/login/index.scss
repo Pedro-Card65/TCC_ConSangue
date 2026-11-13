@@ -264,3 +264,22 @@
     height: 65px;
   }
 }
+
+.auth-page .Cadastro .box input[type="date"] {
+  display: block;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  inline-size: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.auth-page .Cadastro .box input[type="date"]::-webkit-date-and-time-value {
+  min-width: 0;
+  text-align: left;
+}
+
+.auth-page .Cadastro .box input[type="date"]::-webkit-datetime-edit {
+  min-width: 0;
+  padding: 0;
+}

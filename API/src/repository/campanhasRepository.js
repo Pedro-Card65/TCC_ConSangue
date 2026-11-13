@@ -1,11 +1,42 @@
 import { con } from './connection.js';
 
-//Finalizado
+let preparacaoFoto;
+
+async function garantirFotoCampanha() {
+    if (!preparacaoFoto) {
+        preparacaoFoto = (async () => {
+            const [colunas] = await con.execute(
+                "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'campanhas' AND COLUMN_NAME = 'foto_campanha'"
+            );
+            if (!colunas.length) {
+                try {
+                    await con.query('ALTER TABLE campanhas ADD COLUMN foto_campanha MEDIUMTEXT NULL, ALGORITHM=INSTANT');
+                } catch (erro) {
+                    if (erro.code !== 'ER_DUP_FIELDNAME') throw erro;
+                }
+            }
+        })().catch(() => {
+            preparacaoFoto = null;
+            const erro = new Error('Não foi possível preparar o armazenamento da foto. Tente novamente ou contate o suporte.');
+            erro.status = 503;
+            throw erro;
+        });
+    }
+    return preparacaoFoto;
+}
+
+export async function atualizarFotoCampanha(id, foto) {
+    await garantirFotoCampanha();
+    const [resultado] = await con.execute('UPDATE campanhas SET foto_campanha = ? WHERE id_campanha = ?', [foto, id]);
+    return resultado.affectedRows;
+}
 
 export async function criarCampanha(campanha){
+    const comFoto = campanha.foto_campanha != null;
+    if (comFoto) await garantirFotoCampanha();
     const command = `
-    insert into campanhas (id_hemocentro, nome_campanha, descricao, data_inicio, data_fim, horario_inicio, horario_fim, status_campanha)
-    values (?, ?, ?, ?, ?, ?, ?, ?) `
+    insert into campanhas (id_hemocentro, nome_campanha, descricao, data_inicio, data_fim, horario_inicio, horario_fim, status_campanha${comFoto ? ', foto_campanha' : ''})
+    values (?, ?, ?, ?, ?, ?, ?, ?${comFoto ? ', ?' : ''}) `
 
     const [result] = await con.query(command, [
         campanha.id_hemocentro,
@@ -15,7 +46,8 @@ export async function criarCampanha(campanha){
         campanha.data_fim,
         campanha.horario_inicio,
         campanha.horario_fim,
-        campanha.status_campanha
+        campanha.status_campanha,
+        ...(comFoto ? [campanha.foto_campanha] : [])
     ]);
 
     return result.insertId;
@@ -45,16 +77,7 @@ export async function listarCampanhasPorNome(nome){
 
 export async function listarCampanhasPorHemocentro(id_hemocentro){
     const command = `
-    select
-        id_campanha,
-        id_hemocentro,
-        nome_campanha,
-        descricao,
-        data_inicio,
-        data_fim,
-        horario_inicio,
-        horario_fim,
-        status_campanha
+    select *
     from campanhas
     where id_hemocentro = ? `
 

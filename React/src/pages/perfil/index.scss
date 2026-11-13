@@ -442,12 +442,12 @@ $largura-central: 600px;
   }
 }
 
-.pagina-user > a:first-child {
+.pagina-user > a {
   display: none;
 }
 
 @media (max-width: 1279px) {
-  .pagina-user > a:first-child {
+  .pagina-user > a {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -458,7 +458,7 @@ $largura-central: 600px;
     text-decoration: none;
   }
 
-  .pagina-user > a:first-child .logo-slogan {
+  .pagina-user > a .logo-slogan {
     position: static;
     top: auto;
     left: auto;
@@ -467,12 +467,12 @@ $largura-central: 600px;
     z-index: auto;
   }
 
-  .pagina-user > a:first-child .logo-slogan .logo {
+  .pagina-user > a .logo-slogan .logo {
     display: flex;
     justify-content: center;
   }
 
-  .pagina-user > a:first-child .logo-slogan .logo img {
+  .pagina-user > a .logo-slogan .logo img {
     display: block;
     width: 100%;
     height: auto;
@@ -500,12 +500,12 @@ $largura-central: 600px;
 @media (max-width: 600px) {
   .pagina-user { padding-inline: 20px; }
 
-  .pagina-user > a:first-child {
+  .pagina-user > a {
     width: min(100%, 220px);
     margin-bottom: 16px;
   }
 
-  .pagina-user > a:first-child .logo-slogan .logo img {
+  .pagina-user > a .logo-slogan .logo img {
     max-height: 66px;
   }
 

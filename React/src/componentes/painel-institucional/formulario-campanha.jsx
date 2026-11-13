@@ -1,15 +1,18 @@
 import { useRef, useState } from 'react';
 import { api } from '../../services/api';
+import FotoCampanha from './foto-campanha';
 
 export default function FormularioCampanha({ instituicao, aoSalvar, aoCancelar }) {
   const [erro, setErro] = useState('');
   const [salvando, setSalvando] = useState(false);
   const [dataInicio, setDataInicio] = useState('');
   const enviando = useRef(false);
+  const [foto, setFoto] = useState(null);
+  const [processandoFoto, setProcessandoFoto] = useState(false);
 
   async function salvar(evento) {
     evento.preventDefault();
-    if (enviando.current) return;
+    if (enviando.current || processandoFoto) return;
     const dados = Object.fromEntries(new FormData(evento.currentTarget));
     dados.nome_campanha = dados.nome_campanha.trim();
     if (!dados.nome_campanha) { setErro('Informe o nome da campanha.'); return; }
@@ -21,7 +24,7 @@ export default function FormularioCampanha({ instituicao, aoSalvar, aoCancelar }
     setSalvando(true);
     setErro('');
     try {
-      await api.post('/api/campanhas', { ...dados, id_hemocentro: instituicao.id_hemocentro }, {
+      await api.post('/api/campanhas', { ...dados, foto_campanha: foto, id_hemocentro: instituicao.id_hemocentro }, {
         headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` },
       });
       aoSalvar();
@@ -44,10 +47,11 @@ export default function FormularioCampanha({ instituicao, aoSalvar, aoCancelar }
         <label>Horário de início (opcional)<input name="horario_inicio" type="time" /></label>
         <label>Horário de término (opcional)<input name="horario_fim" type="time" /></label>
       </div>
+      <FotoCampanha foto={foto} aoAlterar={setFoto} aoProcessar={setProcessandoFoto} />
       <label>Status<select name="status_campanha" defaultValue="ativa"><option value="ativa">Ativa</option><option value="encerrada">Encerrada</option></select></label>
       {erro && <p role="alert">{erro}</p>}
       <div className="acoes">
-        <button type="submit">{salvando ? 'Salvando...' : 'Salvar campanha'}</button>
+        <button type="submit" disabled={processandoFoto}>{salvando ? 'Salvando...' : 'Salvar campanha'}</button>
         <button type="button" onClick={aoCancelar}>Cancelar</button>
       </div>
     </fieldset>

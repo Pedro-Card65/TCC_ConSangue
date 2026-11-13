@@ -132,7 +132,7 @@ export default function ModalCampanha({ campanha, aoFechar }) {
           className="modal-banner"
           style={{
             backgroundImage:
-              "linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('/assets/images/campanha-padrao.webp')"
+              `linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url("${campanha.foto_campanha || '/assets/images/campanha-padrao.webp'}")`
           }}
         >
           <h2>{campanha.nome_campanha}</h2>

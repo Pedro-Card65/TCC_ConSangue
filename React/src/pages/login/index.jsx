@@ -245,7 +245,9 @@ async function fazerCadastro(e) {
             value={cadastro.nascimento}
             onChange={alterarCadastro}
             required
+            aria-describedby="aviso-idade"
         />
+        <small id="aviso-idade">É necessário ter pelo menos 16 anos para se cadastrar.</small>
     </div>
 
     <div className="box">

@@ -52,7 +52,7 @@ export default function Home() {
                 </div>
               </header>
               <div className="cartao-imagem">
-                <img src="/assets/images/campanha-padrao.webp" alt={c.nome_campanha} />
+                <img src={c.foto_campanha || "/assets/images/campanha-padrao.webp"} alt={c.nome_campanha} />
                 <span className="cartao-periodo">
                   {formatarData(c.data_inicio)} a {formatarData(c.data_fim)}
                 </span>

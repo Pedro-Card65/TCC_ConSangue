@@ -220,6 +220,7 @@ export default function Campanhas() {
 
             {resultados.map(campanha => (
               <article className="cartao-campanha" key={campanha.id_campanha}>
+                <img className="foto-campanha" src={campanha.foto_campanha || '/assets/images/campanha-padrao.webp'} alt="" loading="lazy" />
                 <h2>{campanha.nome_campanha}</h2>
 
                 <p>{campanha.nome_hemo} — {campanha.cidade}/{campanha.estado}</p>

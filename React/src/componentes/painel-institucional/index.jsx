@@ -4,6 +4,7 @@ import LogoSlogan from '../logo-slogan/logo-slogan';
 import FormularioCampanha from './formulario-campanha';
 import BuscaGlobal from '../busca-global';
 import Notificacao from '../notificacao';
+import FotoCampanha, { FOTO_CAMPANHA_PADRAO } from './foto-campanha';
 import './index.scss';
 
 const autorizacao = () => ({ headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` } });
@@ -49,6 +50,40 @@ function CadastroInstituicao({ aoSalvar }) {
   </form>;
 }
 
+function EditarFotoCampanha({ campanha, aoSalvar, aoCancelar }) {
+  const [foto, setFoto] = useState(campanha.foto_campanha || null);
+  const [erro, setErro] = useState('');
+  const [salvando, setSalvando] = useState(false);
+  const [processando, setProcessando] = useState(false);
+  const enviando = useRef(false);
+  async function salvar(evento) {
+    evento.preventDefault();
+    if (enviando.current || processando) return;
+    enviando.current = true;
+    setSalvando(true);
+    setErro('');
+    try {
+      await api.put(`/api/campanhas/${campanha.id_campanha}/foto`, { foto_campanha: foto }, autorizacao());
+      aoSalvar('Foto da campanha atualizada.');
+    } catch (e) {
+      setErro(e.response?.data?.erro || 'Não foi possível salvar a foto. Tente novamente.');
+    } finally {
+      enviando.current = false;
+      setSalvando(false);
+    }
+  }
+  return <form onSubmit={salvar} aria-label={`Editar foto de ${campanha.nome_campanha}`}>
+    <fieldset disabled={salvando}>
+      <FotoCampanha foto={foto} aoAlterar={setFoto} aoProcessar={setProcessando} />
+      {erro && <p role="alert">{erro}</p>}
+      <div className="acoes">
+        <button type="submit" disabled={processando}>{salvando ? 'Salvando...' : 'Salvar foto'}</button>
+        <button type="button" onClick={aoCancelar} disabled={processando}>Cancelar</button>
+      </div>
+    </fieldset>
+  </form>;
+}
+
 export default function PainelInstitucional() {
   const [dados, setDados] = useState(null);
   const [campanhas, setCampanhas] = useState([]);
@@ -59,6 +94,7 @@ export default function PainelInstitucional() {
   const [criando, setCriando] = useState(false);
   const [mostrarCampanhas, setMostrarCampanhas] = useState(false);
   const [mensagem, setMensagem] = useState('');
+  const [editandoFoto, setEditandoFoto] = useState(null);
   useEffect(() => {
     let ativo = true;
     async function carregar() {
@@ -94,6 +130,7 @@ export default function PainelInstitucional() {
 
   function atualizado(texto) {
     setMensagem(texto);
+    setEditandoFoto(null);
     setCriando(false);
     setMostrarCampanhas(true);
     setVersao(valor => valor + 1);
@@ -130,9 +167,13 @@ export default function PainelInstitucional() {
           <h2>Minhas campanhas</h2>
           {campanhas.length === 0 ? <p>Nenhuma campanha cadastrada.</p> : <ul className="lista-campanhas">
             {campanhas.map(campanha => <li key={campanha.id_campanha}>
+              <img className="foto-campanha-previa" src={campanha.foto_campanha || FOTO_CAMPANHA_PADRAO} alt={`Foto da campanha ${campanha.nome_campanha}`} />
               <h3>{campanha.nome_campanha}</h3><p>{campanha.descricao}</p>
               <p>{String(campanha.data_inicio).slice(0, 10).split('-').reverse().join('/')} a {String(campanha.data_fim).slice(0, 10).split('-').reverse().join('/')}</p>
               <p>{campanha.horario_inicio || 'Início não informado'} — {campanha.horario_fim || 'Término não informado'}</p>
+              {editandoFoto === campanha.id_campanha
+                ? <EditarFotoCampanha campanha={campanha} aoSalvar={atualizado} aoCancelar={() => setEditandoFoto(null)} />
+                : <button type="button" onClick={() => setEditandoFoto(campanha.id_campanha)}>Alterar foto</button>}
               <p>Status: {campanha.status_campanha === 'ativa' ? 'Ativa' : 'Encerrada'}</p>
               {adesaoPorCampanha[campanha.id_campanha] && <div className="adesao-campanha">
                 <span><strong>{adesaoPorCampanha[campanha.id_campanha].interessados}</strong> Interessados</span>

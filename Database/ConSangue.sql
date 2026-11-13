@@ -60,6 +60,7 @@ CREATE TABLE campanhas (
     id_campanha INT PRIMARY KEY AUTO_INCREMENT,
     id_hemocentro INT NOT NULL,
     nome_campanha VARCHAR(100) NOT NULL,
+    foto_campanha MEDIUMTEXT NULL,
     descricao TEXT,
     data_inicio DATE NOT NULL,
     data_fim DATE NOT NULL,

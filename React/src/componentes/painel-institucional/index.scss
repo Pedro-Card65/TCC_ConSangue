@@ -138,3 +138,13 @@
   flex-wrap: wrap;
   gap: 12px;
 }
+
+.painel-institucional {
+  .foto-campanha-previa { width: 100%; max-height: 220px; object-fit: cover; border-radius: 8px; }
+  .foto-campanha-editor { min-width: 0; margin-block: 16px; }
+  .foto-campanha-editor input[type="file"] { max-width: 100%; min-width: 0; }
+  .fotos-campanha-exemplos { display: flex; flex-wrap: wrap; gap: 10px; margin-block: 12px; }
+  .fotos-campanha-exemplos button { display: flex; flex-direction: column; gap: 6px; align-items: center; max-width: 140px; }
+  .fotos-campanha-exemplos button[aria-pressed="true"] { outline: 3px solid #a3262f; outline-offset: 2px; }
+  .fotos-campanha-exemplos img { width: 100px; height: 64px; object-fit: cover; border-radius: 4px; }
+}

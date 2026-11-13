@@ -56,6 +56,15 @@ endpoints.get('/campanhas/hemocentro/:id', async (req, resp) => {
     }
 });
 
+endpoints.put('/campanhas/:id/foto', getAuthentication(u => u.tipo_usuario === 'instituicao'), somenteDonoCampanha, async (req, resp) => {
+    try {
+        await service.atualizarFotoCampanhaService(req.params.id, req.body.foto_campanha);
+        resp.send({ mensagem: 'Foto da campanha atualizada.' });
+    } catch (erro) {
+        tratarErro(resp, erro);
+    }
+});
+
 endpoints.put('/campanhas/:id', getAuthentication(u => u.tipo_usuario === 'instituicao'), somenteDonoCampanha, async (req, resp) => {
     try {
         let campanha = req.body;

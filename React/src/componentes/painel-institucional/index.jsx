@@ -3,6 +3,7 @@ import { api } from '../../services/api';
 import LogoSlogan from '../logo-slogan/logo-slogan';
 import FormularioCampanha from './formulario-campanha';
 import BuscaGlobal from '../busca-global';
+import Notificacao from '../notificacao';
 import './index.scss';
 
 const autorizacao = () => ({ headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` } });
@@ -102,12 +103,14 @@ export default function PainelInstitucional() {
     <section className="painel-conteudo">
       <div className="busca-painel-institucional"><BuscaGlobal /></div>
       <h1>Painel institucional</h1>
-      {mensagem && <p role="status">{mensagem}</p>}
+      <Notificacao mensagem={mensagem} aoFechar={setMensagem} />
       {carregando ? <p role="status">Carregando painel...</p> : erro ? <>
         <p role="alert">{erro}</p><button onClick={() => setVersao(valor => valor + 1)}>Tentar novamente</button>
       </> : !dados?.instituicao ? <>
         <CadastroInstituicao aoSalvar={atualizado} />
-        <button onClick={() => setVersao(valor => valor + 1)}>Atualizar painel</button>
+        <div className="acoes-cadastro-institucional">
+          <button type="button" onClick={() => setVersao(valor => valor + 1)}>Atualizar painel</button>
+        </div>
       </> : <>
         <h2>{dados.instituicao.nome_hemo}</h2>
         <p>{dados.instituicao.endereco} · {dados.instituicao.cidade} / {dados.instituicao.estado}</p>

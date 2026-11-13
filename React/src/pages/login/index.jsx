@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { api } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 import LogoSlogan from '../../componentes/logo-slogan/logo-slogan';
+import Notificacao from '../../componentes/notificacao';
 
 
 export default function Login() {
@@ -25,6 +26,7 @@ export default function Login() {
 
 const [erro, setErro] = useState('');
 const [carregando, setCarregando] = useState(false);
+const [aviso, setAviso] = useState('');
 
 async function fazerLogin(e) {
     e.preventDefault();
@@ -94,6 +96,7 @@ const [cadastro, setCadastro] = useState({
 if (def === 'Login'){
   return (
     <div className="Background auth-page auth-page--login">
+      <Notificacao mensagem={aviso} aoFechar={setAviso} />
 
       <main className="Login">
         <div className="Login-logo">
@@ -167,7 +170,7 @@ async function fazerCadastro(e) {
             }
         );
 
-        alert(resposta.data.mensagem);
+        setAviso(resposta.data.mensagem || 'Cadastro realizado com sucesso!');
 
         // Limpa o formulário
         setCadastro({
@@ -199,6 +202,7 @@ async function fazerCadastro(e) {
 // Tela de cadastro
     return (
     <div className="Background auth-page auth-page--cadastro">
+        <Notificacao mensagem={aviso} aoFechar={setAviso} />
         <LogoSlogan/>
   
         <main className="Cadastro">

@@ -65,7 +65,7 @@ export default function HemocentrosLaterais() {
 
                 <div className="nome-hemocentro">
                   <p>{h.nome_hemo || 'Hemocentro sem nome'}</p>
-                  <img src="/assets/icons/mini-gota-sangue.webp" alt="" />
+                  <img src="/assets/images/verificado.png" alt="" />
                 </div>
 
                 <div className="acoes">

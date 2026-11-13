@@ -219,10 +219,12 @@ export default function User() {
     <div className="pagina-user">
       <h1 className="sr-only">Meu perfil</h1>
 
-      <LogoSlogan />
+      <header className="cabecalho-perfil">
+        <LogoSlogan />
+        <div className="busca-perfil"><BuscaGlobal /></div>
+      </header>
       {campanhaAberta && <ModalCampanha campanha={campanhaAberta} aoFechar={fecharCampanha} />}
 
-      <div className="busca-perfil"><BuscaGlobal /></div>
 
       <section className="user">
 
@@ -275,7 +277,7 @@ export default function User() {
 
             <div className="coluna-user-2">
               <p>Ingressou em: {formatarData(usuario.data_cadastro)}</p>
-              <p>{usuario.tipo_usuario} <img src="/assets/icons/mini-gota-sangue.webp" alt="" /></p>
+              <p>{usuario.tipo_usuario} <img src="/assets/images/verificado.png" alt="" /></p>
             </div>
           </div>
         </div>

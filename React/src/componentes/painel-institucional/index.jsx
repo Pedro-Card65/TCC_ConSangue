@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { api } from '../../services/api';
 import LogoSlogan from '../logo-slogan/logo-slogan';
 import FormularioCampanha from './formulario-campanha';
@@ -85,13 +86,14 @@ function EditarFotoCampanha({ campanha, aoSalvar, aoCancelar }) {
 }
 
 export default function PainelInstitucional() {
+  const [parametros, setParametros] = useSearchParams();
   const [dados, setDados] = useState(null);
   const [campanhas, setCampanhas] = useState([]);
   const [adesaoPorCampanha, setAdesaoPorCampanha] = useState({});
   const [erro, setErro] = useState('');
   const [carregando, setCarregando] = useState(true);
   const [versao, setVersao] = useState(0);
-  const [criando, setCriando] = useState(false);
+  const [criando, setCriando] = useState(parametros.get('novaCampanha') === '1');
   const [mostrarCampanhas, setMostrarCampanhas] = useState(false);
   const [mensagem, setMensagem] = useState('');
   const [editandoFoto, setEditandoFoto] = useState(null);
@@ -128,10 +130,19 @@ export default function PainelInstitucional() {
     return () => { ativo = false; };
   }, [versao]);
 
+  function fecharCriacao() {
+    setCriando(false);
+    if (parametros.has('novaCampanha')) {
+      const novos = new URLSearchParams(parametros);
+      novos.delete('novaCampanha');
+      setParametros(novos, { replace: true });
+    }
+  }
+
   function atualizado(texto) {
     setMensagem(texto);
     setEditandoFoto(null);
-    setCriando(false);
+    fecharCriacao();
     setMostrarCampanhas(true);
     setVersao(valor => valor + 1);
   }
@@ -161,7 +172,7 @@ export default function PainelInstitucional() {
           <button onClick={() => { setMensagem(''); setCriando(true); }}>Criar nova campanha</button>
           <button aria-expanded={mostrarCampanhas} aria-controls="minhas-campanhas" onClick={() => setMostrarCampanhas(valor => !valor)}>Ver minhas campanhas</button>
         </div>}
-        {criando && <FormularioCampanha instituicao={dados.instituicao} aoCancelar={() => setCriando(false)}
+        {criando && <FormularioCampanha instituicao={dados.instituicao} aoCancelar={fecharCriacao}
           aoSalvar={() => atualizado('Campanha criada com sucesso.')} />}
         {mostrarCampanhas && <section id="minhas-campanhas">
           <h2>Minhas campanhas</h2>

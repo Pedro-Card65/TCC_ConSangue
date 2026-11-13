@@ -4,7 +4,7 @@ $borda: #f1cfd3;
 $tamanho-icone-acao: 30px;
 $espaco-icone-acao: 0px;
 $altura-icone-topo: 34px;
-$tamanho-gota: 14px;
+$tamanho-verificado: 1.15em;
 
 .hemocentros-laterais {
   box-sizing: border-box;
@@ -66,8 +66,9 @@ $tamanho-gota: 14px;
     gap: 6px;
 
     img {
-      width: $tamanho-gota;
-      height: $tamanho-gota;
+      width: $tamanho-verificado;
+      height: $tamanho-verificado;
+      flex-shrink: 0;
       object-fit: contain;
     }
   }

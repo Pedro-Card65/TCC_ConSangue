@@ -1,4 +1,5 @@
 import './index.scss';
+import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { api } from '../../services/api.js';
 import ModalCampanha from '../../componentes/modal-campanha/modal-campanha.jsx';
@@ -27,6 +28,7 @@ function dataFormatada(data) {
 }
 
 export default function Campanhas() {
+  const [instituicao, setInstituicao] = useState(false);
   const [campanhas, setCampanhas] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
@@ -72,6 +74,17 @@ export default function Campanhas() {
       controle.abort();
     };
   }, [tentativa]);
+
+  useEffect(() => {
+    const controle = new AbortController();
+    api.get('/api/usuarios/me', {
+      headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` },
+      signal: controle.signal
+    }).then(resposta => {
+      if (!controle.signal.aborted) setInstituicao((resposta.data.usuario ?? resposta.data).tipo_usuario === 'instituicao');
+    }).catch(() => {});
+    return () => controle.abort();
+  }, []);
 
   function alterar(evento) {
     const { name, value } = evento.target;
@@ -125,6 +138,7 @@ export default function Campanhas() {
     <div className="pagina-campanhas">
 
       <h1>CAMPANHAS</h1>
+      {instituicao && <Link className="criar-campanha" to="/perfil?novaCampanha=1">Criar nova campanha</Link>}
 
       <form className="pesquisa" onSubmit={pesquisar}>
 

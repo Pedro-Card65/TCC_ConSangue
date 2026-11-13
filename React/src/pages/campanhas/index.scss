@@ -235,3 +235,20 @@
   border-radius: 6px;
   margin-bottom: 12px;
 }
+
+.pagina-campanhas .criar-campanha {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  max-width: 100%;
+  padding: 12px 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  background: #a51c30;
+  color: #fff;
+  font: inherit;
+  text-decoration: none;
+  &:hover { background: #901525; }
+  &:focus-visible { outline: 3px solid #366aad; outline-offset: 3px; }
+}

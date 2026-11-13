@@ -304,15 +304,38 @@ No endpoint `POST /api/membro`, envie `codigo_convite` com 8 caracteres válidos
 - O uso de bcrypt, JWT e MySQL **não equivale automaticamente a conformidade integral com a LGPD**; uma implantação real exige avaliação específica de proteção, finalidade, retenção e exclusão de dados.
 - O status de comparecimento informado não é comprovante de doação efetiva.
 
-## Limitações conhecidas
+## Limitações conhecidas e possibilidades de evolução
 
-- **Cadastro de instituição aberto:** `POST /api/usuarios/cadastro` aceita `tipo_usuario='instituicao'` de qualquer pessoa, sem verificação (`API/src/service/usuariosService.js:140`). Não há validação de que a conta pertence a um hemocentro real.
-- **CORS restrito:** origens autorizadas são configuradas em API/src/api.js e pela variável CORS_ORIGENS.
-- **Limite de tentativas de login:** até 20 senhas incorretas por endereço IP em 15 minutos (controle em memória por instância).
-- **Validação manual necessária:** os arquivos de testes automatizados foram removidos do repositório, portanto é necessário verificar os fluxos principais no ambiente publicado.
-- **Participação e presença são informadas pelo usuário:** interesse, intenção e comparecimento informado não são confirmação de doação de sangue.
-- **Listagens públicas minimizadas:** grupos não devolvem id_criador, foto ou código de convite; hemocentros não devolvem id_usuario.
+O ConSangue é um **projeto acadêmico de mobilização para doação de sangue**, não uma plataforma oficial de saúde ou de certificação de doações. As limitações abaixo descrevem a versão atual e ajudam a diferenciar o que já foi implementado do que exigiria validação ou desenvolvimento adicional.
 
+### Cadastro e confiabilidade das instituições
+
+- **Cadastro institucional sem credenciamento:** qualquer pessoa que preencha os requisitos do cadastro pode selecionar o perfil `instituicao`. O sistema não possui aprovação administrativa prévia, conferência de documentação ou validação de vínculo com um hemocentro real. Assim, o cadastro e as campanhas publicados por uma conta institucional **não significam que essa instituição foi oficialmente verificada**.
+- **Evolução necessária:** um ambiente de uso público precisaria de um processo de verificação e autorização de instituições antes da divulgação de campanhas, além de procedimentos para denúncia, revisão e remoção de informações indevidas.
+
+### Participações, metas e comprovação de doações
+
+- **Registros autodeclarados:** os estados `interessado`, `pretende_ir` e `comparecimento_informado` representam ações ou informações registradas na plataforma. **Não comprovam que houve doação de sangue**, nem que o candidato estava apto a doar.
+- **Mobilização coletiva:** vincular um grupo a uma campanha **não inscreve automaticamente seus membros**. Cada candidato precisa registrar sua própria participação. As metas e os indicadores refletem adesões ou comparecimentos informados, **não bolsas de sangue efetivamente coletadas**.
+- **Sem integração clínica:** o sistema não consulta prontuários, não confirma presença com hemocentros e não emite certificados de doação. A verificação de elegibilidade, os procedimentos de coleta e os comprovantes permanecem sob responsabilidade dos serviços de saúde.
+
+### Grupos, privacidade e administração
+
+- **Grupos públicos e privados:** qualquer usuário autenticado pode solicitar ingresso direto em um grupo público; grupos privados exigem um código de convite. O nome e a descrição podem ser usados para descoberta, mas o código de convite e a foto do grupo não aparecem nas listagens públicas.
+- **Integrantes visíveis aos membros:** a lista de integrantes, incluindo nome e foto de perfil quando existente, é acessível a usuários que pertençam ao grupo, mediante autorização da API. Isso restringe a exposição pública, mas **não oferece anonimato entre integrantes**.
+- **Interface administrativa parcial:** algumas operações de administração existentes na API, como determinadas edições e exclusões, não contam com fluxo visual completo no frontend. Não se deve apresentar toda a API como um painel administrativo integralmente disponível na interface.
+
+### Segurança, testes e operação
+
+- **Proteções com limites conhecidos:** o backend restringe origens de navegador por CORS e limita a até 20 falhas de login por IP em uma janela de 15 minutos. Esse controle de tentativas fica **em memória por instância**, é reiniciado quando o processo reinicia e não equivale a uma defesa distribuída completa. CORS, por sua vez, não substitui autenticação ou autorização.
+- **Validação funcional:** os testes automatizados temporários foram retirados do repositório por decisão da equipe; o processo atual de CI realiza o build do React. Portanto, é necessário executar **testes manuais ponta a ponta** no sistema publicado, com contas fictícias, incluindo cadastro, autenticação, campanhas, grupos, permissões, histórico, cancelamento e persistência após recarga.
+- **Dependência de infraestrutura externa:** a disponibilidade do site e da API depende do Vercel, do Railway, do banco MySQL e das respectivas configurações e limites operacionais. Um deploy concluído com sucesso não garante, sozinho, que todos os fluxos estejam funcionando.
+
+### Proteção de dados e implantação real
+
+- **LGPD:** o emprego de bcrypt, JWT e controles de acesso é parte da segurança, mas **não comprova conformidade integral com a LGPD**. Um uso fora do contexto acadêmico exigiria avaliação de finalidade, base legal, transparência, retenção, exclusão, medidas de segurança e resposta a incidentes envolvendo dados pessoais.
+
+Esses pontos não anulam o objetivo do projeto: o ConSangue demonstra uma solução web para **divulgação de campanhas e organização de pessoas**, enquanto credenciamento institucional, integração clínica e validações operacionais mais abrangentes são possibilidades de evolução futura.
 ## Preparação da apresentação
 
 Antes da feira, confira manualmente a disponibilidade do site e da API, o login, a busca, o registro de interesse, a criação de campanhas e os grupos com convites. Prepare contas e registros de demonstração somente em ambiente apropriado, sem incluir dados pessoais ou credenciais no repositório.

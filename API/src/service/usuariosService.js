@@ -364,3 +364,72 @@ export async function trocarEmail(id, novoemail, senha) {
         throw erro;
     }
 }
+
+
+// CPF, data de nascimento e tipo de conta permanecem inalteráveis.
+export async function atualizarDadosPerfil(id, dados) {
+    id = Number(id);
+    if (!Number.isSafeInteger(id) || id <= 0) throw criarErro('Usuário inválido.');
+    if (!dados || typeof dados !== 'object' || Array.isArray(dados)) {
+        throw criarErro('Informe os dados do perfil.');
+    }
+
+    const credenciais = await repository.buscarCredenciaisPorID(id);
+    if (!credenciais) throw criarErro('Usuário não encontrado.', 404);
+    if (typeof dados.senhaAtual !== 'string' ||
+        !(await bcrypt.compare(dados.senhaAtual, credenciais.senha_hash))) {
+        throw criarErro('Senha atual incorreta.');
+    }
+
+    const atual = await repository.buscarPorID(id);
+    const nome = typeof dados.nome === 'string' ? dados.nome.trim() : '';
+    const email = typeof dados.email === 'string' ? dados.email.trim().toLowerCase() : '';
+    const telefone = typeof dados.telefone === 'string' ? dados.telefone.replace(/\D/g, '') : '';
+    const tipo = dados.tipo_sanguineo === '' || dados.tipo_sanguineo === null
+        ? null : dados.tipo_sanguineo;
+    const tipos = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+
+    if (nome.length < 3 || nome.length > 100) throw criarErro('Nome deve ter entre 3 e 100 caracteres.');
+    if (email.length > 100 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        throw criarErro('E-mail inválido.');
+    }
+    if (telefone.length < 10 || telefone.length > 11) throw criarErro('Telefone inválido.');
+    if (tipo !== null && !tipos.includes(tipo)) throw criarErro('Tipo sanguíneo inválido.');
+
+    let cidade = atual.cidade;
+    if (dados.cidade !== undefined || dados.estado !== undefined) {
+        if (typeof dados.cidade !== 'string' || typeof dados.estado !== 'string') {
+            throw criarErro('Escolha estado e cidade.');
+        }
+        const localizacao = await validarLocalizacao(dados.cidade, dados.estado);
+        cidade = localizacao.cidade;
+    }
+
+    try {
+        await repository.atualizarDadosPerfil(id, {
+            nome, email, telefone, tipo_sanguineo: tipo, cidade
+        });
+    } catch (erro) {
+        if (erro.code === 'ER_DUP_ENTRY') throw criarErro('Este e-mail já está cadastrado.', 409);
+        throw erro;
+    }
+    return repository.buscarPorID(id);
+}
+
+export async function excluirContaInstitucional(id, senhaAtual, confirmacao) {
+    id = Number(id);
+    if (!Number.isSafeInteger(id) || id <= 0) throw criarErro('Usuário inválido.');
+    if (confirmacao !== 'EXCLUIR') {
+        throw criarErro('Digite EXCLUIR para confirmar a exclusão.');
+    }
+    const credenciais = await repository.buscarLoginPorIdParaExclusao(id);
+    if (!credenciais) throw criarErro('Usuário não encontrado.', 404);
+    if (credenciais.tipo_usuario !== 'instituicao') {
+        throw criarErro('Operação disponível somente para contas institucionais.', 403);
+    }
+    if (typeof senhaAtual !== 'string' ||
+        !(await bcrypt.compare(senhaAtual, credenciais.senha_hash))) {
+        throw criarErro('Senha atual incorreta.');
+    }
+    return repository.excluirContaInstitucional(id);
+}

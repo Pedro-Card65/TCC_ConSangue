@@ -524,3 +524,37 @@ $largura-central: 600px;
   outline: 2px solid #a3262f;
   outline-offset: 2px;
 }
+
+
+.pagina-user {
+  .acoes-informacoes-perfil {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 18px 16px;
+  }
+
+  .acoes-informacoes-perfil button {
+    min-height: 42px;
+    padding: 9px 16px;
+    color: #fff;
+    background: #a3262f;
+    border: 1px solid #a3262f;
+    border-radius: 8px;
+    font: inherit;
+    font-size: .86rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .informacoes-usuario > .edicao-dados-usuario {
+    margin: 0 18px 18px;
+    width: calc(100% - 36px);
+  }
+}
+
+@media (max-width: 600px) {
+  .pagina-user .informacoes-usuario > .edicao-dados-usuario {
+    margin: 0 10px 14px;
+    width: calc(100% - 20px);
+  }
+}

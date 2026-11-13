@@ -6,6 +6,8 @@ import { api } from '../../services/api.js';
 import ModalCampanha from '../../componentes/modal-campanha/modal-campanha.jsx';
 import PainelInstitucional from '../../componentes/painel-institucional';
 import BuscaGlobal from '../../componentes/busca-global';
+import EditarDadosUsuario from '../../componentes/editar-dados-usuario';
+import Notificacao from '../../componentes/notificacao';
 import useEscapeFechar from '../../hooks/useEscapeFechar.js';
 
 const STATUS = {
@@ -74,6 +76,8 @@ export default function User() {
   const [erroExclusao, setErroExclusao] = useState('');
   const [campanhaAberta, setCampanhaAberta] = useState(null);
   const [atualizacao, setAtualizacao] = useState(0);
+  const [editandoDados, setEditandoDados] = useState(false);
+  const [mensagemPerfil, setMensagemPerfil] = useState('');
 
   async function excluirConta() {
     const token = sessionStorage.getItem('token');
@@ -224,6 +228,7 @@ export default function User() {
         <div className="busca-perfil"><BuscaGlobal /></div>
       </header>
       {campanhaAberta && <ModalCampanha campanha={campanhaAberta} aoFechar={fecharCampanha} />}
+      <Notificacao mensagem={mensagemPerfil} aoFechar={setMensagemPerfil} />
 
 
       <section className="user">
@@ -280,6 +285,20 @@ export default function User() {
               <p>{usuario.tipo_usuario} <img src="/assets/images/verificado.png" alt="" /></p>
             </div>
           </div>
+          <div className="acoes-informacoes-perfil">
+            <button type="button" onClick={() => setEditandoDados(valor => !valor)}>
+              {editandoDados ? 'Fechar edição' : 'Editar meus dados'}
+            </button>
+          </div>
+          {editandoDados && <EditarDadosUsuario key={usuario.id_usuario}
+            usuario={usuario}
+            aoSalvar={atualizado => {
+              setUsuario(atualizado);
+              setEditandoDados(false);
+              setMensagemPerfil('Dados da conta atualizados com sucesso.');
+              setAtualizacao(valor => valor + 1);
+            }}
+            aoCancelar={() => setEditandoDados(false)} />}
         </div>
 
         <div className="grupos-comunidades">

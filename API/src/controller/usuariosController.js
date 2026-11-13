@@ -186,6 +186,37 @@ endpoints.put('/api/usuarios/foto', getAuthentication(), async (req, resp) => {
     }
 });
 
+endpoints.put('/api/usuarios/me', getAuthentication(), async (req, resp) => {
+    try {
+        const usuario = await service.atualizarDadosPerfil(req.user.id_usuario, req.body);
+        resp.status(200).json({ mensagem: 'Dados atualizados com sucesso.', usuario });
+    } catch (erro) {
+        if (!erro.status) console.error(erro);
+        resp.status(erro.status || 500).json({
+            erro: erro.status ? erro.message : 'Não foi possível atualizar o perfil.'
+        });
+    }
+});
+
+endpoints.delete('/api/usuarios/me/conta-institucional',
+    getAuthentication(u => u.tipo_usuario === 'instituicao'), async (req, resp) => {
+        try {
+            await service.excluirContaInstitucional(
+                req.user.id_usuario, req.body?.senhaAtual, req.body?.confirmacao
+            );
+            resp.status(204).send();
+        } catch (erro) {
+            if (!erro.status) console.error(erro);
+            resp.status(erro.status || (erro.code === 'ER_ROW_IS_REFERENCED_2' ? 409 : 500)).json({
+                erro: erro.status ? erro.message :
+                    erro.code === 'ER_ROW_IS_REFERENCED_2'
+                        ? 'A exclusão não pôde ser concluída devido a vínculos no banco. Nenhum dado foi removido.'
+                        : 'Não foi possível excluir a conta. Nenhum dado foi removido.'
+            });
+        }
+    }
+);
+
 ////////////////////////////////////////////////////////////////////////////////////////
 
 export default endpoints;

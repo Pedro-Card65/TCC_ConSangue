@@ -262,3 +262,77 @@
     .confirmacao-caixa .acoes button { flex: 1 1 100%; }
   }
 }
+
+
+// O cabeçalho institucional segue as outras telas: logo ligada à Home
+// no canto, busca centralizada e espaço simétrico à direita.
+.painel-institucional {
+  .cabecalho-painel-institucional {
+    display: grid;
+    grid-template-columns: minmax(160px, 1fr) minmax(0, 760px) minmax(160px, 1fr);
+    align-items: center;
+    gap: 18px;
+    max-width: 1280px;
+    margin: 0 auto 20px;
+  }
+
+  .logo-painel-institucional { justify-self: start; min-width: 0; }
+  .logo-painel-institucional > a { display: block; width: min(100%, 240px); }
+  .logo-painel-institucional .logo-slogan { position: static; width: 100%; }
+  .logo-painel-institucional .logo img { width: 100%; height: auto; max-height: 78px; object-fit: contain; }
+  .busca-painel-institucional { margin: 0; min-width: 0; width: 100%; }
+  .busca-painel-institucional .busca-global { margin: 0 auto; }
+
+  // Só o conjunto (lupa + input + botão) tem borda, inclusive em foco.
+  .busca-global .busca-global-campo { border: 2px solid #a3262f; }
+  .busca-global .busca-global-campo input,
+  .busca-global .busca-global-campo input:focus,
+  .busca-global .busca-global-campo input:focus-visible {
+    width: 100%;
+    min-height: 0;
+    height: 40px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: none;
+    box-shadow: none;
+    background: transparent;
+  }
+  .busca-global .busca-global-campo button { border: 0; }
+  .busca-global .busca-global-campo:focus-within {
+    border-color: #a3262f;
+    box-shadow: 0 0 0 2px #f5d8dd;
+  }
+
+  .secao-dados-conta-institucional {
+    margin-top: 30px;
+    padding: 20px;
+    border: 1px solid #f0d6da;
+    border-radius: 12px;
+    background: #fffafa;
+
+    h2 { margin-top: 0; }
+    > p { margin-bottom: 16px; }
+    > button { margin-bottom: 12px; }
+  }
+
+  .confirmacao-caixa label { color: #a3262f; font-weight: 600; }
+  .confirmacao-caixa input { border: 2px solid #a3262f; }
+}
+
+@media (max-width: 900px) {
+  .painel-institucional .cabecalho-painel-institucional {
+    grid-template-columns: minmax(120px, 1fr) minmax(0, 2.6fr);
+    gap: 16px;
+    .espaco-painel-institucional { display: none; }
+  }
+}
+
+@media (max-width: 650px) {
+  .painel-institucional .cabecalho-painel-institucional {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    .logo-painel-institucional > a { width: min(100%, 200px); }
+    .busca-painel-institucional { grid-row: 2; }
+  }
+}

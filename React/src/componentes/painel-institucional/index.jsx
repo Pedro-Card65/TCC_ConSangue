@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../../services/api';
 import LogoSlogan from '../logo-slogan/logo-slogan';
 import FormularioCampanha from './formulario-campanha';
 import BuscaGlobal from '../busca-global';
+import EditarDadosUsuario from '../editar-dados-usuario';
 import Notificacao from '../notificacao';
 import FotoCampanha, { FOTO_CAMPANHA_PADRAO } from './foto-campanha';
 import EnderecoInstituicao, { combinarEnderecoFormulario } from '../localizacao-brasil/endereco';
@@ -100,6 +101,7 @@ function EditarFotoCampanha({ campanha, aoSalvar, aoCancelar }) {
 
 export default function PainelInstitucional() {
   const [parametros, setParametros] = useSearchParams();
+  const navigate = useNavigate();
   const [dados, setDados] = useState(null);
   const [campanhas, setCampanhas] = useState([]);
   const [adesaoPorCampanha, setAdesaoPorCampanha] = useState({});
@@ -111,6 +113,10 @@ export default function PainelInstitucional() {
   const [mensagem, setMensagem] = useState('');
   const [editandoFoto, setEditandoFoto] = useState(null);
   const [editandoDados, setEditandoDados] = useState(false);
+  const [editandoConta, setEditandoConta] = useState(false);
+  const [usuarioConta, setUsuarioConta] = useState(null);
+  const [senhaExclusao, setSenhaExclusao] = useState('');
+  const [textoConfirmacao, setTextoConfirmacao] = useState('');
   const [confirmandoExclusao, setConfirmandoExclusao] = useState(false);
   const [excluindo, setExcluindo] = useState(false);
   const [erroExclusao, setErroExclusao] = useState('');
@@ -136,7 +142,13 @@ export default function PainelInstitucional() {
             // A listagem principal continua acessível se os indicadores não estiverem disponíveis.
           }
         }
-        if (ativo) { setDados(resposta); setCampanhas(lista); setAdesaoPorCampanha(indicadores); }
+        const conta = (await api.get('/api/usuarios/me', autorizacao())).data;
+        if (ativo) {
+          setDados(resposta);
+          setCampanhas(lista);
+          setAdesaoPorCampanha(indicadores);
+          setUsuarioConta(conta);
+        }
       } catch (e) {
         if (ativo) setErro('Não foi possível atualizar o painel. Tente novamente.');
       } finally {
@@ -156,22 +168,33 @@ export default function PainelInstitucional() {
     return () => window.removeEventListener('keydown', fechar);
   }, [confirmandoExclusao, excluindo]);
 
-  async function excluirInstituicao() {
-    if (!dados?.instituicao?.id_hemocentro || excluindo) return;
+  async function excluirContaInstitucional() {
+    if (excluindo || textoConfirmacao !== 'EXCLUIR' || !senhaExclusao) return;
     setExcluindo(true);
     setErroExclusao('');
     try {
-      await api.delete('/api/instituicoes/' + dados.instituicao.id_hemocentro, autorizacao());
+      await api.delete('/api/usuarios/me/conta-institucional', {
+        ...autorizacao(),
+        data: { senhaAtual: senhaExclusao, confirmacao: textoConfirmacao }
+      });
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('usuario');
       setConfirmandoExclusao(false);
-      setEditandoDados(false);
-      atualizado('Instituição excluída permanentemente.');
+      navigate('/', { replace: true });
     } catch (e) {
       setErroExclusao(e.response?.status === 409
-        ? 'Não é possível excluir esta instituição enquanto houver campanhas ou outros registros vinculados. Nenhum dado foi apagado.'
-        : (e.response?.data?.erro || 'Não foi possível excluir a instituição.'));
+        ? 'Não foi possível excluir devido a vínculos no banco. Nenhum dado foi apagado.'
+        : (e.response?.data?.erro || 'Não foi possível excluir a conta. Nenhum dado foi apagado.'));
     } finally {
       setExcluindo(false);
     }
+  }
+
+  function abrirExclusao() {
+    setErroExclusao('');
+    setSenhaExclusao('');
+    setTextoConfirmacao('');
+    setConfirmandoExclusao(true);
   }
 
   function fecharCriacao() {
@@ -191,9 +214,12 @@ export default function PainelInstitucional() {
     setVersao(valor => valor + 1);
   }
   return <main className="painel-institucional">
-    <LogoSlogan />
-    <section className="painel-conteudo">
+    <header className="cabecalho-painel-institucional">
+      <div className="logo-painel-institucional"><LogoSlogan /></div>
       <div className="busca-painel-institucional"><BuscaGlobal /></div>
+      <div className="espaco-painel-institucional" aria-hidden="true" />
+    </header>
+    <section className="painel-conteudo">
       <h1>Painel institucional</h1>
       <Notificacao mensagem={mensagem} aoFechar={setMensagem} />
       {carregando ? <p role="status">Carregando painel...</p> : erro ? <>
@@ -202,6 +228,9 @@ export default function PainelInstitucional() {
         <FormularioInstituicao aoSalvar={atualizado} />
         <div className="acoes-cadastro-institucional">
           <button type="button" onClick={() => setVersao(valor => valor + 1)}>Atualizar painel</button>
+          <button type="button" className="botao-perigo" onClick={abrirExclusao}>
+            Excluir minha conta institucional
+          </button>
         </div>
       </> : <>
         <h2>{dados.instituicao.nome_hemo}</h2>
@@ -210,9 +239,8 @@ export default function PainelInstitucional() {
           <button type="button" onClick={() => setEditandoDados(valor => !valor)}>
             {editandoDados ? 'Fechar edição' : 'Editar dados institucionais'}
           </button>
-          <button type="button" className="botao-perigo"
-            onClick={() => { setErroExclusao(''); setConfirmandoExclusao(true); }}>
-            Excluir instituição
+          <button type="button" className="botao-perigo" onClick={abrirExclusao}>
+            Excluir minha conta institucional
           </button>
         </div>
         {editandoDados && <FormularioInstituicao key={dados.instituicao.id_hemocentro}
@@ -253,24 +281,55 @@ export default function PainelInstitucional() {
           </ul>}
         </section>}
       </>}
+      {!carregando && !erro && usuarioConta && (
+        <section className="secao-dados-conta-institucional">
+          <h2>Dados da conta</h2>
+          <p>{usuarioConta.nome} · {usuarioConta.email}</p>
+          <button type="button" onClick={() => setEditandoConta(valor => !valor)}>
+            {editandoConta ? 'Fechar edição da conta' : 'Editar meus dados de usuário'}
+          </button>
+          {editandoConta && <EditarDadosUsuario key={usuarioConta.id_usuario}
+            usuario={usuarioConta}
+            aoSalvar={atualizado => {
+              setUsuarioConta(atualizado);
+              setEditandoConta(false);
+              setMensagem('Dados da conta atualizados com sucesso.');
+            }}
+            aoCancelar={() => setEditandoConta(false)} />}
+        </section>
+      )}
     </section>
     {confirmandoExclusao && <div className="confirmacao-fundo" role="presentation"
       onMouseDown={evento => { if (evento.target === evento.currentTarget && !excluindo) setConfirmandoExclusao(false); }}>
       <div className="confirmacao-caixa" role="dialog" aria-modal="true"
-        aria-labelledby="titulo-excluir-instituicao" aria-describedby="aviso-excluir-instituicao">
-        <h2 id="titulo-excluir-instituicao">Excluir instituição?</h2>
-        <p id="aviso-excluir-instituicao">
-          A instituição e os dados do seu cadastro serão excluídos permanentemente.
-          Essa ação é irreversível. Se houver campanhas ou outros registros vinculados,
-          a exclusão será impedida e nenhum dado será apagado.
+        aria-labelledby="titulo-excluir-conta-institucional"
+        aria-describedby="aviso-excluir-conta-institucional">
+        <h2 id="titulo-excluir-conta-institucional">Excluir toda a conta institucional?</h2>
+        <p id="aviso-excluir-conta-institucional">
+          Essa ação é permanente e irreversível. Seu acesso ao ConSangue, os dados
+          da instituição, suas campanhas, os grupos que sua conta criou e as
+          participações vinculadas a essas campanhas serão apagados. As contas
+          de outros usuários não serão excluídas, mas seus registros de
+          participação nessas campanhas deixarão de existir.
         </p>
+        <p>Para confirmar, digite <strong>EXCLUIR</strong> e informe sua senha atual.</p>
+        <label>Confirmação
+          <input value={textoConfirmacao} autoComplete="off" maxLength={7}
+            onChange={evento => setTextoConfirmacao(evento.target.value.toUpperCase())}
+            placeholder="EXCLUIR" disabled={excluindo} />
+        </label>
+        <label>Senha atual
+          <input type="password" autoComplete="current-password" value={senhaExclusao}
+            onChange={evento => setSenhaExclusao(evento.target.value)} disabled={excluindo} />
+        </label>
         {erroExclusao && <p role="alert">{erroExclusao}</p>}
         <div className="acoes">
           <button type="button" className="botao-secundario" disabled={excluindo}
             onClick={() => setConfirmandoExclusao(false)}>Cancelar</button>
-          <button type="button" className="botao-perigo" disabled={excluindo}
-            onClick={excluirInstituicao}>
-            {excluindo ? 'Excluindo...' : 'Sim, excluir permanentemente'}
+          <button type="button" className="botao-perigo"
+            disabled={excluindo || textoConfirmacao !== 'EXCLUIR' || !senhaExclusao}
+            onClick={excluirContaInstitucional}>
+            {excluindo ? 'Excluindo...' : 'Excluir conta permanentemente'}
           </button>
         </div>
       </div>

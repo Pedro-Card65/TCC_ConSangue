@@ -1,0 +1,50 @@
+.edicao-dados-usuario {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20px;
+  border: 1px solid #ecd0d5;
+  border-radius: 12px;
+  background: #fffafa;
+  color: #443b3d;
+  font-family: 'Lexend', sans-serif;
+
+  h3 { margin: 0 0 10px; color: #a3262f; font-size: 1.15rem; }
+  p { margin: 8px 0 16px; font-size: .88rem; line-height: 1.5; }
+  fieldset { padding: 0; margin: 0; min-width: 0; border: 0; }
+  label { display: flex; flex-direction: column; gap: 7px; margin: 12px 0; font-size: .88rem; color: #862332; }
+  input, select {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    min-height: 44px;
+    padding: 9px 12px;
+    background: #fff;
+    border: 2px solid #ac283a;
+    border-radius: 8px;
+    font: inherit;
+    color: #31262a;
+  }
+  input:focus-visible, select:focus-visible { outline: 2px solid #a3262f; outline-offset: 2px; }
+  .edicao-cidade { margin: 16px 0; padding: 12px; border: 1px solid #f1d9dd; border-radius: 8px; }
+  .edicao-cidade p { margin: 0 0 8px; }
+  .edicao-cidade .erro-localizacao { color: #a3262f; }
+  .edicao-erro { color: #a3262f; }
+  .edicao-acoes { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  .edicao-acoes button {
+    min-height: 44px;
+    border-radius: 8px;
+    padding: 10px 16px;
+    background: #a3262f;
+    color: white;
+    border: 1px solid #a3262f;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .edicao-acoes .edicao-cancelar { background: white; color: #a3262f; }
+  button:disabled { opacity: .6; cursor: wait; }
+}
+@media (max-width: 460px) {
+  .edicao-dados-usuario { padding: 14px; }
+  .edicao-dados-usuario .edicao-acoes button { flex: 1 1 100%; }
+}

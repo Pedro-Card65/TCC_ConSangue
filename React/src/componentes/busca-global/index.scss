@@ -48,9 +48,12 @@
       background: transparent;
       border: 0;
       outline: none;
+      box-shadow: none;
       color: #2d2427;
       font: inherit;
       font-size: .9rem;
+
+      &:focus, &:focus-visible { outline: none; border: 0; box-shadow: none; }
 
       &::placeholder { color: #8d8588; opacity: 1; }
     }
@@ -60,7 +63,7 @@
       min-height: 42px;
       margin: 0;
       padding: 8px 18px;
-      border: 1px solid #ad1729;
+      border: 0;
       border-radius: 9px;
       background: #ad1729;
       color: #fff;

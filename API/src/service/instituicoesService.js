@@ -1,4 +1,5 @@
 import * as repository from '../repository/instituicoesRepository.js';
+import { validarLocalizacao } from './localidadesService.js';
 
 export async function buscarMinhaAdesao(idUsuario) {
     const linhas = await repository.listarAdesaoPorCampanha(validarId(idUsuario));
@@ -133,6 +134,7 @@ export async function buscarInstituicao(id) {
 export async function cadastrarInstituicao(dados) {
     const id_usuario = validarId(dados?.id_usuario);
     const campos = validarDados(dados);
+    await validarLocalizacao(campos.cidade, campos.estado);
 
     const usuario = await repository.buscarUsuario(id_usuario);
 
@@ -158,6 +160,7 @@ export async function cadastrarInstituicao(dados) {
 export async function atualizarInstituicao(id, dados) {
     const idValidado = validarId(id);
     const campos = validarDados(dados);
+    await validarLocalizacao(campos.cidade, campos.estado);
 
     if ('id_usuario' in dados) {
         throw erroHttp(

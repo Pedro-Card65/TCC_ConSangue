@@ -506,3 +506,21 @@ $largura-central: 600px;
 @media (max-width: 360px) {
   .pagina-user { padding-inline: 16px; }
 }
+
+
+.pagina-user .excluir-caixa {
+  border-top: 5px solid #a3262f;
+  border-radius: 14px;
+  box-shadow: 0 18px 55px rgba(60, 18, 26, .22);
+}
+
+.pagina-user .excluir-caixa .confirmar-excluir {
+  background: #a3262f;
+  border-color: #a3262f;
+  font-weight: 600;
+}
+
+.pagina-user .excluir-caixa :is(button, input):focus-visible {
+  outline: 2px solid #a3262f;
+  outline-offset: 2px;
+}

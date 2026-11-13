@@ -6,48 +6,61 @@ import FormularioCampanha from './formulario-campanha';
 import BuscaGlobal from '../busca-global';
 import Notificacao from '../notificacao';
 import FotoCampanha, { FOTO_CAMPANHA_PADRAO } from './foto-campanha';
+import EnderecoInstituicao, { combinarEnderecoFormulario } from '../localizacao-brasil/endereco';
 import './index.scss';
 
 const autorizacao = () => ({ headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` } });
-const camposInstituicao = [
-  ['nome_hemo', 'Nome da instituição', 100], ['cep', 'CEP', 9],
-  ['endereco', 'Endereço', 255], ['cidade', 'Cidade', 100],
-  ['estado', 'Estado (UF)', 2], ['telefone_centro', 'Telefone', 20],
-];
-
-function CadastroInstituicao({ aoSalvar }) {
+function FormularioInstituicao({ instituicao, aoSalvar, aoCancelar }) {
   const [erro, setErro] = useState('');
   const [salvando, setSalvando] = useState(false);
   const enviando = useRef(false);
+
   async function salvar(evento) {
     evento.preventDefault();
     if (enviando.current) return;
-    const dados = Object.fromEntries(new FormData(evento.currentTarget));
+    const dadosBrutos = Object.fromEntries(new FormData(evento.currentTarget));
+    const dados = combinarEnderecoFormulario(dadosBrutos);
     dados.estado = dados.estado.toUpperCase();
+
     enviando.current = true;
     setSalvando(true);
     setErro('');
     try {
-      await api.post('/api/instituicoes', dados, autorizacao());
-      aoSalvar('Instituição cadastrada. Agora você pode criar campanhas.');
+      if (instituicao) {
+        await api.put('/api/instituicoes/' + instituicao.id_hemocentro, dados, autorizacao());
+        aoSalvar('Dados institucionais atualizados com sucesso.');
+      } else {
+        await api.post('/api/instituicoes', dados, autorizacao());
+        aoSalvar('Instituição cadastrada. Agora você pode criar campanhas.');
+      }
     } catch (e) {
-      setErro(e.response?.data?.erro || 'Não foi possível confirmar o cadastro. Atualize o painel antes de tentar novamente.');
+      setErro(e.response?.data?.erro ||
+        'Não foi possível salvar os dados. Confira o formulário e tente novamente.');
     } finally {
       enviando.current = false;
       setSalvando(false);
     }
   }
-  return <form onSubmit={salvar}>
-    <h2>Cadastre sua instituição</h2>
-    <p>Informe os dados do local onde suas campanhas serão realizadas.</p>
+
+  return <form className="formulario-instituicao" onSubmit={salvar}>
+    <h2>{instituicao ? 'Editar dados institucionais' : 'Cadastre sua instituição'}</h2>
+    <p>Informe os dados oficiais do local. Ao inserir o CEP, o endereço será sugerido e poderá ser corrigido.</p>
     <fieldset disabled={salvando}>
-      {camposInstituicao.map(([nome, rotulo, limite]) => <label key={nome}>{rotulo}
-        <input name={nome} required maxLength={limite} type={nome === 'telefone_centro' ? 'tel' : 'text'}
-          pattern={nome === 'cep' ? '[0-9]{5}-?[0-9]{3}' : undefined} />
-      </label>)}
-      <button type="submit">{salvando ? 'Salvando...' : 'Salvar instituição'}</button>
+      <label>Nome da instituição *
+        <input name="nome_hemo" required maxLength={100} defaultValue={instituicao?.nome_hemo || ''} />
+      </label>
+      <EnderecoInstituicao key={instituicao?.id_hemocentro || 'novo'} instituicao={instituicao} />
+      <label>Telefone *
+        <input name="telefone_centro" type="tel" required maxLength={20}
+          defaultValue={instituicao?.telefone_centro || ''} placeholder="(11) 99999-9999" />
+      </label>
+      {erro && <p role="alert">{erro}</p>}
+      <div className="acoes">
+        <button type="submit">{salvando ? 'Salvando...' : instituicao ? 'Salvar alterações' : 'Salvar instituição'}</button>
+        {instituicao && <button className="botao-secundario" type="button"
+          onClick={aoCancelar}>Cancelar</button>}
+      </div>
     </fieldset>
-    {erro && <p role="alert">{erro}</p>}
   </form>;
 }
 
@@ -97,6 +110,10 @@ export default function PainelInstitucional() {
   const [mostrarCampanhas, setMostrarCampanhas] = useState(false);
   const [mensagem, setMensagem] = useState('');
   const [editandoFoto, setEditandoFoto] = useState(null);
+  const [editandoDados, setEditandoDados] = useState(false);
+  const [confirmandoExclusao, setConfirmandoExclusao] = useState(false);
+  const [excluindo, setExcluindo] = useState(false);
+  const [erroExclusao, setErroExclusao] = useState('');
   useEffect(() => {
     let ativo = true;
     async function carregar() {
@@ -130,6 +147,33 @@ export default function PainelInstitucional() {
     return () => { ativo = false; };
   }, [versao]);
 
+  useEffect(() => {
+    if (!confirmandoExclusao || excluindo) return undefined;
+    const fechar = evento => {
+      if (evento.key === 'Escape') setConfirmandoExclusao(false);
+    };
+    window.addEventListener('keydown', fechar);
+    return () => window.removeEventListener('keydown', fechar);
+  }, [confirmandoExclusao, excluindo]);
+
+  async function excluirInstituicao() {
+    if (!dados?.instituicao?.id_hemocentro || excluindo) return;
+    setExcluindo(true);
+    setErroExclusao('');
+    try {
+      await api.delete('/api/instituicoes/' + dados.instituicao.id_hemocentro, autorizacao());
+      setConfirmandoExclusao(false);
+      setEditandoDados(false);
+      atualizado('Instituição excluída permanentemente.');
+    } catch (e) {
+      setErroExclusao(e.response?.status === 409
+        ? 'Não é possível excluir esta instituição enquanto houver campanhas ou outros registros vinculados. Nenhum dado foi apagado.'
+        : (e.response?.data?.erro || 'Não foi possível excluir a instituição.'));
+    } finally {
+      setExcluindo(false);
+    }
+  }
+
   function fecharCriacao() {
     setCriando(false);
     if (parametros.has('novaCampanha')) {
@@ -155,13 +199,26 @@ export default function PainelInstitucional() {
       {carregando ? <p role="status">Carregando painel...</p> : erro ? <>
         <p role="alert">{erro}</p><button onClick={() => setVersao(valor => valor + 1)}>Tentar novamente</button>
       </> : !dados?.instituicao ? <>
-        <CadastroInstituicao aoSalvar={atualizado} />
+        <FormularioInstituicao aoSalvar={atualizado} />
         <div className="acoes-cadastro-institucional">
           <button type="button" onClick={() => setVersao(valor => valor + 1)}>Atualizar painel</button>
         </div>
       </> : <>
         <h2>{dados.instituicao.nome_hemo}</h2>
         <p>{dados.instituicao.endereco} · {dados.instituicao.cidade} / {dados.instituicao.estado}</p>
+        <div className="acoes acoes-dados-institucionais">
+          <button type="button" onClick={() => setEditandoDados(valor => !valor)}>
+            {editandoDados ? 'Fechar edição' : 'Editar dados institucionais'}
+          </button>
+          <button type="button" className="botao-perigo"
+            onClick={() => { setErroExclusao(''); setConfirmandoExclusao(true); }}>
+            Excluir instituição
+          </button>
+        </div>
+        {editandoDados && <FormularioInstituicao key={dados.instituicao.id_hemocentro}
+          instituicao={dados.instituicao}
+          aoSalvar={texto => { setEditandoDados(false); atualizado(texto); }}
+          aoCancelar={() => setEditandoDados(false)} />}
         <dl className="indicadores">
           <div><dt>Agendamentos informados</dt><dd>{dados.estatisticas.agendamentos}</dd></div>
           <div><dt>Grupos vinculados</dt><dd>{dados.estatisticas.grupos}</dd></div>
@@ -197,5 +254,26 @@ export default function PainelInstitucional() {
         </section>}
       </>}
     </section>
+    {confirmandoExclusao && <div className="confirmacao-fundo" role="presentation"
+      onMouseDown={evento => { if (evento.target === evento.currentTarget && !excluindo) setConfirmandoExclusao(false); }}>
+      <div className="confirmacao-caixa" role="dialog" aria-modal="true"
+        aria-labelledby="titulo-excluir-instituicao" aria-describedby="aviso-excluir-instituicao">
+        <h2 id="titulo-excluir-instituicao">Excluir instituição?</h2>
+        <p id="aviso-excluir-instituicao">
+          A instituição e os dados do seu cadastro serão excluídos permanentemente.
+          Essa ação é irreversível. Se houver campanhas ou outros registros vinculados,
+          a exclusão será impedida e nenhum dado será apagado.
+        </p>
+        {erroExclusao && <p role="alert">{erroExclusao}</p>}
+        <div className="acoes">
+          <button type="button" className="botao-secundario" disabled={excluindo}
+            onClick={() => setConfirmandoExclusao(false)}>Cancelar</button>
+          <button type="button" className="botao-perigo" disabled={excluindo}
+            onClick={excluirInstituicao}>
+            {excluindo ? 'Excluindo...' : 'Sim, excluir permanentemente'}
+          </button>
+        </div>
+      </div>
+    </div>}
   </main>;
 }

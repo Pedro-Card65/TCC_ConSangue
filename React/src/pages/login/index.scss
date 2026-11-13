@@ -78,7 +78,7 @@
   box-sizing: border-box;
   padding: 10px 14px;
   background: white;
-  border: 2px solid #e8e8e8;
+  border: 2px solid #ad2626;
   border-radius: 7px;
   color: #222;
   font-size: 1rem;
@@ -89,6 +89,7 @@
 .auth-page button:focus-visible {
   outline: 2px solid #a3262f;
   outline-offset: 2px;
+  border-color: #a3262f;
 }
 
 .auth-page .Entrar {
@@ -282,4 +283,31 @@
 .auth-page .Cadastro .box input[type="date"]::-webkit-datetime-edit {
   min-width: 0;
   padding: 0;
+}
+
+
+.auth-page--cadastro .Cadastro .box label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 0;
+  color: #ad2626;
+  font-size: .94rem;
+  line-height: 1.45;
+}
+
+.auth-page--cadastro .Cadastro .box .erro-localizacao {
+  color: #a3262f;
+  font-size: .82rem;
+}
+
+.auth-page--cadastro .Cadastro .box select:disabled {
+  color: #65585b;
+  background: #f9f7f7;
+  cursor: wait;
+}
+
+.auth-page--cadastro .Cadastro .box :is(input, select):focus-visible {
+  border-color: #991b2c;
+  box-shadow: 0 0 0 2px #f8d6dc;
 }

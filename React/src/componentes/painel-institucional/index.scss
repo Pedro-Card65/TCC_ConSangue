@@ -11,11 +11,11 @@
   .acoes { display: flex; gap: 12px; flex-wrap: wrap; margin: 20px 0; }
   button { padding: 12px 20px; border: 1px solid #a51c30; border-radius: 8px; background: #a51c30; color: #fff; cursor: pointer; font: inherit; }
   button:disabled { opacity: .6; cursor: wait; }
-  button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 3px solid #366aad; outline-offset: 3px; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid #a3262f; outline-offset: 2px; }
   form { margin-top: 24px; }
   fieldset { border: 0; padding: 0; min-width: 0; }
   label { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
-  input, textarea, select { box-sizing: border-box; width: 100%; padding: 12px; border: 1px solid #a48c8c; border-radius: 6px; font: inherit; background: #fff; color: #352d2d; }
+  input, textarea, select { box-sizing: border-box; width: 100%; padding: 12px; border: 2px solid #ad2626; border-radius: 7px; font: inherit; background: #fff; color: #352d2d; }
   textarea { resize: vertical; }
   .campos-duplos { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
   [role='alert'] { color: #a51c30; padding: 12px; background: #fff0f0; }
@@ -143,8 +143,122 @@
   .foto-campanha-previa { width: 100%; max-height: 220px; object-fit: cover; border-radius: 8px; }
   .foto-campanha-editor { min-width: 0; margin-block: 16px; }
   .foto-campanha-editor input[type="file"] { max-width: 100%; min-width: 0; }
-  .fotos-campanha-exemplos { display: flex; flex-wrap: wrap; gap: 10px; margin-block: 12px; }
-  .fotos-campanha-exemplos button { display: flex; flex-direction: column; gap: 6px; align-items: center; max-width: 140px; }
-  .fotos-campanha-exemplos button[aria-pressed="true"] { outline: 3px solid #a3262f; outline-offset: 2px; }
-  .fotos-campanha-exemplos img { width: 100px; height: 64px; object-fit: cover; border-radius: 4px; }
+}
+
+
+.painel-institucional {
+  .formulario-instituicao {
+    padding: 18px 22px;
+    background: #fff9fa;
+    border: 1px solid #edcbd1;
+    border-radius: 12px;
+  }
+
+  .formulario-instituicao h2 { margin-bottom: 8px; }
+  .formulario-instituicao label { color: #a3262f; font-weight: 500; }
+  .formulario-instituicao .erro-localizacao,
+  .formulario-instituicao .mensagem-cep { display: block; font-size: .85rem; margin: 6px 0; color: #7f2632; }
+  .formulario-instituicao input:focus-visible,
+  .formulario-instituicao select:focus-visible,
+  .formulario-instituicao textarea:focus-visible { border-color: #991b2c; box-shadow: 0 0 0 2px #f8d6dc; }
+
+  button.botao-secundario {
+    background: #fff;
+    color: #a3262f;
+  }
+
+  button.botao-perigo {
+    background: #fff7f8;
+    color: #a3262f;
+    border: 2px solid #a3262f;
+  }
+  button.botao-perigo:hover:not(:disabled) { background: #ffebee; }
+  .acoes-dados-institucionais { margin-top: 18px; }
+
+  .foto-campanha-editor {
+    margin-block: 18px;
+    padding: 18px;
+    border-radius: 13px;
+    background: linear-gradient(145deg, #fffafa, #fcf1f3);
+    border: 1px solid #efd8dc;
+  }
+
+  .foto-campanha-editor .linha-upload-foto {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    color: #765b63;
+    font-size: .85rem;
+  }
+
+  .foto-campanha-editor .botao-upload-foto {
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+    margin: 0;
+    padding: 10px 16px;
+    background: #a3262f;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .foto-campanha-editor .botao-upload-foto:focus-within {
+    outline: 2px solid #a3262f;
+    outline-offset: 2px;
+  }
+
+  .foto-campanha-editor .botao-upload-foto input[type='file'] {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+  }
+
+  .foto-campanha-editor .botao-remover-foto-campanha {
+    margin-top: 12px;
+    background: white;
+    color: #a3262f;
+  }
+
+  .confirmacao-fundo {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(40, 10, 18, .52);
+  }
+
+  .confirmacao-caixa {
+    box-sizing: border-box;
+    width: min(100%, 480px);
+    max-height: calc(100dvh - 32px);
+    overflow: auto;
+    background: white;
+    padding: 26px;
+    border-top: 5px solid #a3262f;
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(48, 9, 19, .25);
+  }
+
+  .confirmacao-caixa p { color: #4f4043; }
+  .confirmacao-caixa .acoes { justify-content: flex-end; }
+}
+
+@media (max-width: 600px) {
+  .painel-institucional {
+    .formulario-instituicao { padding: 14px; }
+    .confirmacao-caixa { padding: 20px; }
+    .confirmacao-caixa .acoes button { flex: 1 1 100%; }
+  }
 }

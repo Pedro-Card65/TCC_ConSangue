@@ -392,8 +392,9 @@ export default function User() {
             aria-labelledby="titulo-excluir-conta"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 id="titulo-excluir-conta">Excluir sua conta?</h2>
-            <p>Essa ação é permanente e não pode ser desfeita.</p>
+            <h2 id="titulo-excluir-conta">Tem certeza que deseja excluir sua conta?</h2>
+            <p>A exclusão permanente da sua conta e dos seus dados não poderá ser desfeita.</p>
+            <p>Se existirem grupos, campanhas ou participações vinculados à conta, o sistema impedirá a exclusão até que esses vínculos sejam resolvidos. Nenhum dado é apagado quando a exclusão é bloqueada.</p>
 
             {erroExclusao && <p role="alert" className="erro-excluir">{erroExclusao}</p>}
 
@@ -402,7 +403,7 @@ export default function User() {
                 Cancelar
               </button>
               <button type="button" className="confirmar-excluir" disabled={excluindo} onClick={excluirConta}>
-                {excluindo ? 'Excluindo...' : 'Sim, excluir'}
+                {excluindo ? 'Excluindo...' : 'Sim, excluir permanentemente'}
               </button>
             </div>
           </div>

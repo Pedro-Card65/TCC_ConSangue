@@ -1,5 +1,6 @@
 import * as repository from '../repository/usuariosRepository.js';
 import bcrypt from 'bcrypt';
+import { validarLocalizacao } from './localidadesService.js';
 
 
 function criarErro(mensagem, status = 400) {
@@ -42,7 +43,7 @@ function validarCPF(cpf) {
 
 export async function fazerCadastro(
     usuario, nascimento, cpf, telefone,
-    email, senha, cidade, tipo_sangue, tipo_usuario
+    email, senha, cidade, tipo_sangue, tipo_usuario, estado
 ) {
 
     // Verifica campos obrigatórios
@@ -104,6 +105,8 @@ export async function fazerCadastro(
         throw criarErro('Nome da cidade muito longo.');
     }
 
+    await validarLocalizacao(cidade, estado);
+
     // Valida nascimento
     const data = new Date(nascimento);
 
@@ -114,6 +117,13 @@ export async function fazerCadastro(
         new Date(nascimento + 'T00:00:00') > new Date()
     ) {
         throw criarErro('Data de nascimento inválida.');
+    }
+
+    // Idade mínima de 16 anos, inclusive na validação do servidor.
+    const limiteIdade = new Date();
+    limiteIdade.setUTCFullYear(limiteIdade.getUTCFullYear() - 16);
+    if (nascimento > limiteIdade.toISOString().slice(0, 10)) {
+        throw criarErro('É necessário ter pelo menos 16 anos para se cadastrar.');
     }
 
     // Valida tipo sanguíneo (opcional)

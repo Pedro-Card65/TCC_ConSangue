@@ -509,3 +509,16 @@
     .acoes-finais-grupo .botao-perigo { width: 100%; }
   }
 }
+
+
+.modal-grupos input:not([type='file']),
+.modal-grupos textarea,
+.modal-grupos select {
+  border: 2px solid #ad2626;
+}
+
+.modal-grupos :is(input, textarea, select):focus-visible {
+  outline: 2px solid #ad2626;
+  outline-offset: 2px;
+  border-color: #991b2c;
+}

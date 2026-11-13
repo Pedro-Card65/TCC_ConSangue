@@ -5,6 +5,7 @@ import { api } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 import LogoSlogan from '../../componentes/logo-slogan/logo-slogan';
 import Notificacao from '../../componentes/notificacao';
+import LocalizacaoBrasil from '../../componentes/localizacao-brasil';
 
 
 export default function Login() {
@@ -87,6 +88,7 @@ const [cadastro, setCadastro] = useState({
     telefone: '',
     email: '',
     cidade: '',
+    estado: '',
     tipo_sangue: '',
     tipo_usuario: 'candidato',
     senha: ''
@@ -180,6 +182,7 @@ async function fazerCadastro(e) {
             telefone: '',
             email: '',
             cidade: '',
+            estado: '',
             tipo_sangue: '',
             tipo_usuario: 'candidato',
             senha: ''
@@ -277,16 +280,8 @@ async function fazerCadastro(e) {
     </div>
 
     <div className="box">
-        <p>Cidade *</p>
-        <input
-            type="text"
-            name="cidade"
-            aria-label="Cidade"
-            placeholder="Digite sua cidade"
-            value={cadastro.cidade}
-            onChange={alterarCadastro}
-            required
-        />
+        <LocalizacaoBrasil estado={cadastro.estado} cidade={cadastro.cidade}
+          aoAlterar={alteracoes => setCadastro(atual => ({ ...atual, ...alteracoes }))} />
     </div>
  {/* sem scss por questões de classificação, mas vou dar uma arrumada dps */}
     <div className="box">

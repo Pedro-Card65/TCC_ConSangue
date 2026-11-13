@@ -45,7 +45,7 @@ export async function fazerCadastro(
     email, senha, cidade, tipo_sangue, tipo_usuario
 ) {
 
-    // Verifica campos obrigatórios
+    // Verifica campos obrigat�rios
     const campos = [
         usuario, nascimento, cpf, telefone,
         email, senha, cidade, tipo_usuario
@@ -54,10 +54,10 @@ export async function fazerCadastro(
     if (campos.some(campo =>
         typeof campo !== 'string' || !campo.trim()
     )) {
-        throw criarErro('Preencha todos os campos obrigatórios.');
+        throw criarErro('Preencha todos os campos obrigat�rios.');
     }
 
-    // Remove espaços
+    // Remove espa�os
     usuario = usuario.trim();
     email = email.trim().toLowerCase();
     cidade = cidade.trim();
@@ -72,14 +72,14 @@ export async function fazerCadastro(
     cpf = cpf.replace(/\D/g, '');
 
    if (!validarCPF(cpf)) {
-    throw criarErro('CPF inválido.');
+    throw criarErro('CPF inv�lido.');
 }
 
     // Valida telefone
     telefone = telefone.replace(/\D/g, '');
 
     if (telefone.length < 10 || telefone.length > 11) {
-        throw criarErro('Telefone inválido.');
+        throw criarErro('Telefone inv�lido.');
     }
 
     // Valida email
@@ -87,12 +87,16 @@ export async function fazerCadastro(
         email.length > 100 ||
         !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
     ) {
-        throw criarErro('Email inválido.');
+        throw criarErro('Email inv�lido.');
     }
 
     // Valida senha
     if (senha.length < 8 || senha.length > 255) {
         throw criarErro('Senha deve ter entre 8 e 255 caracteres.');
+    }
+
+    if (Buffer.byteLength(senha, 'utf8') > 72) {
+        throw criarErro('Senha deve ocupar no m�ximo 72 bytes. Use uma senha menor.');
     }
 
     // Valida cidade
@@ -109,10 +113,10 @@ export async function fazerCadastro(
         data.toISOString().slice(0, 10) !== nascimento ||
         new Date(nascimento + 'T00:00:00') > new Date()
     ) {
-        throw criarErro('Data de nascimento inválida.');
+        throw criarErro('Data de nascimento inv�lida.');
     }
 
-    // Valida tipo sanguíneo (opcional)
+    // Valida tipo sangu�neo (opcional)
     const tipos = [
         'A+', 'A-', 'B+', 'B-',
         'AB+', 'AB-', 'O+', 'O-'
@@ -123,7 +127,7 @@ export async function fazerCadastro(
     }
     else {
         if (typeof tipo_sangue !== 'string') {
-            throw criarErro('Tipo sanguíneo inválido.');
+            throw criarErro('Tipo sangu�neo inv�lido.');
         }
 
         tipo_sangue = tipo_sangue.trim().toUpperCase();
@@ -132,14 +136,14 @@ export async function fazerCadastro(
             tipo_sangue = null;
         }
         else if (!tipos.includes(tipo_sangue)) {
-            throw criarErro('Tipo sanguíneo inválido.');
+            throw criarErro('Tipo sangu�neo inv�lido.');
         }
     }
 
-    // Valida tipo de usuário
+    // Valida tipo de usu�rio
     if (tipo_usuario !== 'candidato' &&
         tipo_usuario !== 'instituicao') {
-        throw criarErro('Tipo de usuário inválido.');
+        throw criarErro('Tipo de usu�rio inv�lido.');
     }
    
     // Envia para o Repository
@@ -153,7 +157,7 @@ export async function fazerCadastro(
     }
     catch (erro) {
         if (erro.code === 'ER_DUP_ENTRY') {
-            throw criarErro('CPF ou email já cadastrado.', 409);
+            throw criarErro('CPF ou email j� cadastrado.', 409);
         }
 
         throw erro;
@@ -164,14 +168,14 @@ export async function fazerCadastro(
 export async function buscarPorID(id) {
     id = Number(id);
     if (!Number.isInteger(id) || id <= 0) {
-        const erro = new Error('ID inválido.');
+        const erro = new Error('ID inv�lido.');
         erro.status = 400;
         throw erro}
 
     const usuario = await repository.buscarPorID(id);
 
     if (!usuario) {
-        const erro = new Error('Usuário não encontrado.');
+        const erro = new Error('Usu�rio n�o encontrado.');
         erro.status = 404;
         throw erro}
 
@@ -192,7 +196,7 @@ export async function atualizarFotoPerfil(id, foto) {
     id = Number(id);
 
     if (!Number.isInteger(id) || id <= 0) {
-        throw criarErro('ID inválido.');
+        throw criarErro('ID inv�lido.');
     }
 
     // null remove a foto
@@ -203,20 +207,20 @@ export async function atualizarFotoPerfil(id, foto) {
         }
 
         if (foto.length > FOTO_MAX_CARACTERES) {
-            throw criarErro('Foto muito grande. O limite é de 300 KB.');
+            throw criarErro('Foto muito grande. O limite � de 300 KB.');
         }
 
         const dados = foto.slice(foto.indexOf(',') + 1);
 
         if (!/^[A-Za-z0-9+/]+={0,2}$/.test(dados)) {
-            throw criarErro('Foto em base64 inválida.');
+            throw criarErro('Foto em base64 inv�lida.');
         }
     }
 
     const afetados = await repository.atualizarFotoPerfil(id, foto);
 
     if (afetados === 0) {
-        throw criarErro('Usuário não encontrado.', 404);
+        throw criarErro('Usu�rio n�o encontrado.', 404);
     }
 
     return afetados;
@@ -227,7 +231,7 @@ export async function atualizarFotoPerfil(id, foto) {
 export async function buscarPorUser(nome) {
 
     if (!nome || typeof nome !== 'string') {
-        const erro = new Error("Nome obrigatório");
+        const erro = new Error("Nome obrigat�rio");
         erro.status = 400;
         throw erro;
     }
@@ -250,13 +254,13 @@ export async function buscarPorUser(nome) {
 export async function deletarPorID(id) {
     id = Number(id);
     if (!Number.isInteger(id) || id <= 0) {
-        const erro = new Error("ID inválido");
+        const erro = new Error("ID inv�lido");
         erro.status = 400;
         throw erro;
     }
     const del = await repository.deletarPorID(id);
     if (del === 0) {
-        const erro = new Error("Usuário não encontrado");
+        const erro = new Error("Usu�rio n�o encontrado");
         erro.status = 404;
         throw erro;
     }
@@ -270,24 +274,24 @@ export async function trocarTelefone(id, novotel, senha) {
     id = Number(id);
 
     if (!Number.isInteger(id) || id <= 0) {
-        throw criarErro('ID inválido');
+        throw criarErro('ID inv�lido');
     }
 
     if (typeof senha !== 'string' || !senha ||
         (typeof novotel !== 'string' && typeof novotel !== 'number')) {
-        throw criarErro('Telefone e senha são obrigatórios');
+        throw criarErro('Telefone e senha s�o obrigat�rios');
     }
 
     novotel = String(novotel).replace(/\D/g, '');
 
     if (novotel.length < 10 || novotel.length > 11) {
-        throw criarErro('Telefone inválido');
+        throw criarErro('Telefone inv�lido');
     }
 
     const usuario = await repository.buscarCredenciaisPorID(id);
 
     if (!usuario) {
-        throw criarErro('Usuário não encontrado', 404);
+        throw criarErro('Usu�rio n�o encontrado', 404);
     }
 
     const senhaCorreta = await bcrypt.compare(
@@ -309,25 +313,25 @@ export async function trocarEmail(id, novoemail, senha) {
     id = Number(id);
 
     if (!Number.isInteger(id) || id <= 0) {
-        throw criarErro('ID inválido');
+        throw criarErro('ID inv�lido');
     }
 
     if (typeof novoemail !== 'string' ||
         typeof senha !== 'string' || !senha) {
-        throw criarErro('Email e senha são obrigatórios');
+        throw criarErro('Email e senha s�o obrigat�rios');
     }
 
     novoemail = novoemail.trim().toLowerCase();
 
     if (novoemail.length > 100 ||
     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(novoemail)) {
-    throw criarErro('Email inválido');
+    throw criarErro('Email inv�lido');
 }
 
     const usuario = await repository.buscarCredenciaisPorID(id);
 
     if (!usuario) {
-        throw criarErro('Usuário não encontrado', 404);
+        throw criarErro('Usu�rio n�o encontrado', 404);
     }
 
     const senhaCorreta = await bcrypt.compare(
@@ -344,7 +348,7 @@ export async function trocarEmail(id, novoemail, senha) {
     }
     catch (erro) {
         if (erro.code === 'ER_DUP_ENTRY') {
-            throw criarErro('Email já cadastrado', 409);
+            throw criarErro('Email j� cadastrado', 409);
         }
 
         throw erro;

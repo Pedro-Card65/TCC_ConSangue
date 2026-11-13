@@ -27,7 +27,7 @@ export default function VincularCampanha({ idGrupo, podeAdministrar = false, aoV
     const carregar = useCallback(async () => {
         const token = sessionStorage.getItem('token') || localStorage.getItem('token');
         if (!token) {
-            setErro('Fa�a login para consultar as campanhas do grupo.');
+            setErro('Faça login para consultar as campanhas do grupo.');
             setCarregando(false);
             return;
         }
@@ -51,7 +51,7 @@ export default function VincularCampanha({ idGrupo, podeAdministrar = false, aoV
                 .filter(vinculo => String(vinculo.id_grupo) === String(idGrupo)));
             setParticipacoes(listaDa(resParticipacoes, 'participacoes'));
         } catch (error) {
-            setErro(error.response?.data?.erro || 'N�o foi poss�vel carregar as campanhas deste grupo.');
+            setErro(error.response?.data?.erro || 'Não foi possível carregar as campanhas deste grupo.');
         } finally {
             setCarregando(false);
         }
@@ -63,7 +63,7 @@ export default function VincularCampanha({ idGrupo, podeAdministrar = false, aoV
         evento.preventDefault();
         if (!podeAdministrar || salvando || carregando) return;
         if (!idCampanha || !Number.isSafeInteger(Number(meta)) || Number(meta) < 1) {
-            setErro('Selecione uma campanha e informe uma meta v�lida.');
+            setErro('Selecione uma campanha e informe uma meta válida.');
             return;
         }
         setSalvando(true);
@@ -76,13 +76,13 @@ export default function VincularCampanha({ idGrupo, podeAdministrar = false, aoV
                 id_campanha: Number(idCampanha),
                 meta_participacoes: Number(meta)
             }, { headers: { Authorization: `Bearer ${token}` } });
-            // Vincular o grupo N�O registra interesse individual do administrador nem dos membros.
-            setSucesso('Grupo vinculado � campanha! Cada membro poder� decidir se quer participar.');
+            // Vincular o grupo NÃO registra interesse individual do administrador nem dos membros.
+            setSucesso('Grupo vinculado à campanha! Cada membro poderá decidir se quer participar.');
             setIdCampanha('');
             aoVincular?.(resposta.data.id);
             await carregar();
         } catch (error) {
-            setErro(error.response?.data?.erro || 'N�o foi poss�vel vincular a campanha.');
+            setErro(error.response?.data?.erro || 'Não foi possível vincular a campanha.');
         } finally {
             setSalvando(false);
         }
@@ -92,12 +92,12 @@ export default function VincularCampanha({ idGrupo, podeAdministrar = false, aoV
         if (!ehCandidato || salvando || carregando) return;
         const campanha = campanhas.find(c => String(c.id_campanha) === String(vinculo.id_campanha));
         if (!campanha || campanha.status_campanha !== 'ativa') {
-            setErro('Essa campanha n�o est� ativa.');
+            setErro('Essa campanha não está ativa.');
             return;
         }
         const anterior = participacoes.find(p => String(p.id_campanha) === String(vinculo.id_campanha));
         if (anterior?.status_participacao === 'comparecimento_informado') {
-            setErro('O comparecimento j� foi informado para esta campanha.');
+            setErro('O comparecimento já foi informado para esta campanha.');
             return;
         }
         setSalvando(true);
@@ -127,10 +127,10 @@ export default function VincularCampanha({ idGrupo, podeAdministrar = false, aoV
             ]);
             await carregar();
             setSucesso(status === 'pretende_ir'
-                ? 'Sua inten��o de comparecer foi registrada.'
+                ? 'Sua intenção de comparecer foi registrada.'
                 : 'Seu interesse foi registrado.');
         } catch (error) {
-            setErro(error.response?.data?.erro || 'N�o foi poss�vel registrar sua participa��o.');
+            setErro(error.response?.data?.erro || 'Não foi possível registrar sua participação.');
         } finally {
             setSalvando(false);
         }
@@ -143,10 +143,10 @@ export default function VincularCampanha({ idGrupo, podeAdministrar = false, aoV
     return (
         <section className="vincular-campanha" aria-label="Campanhas do grupo">
             <h2>Campanhas do grupo</h2>
-            <p>O administrador pode aderir a uma campanha em nome do grupo, sem se inscrever pessoalmente. Cada membro decide sua pr�pria participa��o.</p>
+            <p>O administrador pode aderir a uma campanha em nome do grupo, sem se inscrever pessoalmente. Cada membro decide sua própria participação.</p>
 
             {carregando && <p role="status">Carregando campanhas...</p>}
-            {!carregando && vinculos.length === 0 && <p>Este grupo ainda n�o aderiu a nenhuma campanha.</p>}
+            {!carregando && vinculos.length === 0 && <p>Este grupo ainda não aderiu a nenhuma campanha.</p>}
             {!carregando && vinculos.map(vinculo => {
                 const campanha = campanhas.find(c => String(c.id_campanha) === String(vinculo.id_campanha));
                 const registro = participacoes.find(p => String(p.id_campanha) === String(vinculo.id_campanha));
@@ -154,26 +154,26 @@ export default function VincularCampanha({ idGrupo, podeAdministrar = false, aoV
                 return (
                     <div className="campanha-do-grupo" key={vinculo.id_grupo_campanha}>
                         <strong>{campanha?.nome_campanha || `Campanha #${vinculo.id_campanha}`}</strong>
-                        <small>Ades�es individuais: {vinculo.total_adesoes ?? 0} � Interessados: {vinculo.total_interessados ?? 0}</small>
+                        <small>Adesões individuais: {vinculo.total_adesoes ?? 0} · Interessados: {vinculo.total_interessados ?? 0}</small>
                         {Number(vinculo.meta_participacoes) > 0 ? (
                             <>
-                                <small>Meta do grupo: {vinculo.meta_participacoes} participa��es � {vinculo.percentual_progresso ?? 0}%</small>
+                                <small>Meta do grupo: {vinculo.meta_participacoes} participações · {vinculo.percentual_progresso ?? 0}%</small>
                                 <progress aria-label={`Progresso do grupo em ${campanha?.nome_campanha || 'campanha'}`}
                                     max={Number(vinculo.meta_participacoes)}
                                     value={Math.min(Number(vinculo.total_adesoes || 0), Number(vinculo.meta_participacoes))} />
                                 <small>{Number(vinculo.total_adesoes) > Number(vinculo.meta_participacoes)
                                     ? 'Meta superada' : Number(vinculo.total_adesoes) === Number(vinculo.meta_participacoes)
-                                        ? 'Meta atingida' : 'Mobiliza��o em andamento'}</small>
+                                        ? 'Meta atingida' : 'Mobilização em andamento'}</small>
                             </>
                         ) : <small>Sem meta definida</small>}
-                        <small>Contam inten��es e presen�as informadas pelos candidatos; n�o representam doa��es comprovadas.</small>
+                        <small>Contam intenções e presenças informadas pelos candidatos; não representam doações comprovadas.</small>
                         <small>{ativa ? 'Campanha ativa' : 'Campanha encerrada'}</small>
                         {ehCandidato && registro && (
                             <p className="situacao-campanha-grupo">
-                                Sua situa��o: {registro.status_participacao === 'pretende_ir'
+                                Sua situação: {registro.status_participacao === 'pretende_ir'
                                     ? 'Pretende ir'
                                     : registro.status_participacao === 'comparecimento_informado'
-                                        ? 'Presen�a informada' : 'Interesse registrado'}
+                                        ? 'Presença informada' : 'Interesse registrado'}
                             </p>
                         )}
                         {ehCandidato && ativa && registro?.status_participacao !== 'comparecimento_informado' && (
@@ -199,7 +199,7 @@ export default function VincularCampanha({ idGrupo, podeAdministrar = false, aoV
             {podeAdministrar && !carregando && (
                 <form onSubmit={vincular}>
                     <h3>Vincular o grupo a outra campanha</h3>
-                    <label htmlFor="campanha-vinculo">Campanha dispon�vel</label>
+                    <label htmlFor="campanha-vinculo">Campanha disponível</label>
                     <select id="campanha-vinculo" value={idCampanha}
                         onChange={e => setIdCampanha(e.target.value)}
                         disabled={salvando || disponiveis.length === 0} required>
@@ -210,13 +210,13 @@ export default function VincularCampanha({ idGrupo, podeAdministrar = false, aoV
                             </option>
                         ))}
                     </select>
-                    <label htmlFor="meta-vinculo">Meta de participa��es</label>
+                    <label htmlFor="meta-vinculo">Meta de participações</label>
                     <input id="meta-vinculo" type="number" min="1" step="1" value={meta}
                         onChange={e => setMeta(e.target.value)} disabled={salvando} required />
                     <button type="submit" disabled={salvando || !idCampanha || disponiveis.length === 0}>
-                        {salvando ? 'Vinculando...' : 'Vincular grupo � campanha'}
+                        {salvando ? 'Vinculando...' : 'Vincular grupo à campanha'}
                     </button>
-                    {disponiveis.length === 0 && <p>Nenhuma nova campanha ativa dispon�vel.</p>}
+                    {disponiveis.length === 0 && <p>Nenhuma nova campanha ativa disponível.</p>}
                 </form>
             )}
             {erro && <p role="alert">{erro}</p>}

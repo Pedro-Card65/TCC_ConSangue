@@ -20,8 +20,9 @@ endpoints.post('/api/usuarios/cadastro', async (req, resp) => {
         let tipo_sangue = req.body.tipo_sangue;
         let tipo_usuario = req.body.tipo_usuario;
         let estado = req.body.estado;
+        let codigo_instituicao = req.body.codigo_instituicao;
 
-        const conta = await service.fazerCadastro(usuario, nascimento, cpf, telefone, email, senha, cidade, tipo_sangue, tipo_usuario, estado);
+        const conta = await service.fazerCadastro(usuario, nascimento, cpf, telefone, email, senha, cidade, tipo_sangue, tipo_usuario, estado, codigo_instituicao);
 
         resp.status(201).send({
             mensagem: 'Cadastro realizado com sucesso!',
@@ -81,7 +82,7 @@ endpoints.get('/api/usuarios/busca/nome/:nome', getAuthentication(), async (req,
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
-endpoints.delete('/api/usuarios/deletar/certeza/:id', getAuthentication(), somenteMeuId(), async (req, resp) => {
+endpoints.delete('/api/usuarios/deletar/certeza/:id', getAuthentication(u => u.tipo_usuario === 'candidato'), somenteMeuId(), async (req, resp) => {
     try{ 
         let id = req.params.id;
         const del = await service.deletarPorID(id)

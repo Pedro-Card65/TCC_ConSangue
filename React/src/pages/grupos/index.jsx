@@ -71,7 +71,7 @@ export default function Grupos() {
   const [visibilidade, setVisibilidade] = useState('privado');
   const [codigo, setCodigo] = useState('');
   const [salvando, setSalvando] = useState(false);
-  useEscapeFechar(modal === 'confirmar-apagar' && !salvando, () => { setErro(''); setModal('detalhes'); });
+  useEscapeFechar((modal === 'confirmar-apagar' || modal === 'confirmar-sair') && !salvando, () => { setErro(''); setModal('detalhes'); });
   const [fotoGrupo, setFotoGrupo] = useState(null);
   const [fotoAlterada, setFotoAlterada] = useState(false);
   const [nomeArquivoFoto, setNomeArquivoFoto] = useState('');
@@ -109,7 +109,13 @@ export default function Grupos() {
       const resMeus = await api.get(`/api/grupos/usuario/${usuario.id_usuario}`, config);
       const meus = listaDa(resMeus, 'grupos');
       const dadosPrivados = Object.fromEntries(meus.map(grupo => [String(grupo.id_grupo), grupo]));
-      setGrupos(todos.map(grupo => ({ ...grupo, ...(dadosPrivados[String(grupo.id_grupo)] || {}) })));
+      // Descoberta pública mostra apenas grupos públicos; os privados do
+      // usuário continuam acessíveis pela rota autenticada de membros.
+      const idsPublicos = new Set(todos.map(grupo => String(grupo.id_grupo)));
+      setGrupos([
+        ...todos.map(grupo => ({ ...grupo, ...(dadosPrivados[String(grupo.id_grupo)] || {}) })),
+        ...meus.filter(grupo => !idsPublicos.has(String(grupo.id_grupo)))
+      ]);
       setMeusIds(new Set(meus.map((grupo) => String(grupo.id_grupo))));
       setMeusGrupos(Object.fromEntries(meus.map((grupo) => [String(grupo.id_grupo), grupo])));
 
@@ -208,7 +214,7 @@ export default function Grupos() {
 
   async function sairGrupo(grupo) {
     const membro = meusGrupos[String(grupo.id_grupo)];
-    if (!membro || !window.confirm(`Deseja sair do grupo "${grupo.nome_grupo}"?`)) return;
+    if (!membro) return;
 
     setSalvando(true);
     setErro('');
@@ -470,7 +476,7 @@ export default function Grupos() {
                 ? <button className="botao-principal" type="button" disabled={salvando} onClick={() => entrarGrupoPublico(grupoSelecionado)}>{salvando ? 'Entrando...' : 'Entrar neste grupo público'}</button>
                 : <button className="botao-principal" type="button" onClick={() => { setCodigo(''); setErro(''); setModal('entrar'); }}>Entrar com convite</button>}
             {meusIds.has(String(grupoSelecionado.id_grupo)) && String(grupoSelecionado.id_criador) !== String(usuarioId) && (
-              <button className="botao-perigo" type="button" disabled={salvando} onClick={() => sairGrupo(grupoSelecionado)}>
+              <button className="botao-perigo" type="button" disabled={salvando} onClick={() => { setErro(""); setModal("confirmar-sair"); }}>
                 {salvando ? 'Saindo...' : 'Sair do grupo'}
               </button>
             )}
@@ -526,6 +532,20 @@ export default function Grupos() {
                 </button>
               </div>
             )}
+          </>}
+          {modal === 'confirmar-sair' && grupoSelecionado && <>
+            <h2 id="titulo-modal-grupos">Sair do grupo?</h2>
+            <p>Tem certeza de que deseja sair de <strong>{grupoSelecionado.nome_grupo}</strong>?
+              Para voltar a um grupo privado, você precisará do código de convite.</p>
+            {erro && <p className="erro-modal" role="alert">{erro}</p>}
+            <div className="acoes-confirmacao">
+              <button className="botao-secundario" type="button" disabled={salvando}
+                onClick={() => { setErro(''); setModal('detalhes'); }}>Cancelar</button>
+              <button className="botao-apagar-confirmacao" type="button" disabled={salvando}
+                onClick={() => sairGrupo(grupoSelecionado)}>
+                {salvando ? 'Saindo...' : 'Sim, sair do grupo'}
+              </button>
+            </div>
           </>}
           {modal === 'confirmar-apagar' && grupoSelecionado && <>
             <h2 id="titulo-modal-grupos">Apagar grupo?</h2>

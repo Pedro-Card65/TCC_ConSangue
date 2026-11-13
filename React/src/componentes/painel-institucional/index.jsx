@@ -112,6 +112,10 @@ export default function PainelInstitucional() {
   const [mostrarCampanhas, setMostrarCampanhas] = useState(false);
   const [mensagem, setMensagem] = useState('');
   const [editandoFoto, setEditandoFoto] = useState(null);
+  const [editandoCampanha, setEditandoCampanha] = useState(null);
+  const [confirmandoCampanha, setConfirmandoCampanha] = useState(null);
+  const [excluindoCampanha, setExcluindoCampanha] = useState(false);
+  const [erroExclusaoCampanha, setErroExclusaoCampanha] = useState('');
   const [editandoDados, setEditandoDados] = useState(false);
   const [editandoConta, setEditandoConta] = useState(false);
   const [usuarioConta, setUsuarioConta] = useState(null);
@@ -182,9 +186,8 @@ export default function PainelInstitucional() {
       setConfirmandoExclusao(false);
       navigate('/', { replace: true });
     } catch (e) {
-      setErroExclusao(e.response?.status === 409
-        ? 'Não foi possível excluir devido a vínculos no banco. Nenhum dado foi apagado.'
-        : (e.response?.data?.erro || 'Não foi possível excluir a conta. Nenhum dado foi apagado.'));
+      setErroExclusao(e.response?.data?.erro ||
+        'Não foi possível excluir a conta. Nenhum dado foi apagado.');
     } finally {
       setExcluindo(false);
     }
@@ -195,6 +198,23 @@ export default function PainelInstitucional() {
     setSenhaExclusao('');
     setTextoConfirmacao('');
     setConfirmandoExclusao(true);
+  }
+
+  async function excluirCampanha() {
+    if (!confirmandoCampanha || excluindoCampanha) return;
+    setExcluindoCampanha(true);
+    setErroExclusaoCampanha('');
+    try {
+      await api.delete(`/api/campanhas/${confirmandoCampanha.id_campanha}`, autorizacao());
+      setConfirmandoCampanha(null);
+      atualizado('Campanha excluída com sucesso.');
+    } catch (falha) {
+      setErroExclusaoCampanha(falha.response?.status === 409
+        ? 'A campanha possui grupos ou participações vinculados e não pode ser excluída. Desfaça os vínculos antes.'
+        : falha.response?.data?.erro || 'Não foi possível excluir a campanha.');
+    } finally {
+      setExcluindoCampanha(false);
+    }
   }
 
   function fecharCriacao() {
@@ -209,6 +229,7 @@ export default function PainelInstitucional() {
   function atualizado(texto) {
     setMensagem(texto);
     setEditandoFoto(null);
+    setEditandoCampanha(null);
     fecharCriacao();
     setMostrarCampanhas(true);
     setVersao(valor => valor + 1);
@@ -263,9 +284,23 @@ export default function PainelInstitucional() {
               <h3>{campanha.nome_campanha}</h3><p>{campanha.descricao}</p>
               <p>{String(campanha.data_inicio).slice(0, 10).split('-').reverse().join('/')} a {String(campanha.data_fim).slice(0, 10).split('-').reverse().join('/')}</p>
               <p>{campanha.horario_inicio || 'Início não informado'} — {campanha.horario_fim || 'Término não informado'}</p>
-              {editandoFoto === campanha.id_campanha
-                ? <EditarFotoCampanha campanha={campanha} aoSalvar={atualizado} aoCancelar={() => setEditandoFoto(null)} />
-                : <button type="button" onClick={() => setEditandoFoto(campanha.id_campanha)}>Alterar foto</button>}
+              {editandoCampanha === campanha.id_campanha
+                ? <FormularioCampanha key={campanha.id_campanha} instituicao={dados.instituicao}
+                    campanha={campanha} aoCancelar={() => setEditandoCampanha(null)}
+                    aoSalvar={() => atualizado('Campanha atualizada com sucesso.')} />
+                : editandoFoto === campanha.id_campanha
+                  ? <EditarFotoCampanha campanha={campanha} aoSalvar={atualizado} aoCancelar={() => setEditandoFoto(null)} />
+                  : <div className="acoes acoes-gerenciar-campanha">
+                      <button type="button" onClick={() => { setEditandoFoto(null); setEditandoCampanha(campanha.id_campanha); }}>
+                        Editar campanha
+                      </button>
+                      <button type="button" onClick={() => { setEditandoCampanha(null); setEditandoFoto(campanha.id_campanha); }}>
+                        Alterar foto
+                      </button>
+                      <button type="button" className="botao-perigo" onClick={() => {
+                        setErroExclusaoCampanha(''); setConfirmandoCampanha(campanha);
+                      }}>Excluir campanha</button>
+                    </div>}
               <p>Status: {campanha.status_campanha === 'ativa' ? 'Ativa' : 'Encerrada'}</p>
               {adesaoPorCampanha[campanha.id_campanha] && <div className="adesao-campanha">
                 <span><strong>{adesaoPorCampanha[campanha.id_campanha].interessados}</strong> Interessados</span>
@@ -300,6 +335,27 @@ export default function PainelInstitucional() {
         </section>
       )}
     </section>
+    {confirmandoCampanha && <div className="confirmacao-fundo" role="presentation"
+      onMouseDown={evento => {
+        if (evento.target === evento.currentTarget && !excluindoCampanha) setConfirmandoCampanha(null);
+      }}>
+      <div className="confirmacao-caixa" role="dialog" aria-modal="true"
+        aria-labelledby="titulo-exclusao-campanha">
+        <h2 id="titulo-exclusao-campanha">Excluir campanha?</h2>
+        <p>Tem certeza de que deseja excluir <strong>{confirmandoCampanha.nome_campanha}</strong>?
+          Esta ação é irreversível. Se houver grupos ou participações vinculados,
+          a exclusão será bloqueada para proteger esses registros.</p>
+        {erroExclusaoCampanha && <p role="alert">{erroExclusaoCampanha}</p>}
+        <div className="acoes">
+          <button type="button" className="botao-secundario" disabled={excluindoCampanha}
+            onClick={() => setConfirmandoCampanha(null)}>Cancelar</button>
+          <button type="button" className="botao-perigo" disabled={excluindoCampanha}
+            onClick={excluirCampanha}>
+            {excluindoCampanha ? 'Excluindo...' : 'Sim, excluir campanha'}
+          </button>
+        </div>
+      </div>
+    </div>}
     {confirmandoExclusao && <div className="confirmacao-fundo" role="presentation"
       onMouseDown={evento => { if (evento.target === evento.currentTarget && !excluindo) setConfirmandoExclusao(false); }}>
       <div className="confirmacao-caixa" role="dialog" aria-modal="true"
@@ -307,11 +363,11 @@ export default function PainelInstitucional() {
         aria-describedby="aviso-excluir-conta-institucional">
         <h2 id="titulo-excluir-conta-institucional">Excluir toda a conta institucional?</h2>
         <p id="aviso-excluir-conta-institucional">
-          Essa ação é permanente e irreversível. Seu acesso ao ConSangue, os dados
-          da instituição, suas campanhas, os grupos que sua conta criou e as
-          participações vinculadas a essas campanhas serão apagados. As contas
-          de outros usuários não serão excluídas, mas seus registros de
-          participação nessas campanhas deixarão de existir.
+          Esta ação é permanente e irreversível. A conta institucional,
+          os dados da instituição, suas campanhas e seus grupos serão removidos
+          apenas se não houver participações, membros ou vínculos pertencentes
+          a outras pessoas. Se existirem, o sistema bloqueará a exclusão
+          e nenhum dado será apagado. A conta de outros usuários nunca será excluída.
         </p>
         <p>Para confirmar, digite <strong>EXCLUIR</strong> e informe sua senha atual.</p>
         <label>Confirmação

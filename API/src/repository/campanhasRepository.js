@@ -1,28 +1,15 @@
 import { con } from './connection.js';
 
-let preparacaoFoto;
-
+// Nenhuma alteração de tabela durante requisições: aplicar a migração SQL com backup.
 async function garantirFotoCampanha() {
-    if (!preparacaoFoto) {
-        preparacaoFoto = (async () => {
-            const [colunas] = await con.execute(
-                "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'campanhas' AND COLUMN_NAME = 'foto_campanha'"
-            );
-            if (!colunas.length) {
-                try {
-                    await con.query('ALTER TABLE campanhas ADD COLUMN foto_campanha MEDIUMTEXT NULL, ALGORITHM=INSTANT');
-                } catch (erro) {
-                    if (erro.code !== 'ER_DUP_FIELDNAME') throw erro;
-                }
-            }
-        })().catch(() => {
-            preparacaoFoto = null;
-            const erro = new Error('Não foi possível preparar o armazenamento da foto. Tente novamente ou contate o suporte.');
-            erro.status = 503;
-            throw erro;
-        });
+    const [colunas] = await con.execute(
+        "SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'campanhas' AND COLUMN_NAME = 'foto_campanha' LIMIT 1"
+    );
+    if (!colunas.length) {
+        const erro = new Error('O banco ainda precisa da migração da coluna de foto da campanha.');
+        erro.status = 503;
+        throw erro;
     }
-    return preparacaoFoto;
 }
 
 export async function atualizarFotoCampanha(id, foto) {

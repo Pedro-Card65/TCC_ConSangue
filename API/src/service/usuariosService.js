@@ -1,6 +1,7 @@
 import * as repository from '../repository/usuariosRepository.js';
 import bcrypt from 'bcrypt';
 import { validarLocalizacao } from './localidadesService.js';
+import { exigirConviteInstitucional } from '../utils/cadastroInstitucional.js';
 
 
 function criarErro(mensagem, status = 400) {
@@ -43,7 +44,7 @@ function validarCPF(cpf) {
 
 export async function fazerCadastro(
     usuario, nascimento, cpf, telefone,
-    email, senha, cidade, tipo_sangue, tipo_usuario, estado
+    email, senha, cidade, tipo_sangue, tipo_usuario, estado, codigo_instituicao
 ) {
 
     // Verifica campos obrigatórios
@@ -154,6 +155,9 @@ export async function fazerCadastro(
     if (tipo_usuario !== 'candidato' &&
         tipo_usuario !== 'instituicao') {
         throw criarErro('Tipo de usuário inválido.');
+    }
+    if (tipo_usuario === 'instituicao') {
+        exigirConviteInstitucional(codigo_instituicao);
     }
    
     // Envia para o Repository

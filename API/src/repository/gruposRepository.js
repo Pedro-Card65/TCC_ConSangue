@@ -34,42 +34,15 @@ async function colunaVisibilidadeDisponivel() {
     return colunas.length > 0;
 }
 
-let preparacaoVisibilidade = null;
-
-// Atualiza apenas a coluna ausente, sem recriar ou apagar grupos existentes.
-// Uma Promise compartilhada impede duas alterações simultâneas nesta instância da API.
+// Esquema alterado apenas por migrações controladas, nunca em requisições.
 export async function garantirVisibilidadeGrupos() {
-    if (!preparacaoVisibilidade) {
-        preparacaoVisibilidade = (async () => {
-            if (await colunaVisibilidadeDisponivel()) return;
-
-            try {
-                await con.query(
-                    "ALTER TABLE grupos ADD COLUMN visibilidade ENUM('publico', 'privado') NOT NULL DEFAULT 'privado'"
-                );
-            } catch (erro) {
-                // Outra instância pode ter adicionado a coluna enquanto esta verificava.
-                if (erro.code !== 'ER_DUP_FIELDNAME') {
-                    console.error('Erro ao preparar visibilidade dos grupos:', erro.code || 'desconhecido');
-                    const falha = new Error(
-                        'O banco não permitiu configurar a visibilidade dos grupos. Verifique a permissão ALTER.'
-                    );
-                    falha.status = 503;
-                    throw falha;
-                }
-            }
-
-            if (!(await colunaVisibilidadeDisponivel())) {
-                const falha = new Error('Não foi possível confirmar a visibilidade dos grupos no banco.');
-                falha.status = 503;
-                throw falha;
-            }
-        })().catch(erro => {
-            preparacaoVisibilidade = null;
-            throw erro;
-        });
+    if (!(await colunaVisibilidadeDisponivel())) {
+        const erro = new Error(
+            'A estrutura de grupos precisa ser atualizada pelo administrador antes desta operação.'
+        );
+        erro.status = 503;
+        throw erro;
     }
-    return preparacaoVisibilidade;
 }
 
 //Finalizado
@@ -119,23 +92,21 @@ export async function criarGrupo(grupo) {
 }
 
 export async function listarGrupos() {
-    const visibilidade = await colunaVisibilidadeDisponivel()
-        ? 'visibilidade'
-        : "'privado' AS visibilidade";
+    // Bancos sem migração não podem revelar metadados de grupos privados.
+    if (!(await colunaVisibilidadeDisponivel())) return [];
     const [linhas] = await con.query(
-        `SELECT id_grupo, nome_grupo, descricao, data_criacao, ${visibilidade}
-         FROM grupos`
+        `SELECT id_grupo, nome_grupo, descricao, data_criacao, visibilidade
+         FROM grupos WHERE visibilidade = 'publico'`
     );
     return linhas;
 }
 
 export async function listarGruposPorNome(nome) {
-    const visibilidade = await colunaVisibilidadeDisponivel()
-        ? 'visibilidade'
-        : "'privado' AS visibilidade";
+    // Bancos sem migração não podem revelar metadados de grupos privados.
+    if (!(await colunaVisibilidadeDisponivel())) return [];
     const [linhas] = await con.query(
-        `SELECT id_grupo, nome_grupo, descricao, data_criacao, ${visibilidade}
-         FROM grupos WHERE nome_grupo LIKE ?`,
+        `SELECT id_grupo, nome_grupo, descricao, data_criacao, visibilidade
+         FROM grupos WHERE visibilidade = 'publico' AND nome_grupo LIKE ?`,
         [`%${nome}%`]
     );
     return linhas;

@@ -91,6 +91,7 @@ const [cadastro, setCadastro] = useState({
     estado: '',
     tipo_sangue: '',
     tipo_usuario: 'candidato',
+    codigo_instituicao: '',
     senha: ''
 });
 
@@ -185,6 +186,7 @@ async function fazerCadastro(e) {
             estado: '',
             tipo_sangue: '',
             tipo_usuario: 'candidato',
+            codigo_instituicao: '',
             senha: ''
         });
 
@@ -314,9 +316,17 @@ async function fazerCadastro(e) {
             required
         >
             <option value="candidato">Candidato</option>
-            <option value="instituicao">Instituição</option>
+            <option value="instituicao">Instituição (com convite)</option>
         </select>
     </div>
+    {cadastro.tipo_usuario === 'instituicao' && <div className="box">
+        <p>Código de convite institucional *</p>
+        <input type="password" name="codigo_instituicao"
+            aria-label="Código institucional" autoComplete="off"
+            value={cadastro.codigo_instituicao}
+            onChange={alterarCadastro} required />
+        <small>Somente instituições convidadas. O código não comprova credenciamento oficial.</small>
+    </div>}
 
     <div className="box">
         <p>Senha *</p>

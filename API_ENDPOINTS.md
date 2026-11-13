@@ -38,13 +38,15 @@ Arquivos: `API/src/controller/authController.js` e `API/src/controller/usuariosC
 | Método | Caminho | Auth | Perfil / permissão | Corpo | Resposta | Códigos |
 |---|---|---|---|---|---|---|
 | POST | `/api/usuarios/login` | Pública | — | `{ cpf, senha }` | `200 { token, usuario: { id_usuario, nome, tipo_usuario } }` | 200; 401 `"CPF ou senha incorretos."`; 400 para CPF inválido (verificar no código: `authService.js:6-13`); 500 |
-| GET | `/api/usuarios/me` | JWT | Qualquer perfil (dados do próprio token) | — | `200 { id_usuario, nome, email, cidade, tipo_sanguineo, tipo_usuario, foto_perfil }` | 200; 401; 404 `"Usuário não encontrado."` (`usuariosService.js:173-176`); 500 |
-| POST | `/api/usuarios/cadastro` | Pública | — | `{ usuario, nascimento, cpf, telefone, email, senha, cidade, tipo_sangue, tipo_usuario }` | `201 { mensagem, id_usuario }` | 201; 400 (campos obrigatórios, CPF, telefone, e-mail, senha 8–255, tipo sanguíneo, tipo de usuário; `usuariosService.js:57-142`); 409 `"CPF ou email já cadastrado."` (`usuariosService.js:156`); 500 |
+| GET | `/api/usuarios/me` | JWT | Qualquer perfil (dados do próprio token) | — | `200 { id_usuario, nome, email, telefone, cidade, tipo_sanguineo, tipo_usuario, foto_perfil }` | 200; 401; 404 `"Usuário não encontrado."` (`usuariosService.js:173-176`); 500 |
+| POST | `/api/usuarios/cadastro` | Pública | — | `{ usuario, nascimento, cpf, telefone, email, senha, cidade, estado, tipo_sangue, tipo_usuario, codigo_instituicao? }` | `201 { mensagem, id_usuario }` | 201; 400 (campos obrigatórios, CPF, telefone, e-mail, senha 8–255, tipo sanguíneo, tipo de usuário; `usuariosService.js:57-142`); 409 `"CPF ou email já cadastrado."` (`usuariosService.js:156`); 500 |
 | GET | `/api/usuarios/busca/:id` | JWT + dono (`somenteMeuId`) | Só o próprio usuário | — | `200` com a linha do usuário: `id_usuario, nome, email, data_nascimento, cidade, tipo_sanguineo, tipo_usuario, telefone, foto_perfil, data_cadastro`. Sem `senha_hash`. A resposta não traz `cpf` a partir da PR #6; antes dela, traz. | 200; 400 `"ID inválido."`; 403 para outro ID (`permissoes.js:32-41`); 404; 500 |
 | GET | `/api/usuarios/busca/nome/:nome` | JWT | Qualquer perfil | — `200` **array direto** (sem envelope) com `id_usuario, nome, cidade, tipo_usuario, data_cadastro` (`usuariosRepository.js:51-61`; controller `usuariosController.js:60-75`) | 200; 400 `"Nome obrigatório"` ou `"Digite pelo menos 2 caracteres"` (`usuariosService.js:227-245`); 401; 500 |
 | DELETE | `/api/usuarios/deletar/certeza/:id` | JWT + dono (`somenteMeuId`) | Só a própria conta | — | `200 { del }` (número de linhas afetadas; verificar no código: `usuariosController.js:79-106`) | 200; 400; 403; 409 `"Não é possível excluir a conta enquanto existirem registros vinculados."`; 500 |
 | PUT | `/api/usuarios/modificar/telefone/:id` | JWT + dono (`somenteMeuId`) | Só a própria conta | `{ novotel, senha }` | `200 { trocarTelefone }` (verificar no código: `usuariosController.js:110-128`, `usuariosService.js`) | 200; 400; 403; 500 |
 | PUT | `/api/usuarios/modificar/email/:id` | JWT + dono (`somenteMeuId`) | Só a própria conta | `{ novoemail, senha }` | `200 { trocaremail }` (verificar no código: `usuariosController.js:132-151`, `usuariosService.js`) | 200; 400; 403; 500 |
+| PUT | `/api/usuarios/me` | JWT | Próprio usuário | `{ nome, email, telefone, cidade?, estado?, tipo_sanguineo, senhaAtual }` (se alterar cidade, informar também UF) | `200 { mensagem, usuario }` | 200; 400; 401; 409 e 500 |
+| DELETE | `/api/usuarios/me/conta-institucional` | JWT + instituição | Somente o titular; impede exclusão de dados de terceiros | `{ senhaAtual, confirmacao: "EXCLUIR" }` | `204` sem corpo | 204; 400; 401; 403; 404; 409 por vínculos de terceiros; 500 |
 | PUT | `/api/usuarios/foto` | JWT | Qualquer perfil. O `id` vem do token, nunca do corpo ou da URL (`usuariosController.js:157-158`) | `{ foto }`: string base64 com prefixo `data:image/jpeg;base64,`, `data:image/png;base64,` ou `data:image/webp;base64,`; ou `null` para remover | `200 { mensagem: "Foto de perfil atualizada com sucesso!" }` ou `"Foto de perfil removida com sucesso!"` quando `foto` é `null` | 200; 400 para formato inválido, base64 inválido ou string de foto com mais de 300 KB de caracteres (`usuariosService.js:189`, `205`, `191-213`); 401; 500 `"Erro interno ao atualizar foto de perfil."` |
 
 ---
@@ -55,7 +57,7 @@ Arquivo: `API/src/controller/instituicoesController.js`. Validações em `API/sr
 
 | Método | Caminho | Auth | Perfil / permissão | Corpo | Resposta | Códigos |
 |---|---|---|---|---|---|---|
-| GET | `/api/instituicoes` | Pública | — | Query opcional `cidade` (filtro parcial) | `200` array de hemocentros (`SELECT *`, ordenado por `nome_hemo`) | 200; 400 `"Filtro cidade inválido"`; 500 |
+| GET | `/api/instituicoes` | Pública | — | Query opcional `cidade` (filtro parcial) | `200` array de hemocentros (ordenado por `nome_hemo`, sem `id_usuario`) | 200; 400 `"Filtro cidade inválido"`; 500 |
 | GET | `/api/instituicoes/me` | JWT + instituição | Só instituição. Usa o `id_usuario` do token | — | `200 { instituicao, estatisticas: { campanhas, grupos, agendamentos } }`. Sem hemocentro cadastrado: `200 { instituicao: null }` | 200; 401; 403 `"Você não possui permissão."`; 500 |
 | GET | `/api/instituicoes/me/adesao` | JWT + instituição | Só instituição. Usa o `id_usuario` do token | — | `200 { campanhas: [ { id_campanha, interessados, pretendem_ir, comparecimentos_informados, grupos_vinculados } ] }`, um item por campanha do hemocentro do usuário, com contagens agregadas (usuários distintos por status; grupos distintos vinculados). Sem dados pessoais. Sem campanhas ou sem hemocentro: `campanhas` vazio (`instituicoesController.js:58-64`, `instituicoesService.js:3-12`, `instituicoesRepository.js:122-137`) | 200; 401 `"Token ausente, inválido ou expirado."`; 403 `"Você não possui permissão."`; 500 |
 | GET | `/api/instituicoes/:id` | Pública | — | — | `200` hemocentro (linha completa, incluindo `id_usuario`) | 200; 400 ID inválido; 404 `"Instituição não encontrada"`; 500 |
@@ -81,15 +83,15 @@ Arquivo: `API/src/controller/campanhasController.js`. Montado com prefixo `/api`
 
 ## Grupos
 
-**Visibilidade:** grupos antigos permanecem `privado`. O esquema de bancos novos está consolidado em `Database/ConSangue.sql`, que já contém a coluna `visibilidade`. Em bancos MySQL existentes, a API verifica e cria automaticamente a coluna `visibilidade` na primeira criação/edição de grupo ou entrada em grupo público, sem executar o script completo de criação. A conta MySQL precisa de permissão `ALTER`; caso contrário, a operação pode retornar 503. A lista pública mostra a visibilidade, mas não código de convite nem foto privada. O comportamento automático no Railway ainda precisa ser validado em teste real. Administradores podem vincular grupos a campanhas sem criar participação individual; somente o membro que clicar em Interesse/Pretendo ir terá registro em `participacoes`.
+**Visibilidade:** grupos antigos permanecem `privado`. O esquema de bancos novos está consolidado em `Database/ConSangue.sql`, que já contém a coluna `visibilidade`. Em bancos existentes, o administrador deve executar `Database/migracao_controlada.sql` após backup, se faltar alguma coluna. A API não executa DDL durante requisições e poderá responder 503 caso a migração seja necessária. A lista pública só retorna grupos `publico`, sem código de convite ou fotos. Grupos privados só são vistos por seus membros autenticados. O comportamento automático no Railway ainda precisa ser validado em teste real. Administradores podem vincular grupos a campanhas sem criar participação individual; somente o membro que clicar em Interesse/Pretendo ir terá registro em `participacoes`.
 
 Arquivo: `API/src/controller/gruposController.js`. Montado com prefixo `/api`. Validações em `API/src/service/gruposService.js`.
 
 | Método | Caminho | Auth | Perfil / permissão | Corpo | Resposta | Códigos |
 |---|---|---|---|---|---|---|
 | POST | `/api/grupo` | JWT | Qualquer perfil. `id_criador` é injetado pelo servidor (`inserirMeuId`) | `{ nome_grupo (até 100), descricao (até 255), visibilidade?: 'privado' | 'publico' } (padrão: privado)` | `200 { id }` (observação: 200, não 201) | 200; 400 (`gruposService.js:15-38`); 401; 404 "Usuário ou grupo relacionado não encontrado."; 500 |
-| GET | `/api/grupos` | Pública | — | — | `200 { grupos }` com informações públicas e `visibilidade`; **sem** `codigo_convite` e `foto_grupo` | 200; 500 |
-| GET | `/api/grupos/:nome` | Pública | — | — | `200 { grupos }` filtrados por nome; **sem** `codigo_convite` e `foto_grupo` | 200; 500 |
+| GET | `/api/grupos` | Pública | — | — | `200 { grupos }` apenas de grupos públicos, com `visibilidade`; **sem** `codigo_convite` e `foto_grupo` | 200; 500 |
+| GET | `/api/grupos/:nome` | Pública | — | — | `200 { grupos }` apenas de grupos públicos filtrados por nome; **sem** `codigo_convite` e `foto_grupo` | 200; 500 |
 | PUT | `/api/grupo/:id` | JWT + criador (`somenteCriadorGrupo`) | Só o criador do grupo | `{ nome_grupo, descricao, foto_grupo?, visibilidade? }`. `foto_grupo` opcional: JPEG base64 validado ou `null` para remover. `id_criador` vem do JWT. | `200 { linhasAfetadas }` | 200; 400; 403; 404; 500 |
 | DELETE | `/api/grupo/:id` | JWT + criador | Só o criador do grupo | — | `200 { linhasAfetadas }` | 200; 403; 409 `"Desvincule as campanhas antes de excluir o grupo."` (verificar no código: `gruposRepository.js:106-114`); 500 |
 
@@ -150,3 +152,11 @@ Arquivo: `API/src/controller/participacoesController.js`. Os endpoints são do c
 - **`GET /api/instituicoes/me`:** a rota já existe na master (`API/src/controller/instituicoesController.js:49`) e faz parte do contrato. O painel institucional do React depende dela.
 - **Códigos de criação:** `POST /api/campanhas` e `POST /api/grupo` respondem 200, e os demais POSTs de criação respondem 201. Decidir se padroniza para 201 ou se mantém e documenta.
 - **`cpf` na busca por ID:** `GET /api/usuarios/busca/:id` não traz `cpf` a partir da PR #6. Antes dela, traz.
+
+### Atualizações de segurança e processos
+
+- **Cadastro institucional:** conta institucional exige `codigo_instituicao` correspondente à variável secreta `CODIGO_CADASTRO_INSTITUICAO` do servidor. Sem configuração o cadastro institucional retorna 503; código inválido retorna 403. O código não equivale a verificação oficial da instituição.
+- **Edição e exclusão de campanha:** a página institucional oferece essas ações; exclusão com participações ou grupos associados retorna 409 sem apagar a campanha.
+- **Exclusão de conta institucional:** o rollback protege contra exclusões parciais; vínculos de outras pessoas impedem a exclusão, que deverá ser tratada com suporte antes de prosseguir.
+- **Esquema:** use `Database/migracao_controlada.sql` com backup para bancos antigos; não executar ALTER dentro dos endpoints.
+- **Testes:** o GitHub Actions testa API (mocks e MySQL isolado descartável, com vínculos e rollback) e frontend antes do build. Não usa o banco de produção.

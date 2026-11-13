@@ -1,15 +1,19 @@
-name: React — build
+name: ConSangue — testes e build
 
 on:
   push:
     branches: [master]
     paths:
+      - 'API/**'
       - 'React/**'
+      - 'Database/**'
       - '.github/workflows/react-ci.yml'
   pull_request:
     branches: [master]
     paths:
+      - 'API/**'
       - 'React/**'
+      - 'Database/**'
       - '.github/workflows/react-ci.yml'
   workflow_dispatch:
 
@@ -17,10 +21,51 @@ permissions:
   contents: read
 
 jobs:
-  react-build:
-    name: Compilação do React
+  api-tests:
+    name: Validações e testes da API
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      TEST_DB_HOST: 127.0.0.1
+      TEST_DB_PORT: '3306'
+      TEST_DB_USER: root
+      TEST_DB_PASSWORD: ci_mysql_descartavel
+      DB_HOST: 127.0.0.1
+      DB_PORT: '3306'
+      DB_USER: root
+      DB_PASSWORD: ci_mysql_descartavel
+      DB_NAME: ConSangue
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ci_mysql_descartavel
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -pci_mysql_descartavel"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+    defaults:
+      run:
+        working-directory: API
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+      - name: Instalar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Instalar dependências
+        run: npm install --no-audit --no-fund
+      - name: Testar validações e exclusão
+        run: npm test
+
+  react-build:
+    name: Testes e compilação do React
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: React
@@ -33,6 +78,10 @@ jobs:
           node-version: '22'
       - name: Instalar dependências
         run: npm install --no-audit --no-fund
+      - name: Testes do frontend
+        env:
+          CI: 'true'
+        run: npm test
       - name: Gerar build de produção
         env:
           CI: 'true'

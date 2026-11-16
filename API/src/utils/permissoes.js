@@ -1,4 +1,5 @@
 import { con } from '../repository/connection.js';
+import { possuiAdministracao } from './adminProjeto.js';
 
 function idValido(valor) {
     const numero = Number(valor);
@@ -82,38 +83,55 @@ export function somenteMinhaInstituicaoNoBody(req, resp, next) {
         [id, req.user.id_usuario]);
 }
 
-export function somenteDonoCampanha(req, resp, next) {
+export async function somenteDonoCampanha(req, resp, next) {
     const id = idValido(req.params.id);
-    verificarPermissao(req, resp, next,
-        `SELECT c.id_hemocentro FROM campanhas c
-         JOIN hemocentros h ON h.id_hemocentro = c.id_hemocentro
-         WHERE c.id_campanha = ? AND h.id_usuario = ? LIMIT 1`,
-        [id, req.user.id_usuario], (campanha) => {
-            if (req.method === 'PUT') {
+    if (!id) return negar(resp, 400, 'ID inválido.');
+    try {
+        const administrativo = await possuiAdministracao(req.user);
+        const sql = administrativo
+            ? 'SELECT id_hemocentro FROM campanhas WHERE id_campanha = ? LIMIT 1'
+            : `SELECT c.id_hemocentro FROM campanhas c
+               JOIN hemocentros h ON h.id_hemocentro = c.id_hemocentro
+               WHERE c.id_campanha = ? AND h.id_usuario = ? LIMIT 1`;
+        return verificarPermissao(req, resp, next, sql,
+            administrativo ? [id] : [id, req.user.id_usuario], campanha => {
+                if (req.method !== 'PUT') return;
                 if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
                     return 'Informe os dados da campanha.';
                 }
-                if (req.body?.id_hemocentro !== undefined &&
+                if (req.body.id_hemocentro !== undefined &&
                     idValido(req.body.id_hemocentro) !== campanha.id_hemocentro) {
-                    return 'Não é permitido alterar o hemocentro da campanha.';
+                    return 'Não é permitido trocar o hemocentro de uma campanha.';
                 }
                 req.body.id_hemocentro = campanha.id_hemocentro;
-            }
-        });
+            });
+    } catch (erro) {
+        console.error('Erro na autorização de campanha:', erro);
+        return negar(resp, 500, 'Erro ao verificar autorização.');
+    }
 }
 
-export function somenteCriadorGrupo(req, resp, next) {
+export async function somenteCriadorGrupo(req, resp, next) {
     const id = idValido(req.params.id);
-    verificarPermissao(req, resp, next,
-        'SELECT id_grupo FROM grupos WHERE id_grupo = ? AND id_criador = ? LIMIT 1',
-        [id, req.user.id_usuario], () => {
-            if (req.method === 'PUT') {
+    if (!id) return negar(resp, 400, 'ID inválido.');
+    try {
+        const administrativo = await possuiAdministracao(req.user);
+        return verificarPermissao(req, resp, next,
+            administrativo
+                ? 'SELECT id_grupo, id_criador FROM grupos WHERE id_grupo = ? LIMIT 1'
+                : 'SELECT id_grupo, id_criador FROM grupos WHERE id_grupo = ? AND id_criador = ? LIMIT 1',
+            administrativo ? [id] : [id, req.user.id_usuario], grupo => {
+                if (req.method !== 'PUT') return;
                 if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
                     return 'Informe os dados do grupo.';
                 }
-                req.body.id_criador = req.user.id_usuario;
-            }
-        });
+                // A edição administrativa mantém o criador original.
+                req.body.id_criador = grupo.id_criador;
+            });
+    } catch (erro) {
+        console.error('Erro na autorização de grupo:', erro);
+        return negar(resp, 500, 'Erro ao verificar autorização.');
+    }
 }
 
 export function somenteDonoParticipacao(req, resp, next) {

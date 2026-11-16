@@ -160,3 +160,16 @@ Arquivo: `API/src/controller/participacoesController.js`. Os endpoints são do c
 - **Exclusão de conta institucional:** o rollback protege contra exclusões parciais; vínculos de outras pessoas impedem a exclusão, que deverá ser tratada com suporte antes de prosseguir.
 - **Esquema:** use `Database/migracao_controlada.sql` com backup para bancos antigos; não executar ALTER dentro dos endpoints.
 - **Testes:** o GitHub Actions testa API (mocks e MySQL isolado descartável, com vínculos e rollback) e frontend antes do build. Não usa o banco de produção.
+
+
+## Administração de demonstração (conta Candidato)
+
+A conta com **nome exatamente `Administrador`**, **CPF permitido na variável de ambiente** e tipo **`candidato`** pode ativar temporariamente o modo administrativo usando um **código adicional privado**. Nome e CPF sozinhos nunca concedem essa permissão. O sistema valida a identidade atual no banco e utiliza token JWT assinado com validade de 2 horas.
+
+- Configurar exclusivamente na API (Railway): `ADMINISTRADOR_CPF` (11 dígitos) e `ADMINISTRADOR_CODIGO_ACESSO` (código forte com pelo menos 20 caracteres); jamais usar `REACT_APP_*` para o código.
+- `GET /api/admin/situacao` — JWT normal; retorna `{ pode_ativar, administrador }`, sem dados pessoais ou segredos.
+- `POST /api/admin/ativar` — JWT normal, corpo `{ codigo }`; valida conta e código; retorna novo `{ token, administrador: true }`. Substituir o token da sessão; sair/expirar exige nova ativação.
+- `GET /api/admin/grupos` — somente JWT com administração ativa e conta validada no banco; lista grupos públicos/privados sem códigos de convite.
+- `PUT /api/grupo/:id`, `DELETE /api/grupo/:id` — criador **ou administrador de demonstração com modo ativo**, preservando criador original no caso de edição.
+- `PUT /api/campanhas/:id`, `PUT /api/campanhas/:id/foto`, `DELETE /api/campanhas/:id` — instituição titular **ou administrador de demonstração com modo ativo**, preservando o hemocentro original.
+- O perfil continua do tipo candidato e **não recebe acesso a excluir contas de outras pessoas**. Exclusões de grupos/campanhas continuam sujeitas a bloqueios de vínculos e participações, mesmo para o administrador. Use somente com dados fictícios para demonstração.

@@ -1,0 +1,26 @@
+.consangue-acesso-admin {
+  margin: 0 0 1.2rem;
+  padding: 1rem 1.25rem;
+  background: #fff;
+  border: 1px solid #e5bdc2;
+  border-left: 4px solid #ad2626;
+  border-radius: 8px;
+  color: #3b2529;
+
+  label { display: block; font-weight: 600; margin-bottom: .6rem; }
+  p { margin: 0; }
+  small { display: block; margin-top: .5rem; }
+  p[role="alert"] { margin-top: .5rem; color: #9d1f27; }
+  .consangue-acesso-admin-campos {
+    display: flex; flex-wrap: wrap; gap: .6rem;
+    input {
+      flex: 1 1 230px; min-width: 0; padding: .7rem;
+      border: 1px solid #b6a4a6; border-radius: 6px;
+    }
+    button {
+      border: 0; border-radius: 6px; padding: .7rem 1rem;
+      background: #a3262f; color: #fff; cursor: pointer;
+    }
+    button:disabled { opacity: .6; cursor: not-allowed; }
+  }
+}

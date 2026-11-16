@@ -101,6 +101,15 @@ export async function listarGrupos() {
     return linhas;
 }
 
+export async function listarTodosGruposAdmin() {
+    await garantirVisibilidadeGrupos();
+    const [linhas] = await con.execute(
+        `SELECT id_grupo, nome_grupo, descricao, data_criacao, id_criador, visibilidade
+         FROM grupos ORDER BY data_criacao DESC, id_grupo DESC`
+    );
+    return linhas;
+}
+
 export async function listarGruposPorNome(nome) {
     // Bancos sem migração não podem revelar metadados de grupos privados.
     if (!(await colunaVisibilidadeDisponivel())) return [];

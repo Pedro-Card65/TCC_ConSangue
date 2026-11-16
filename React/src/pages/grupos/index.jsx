@@ -550,7 +550,7 @@ export default function Grupos() {
           {modal === 'confirmar-apagar' && grupoSelecionado && <>
             <h2 id="titulo-modal-grupos">Apagar grupo?</h2>
             <p>Tem certeza de que deseja apagar <strong>{grupoSelecionado.nome_grupo}</strong>? Esta ação não pode ser desfeita.</p>
-            <p className="aviso-exclusao">Grupos com campanhas vinculadas não podem ser apagados.</p>
+            <p className="aviso-exclusao">A exclusão remove os vínculos de membros deste grupo. Grupos com campanhas vinculadas não podem ser apagados.</p>
             {erro && <p className="erro-modal" role="alert">{erro}</p>}
             <div className="acoes-confirmacao">
               <button className="botao-secundario" type="button" disabled={salvando} onClick={() => { setErro(''); setModal('detalhes'); }}>Cancelar</button>

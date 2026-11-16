@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { api } from '../../services/api.js';
 import ModalCampanha from '../../componentes/modal-campanha/modal-campanha.jsx';
+import FormularioCampanha from '../../componentes/painel-institucional/formulario-campanha.jsx';
+import AcessoAdministrativo from '../../componentes/acesso-administrativo';
 
 const filtrosIniciais = {
   nome: '',
@@ -29,6 +31,11 @@ function dataFormatada(data) {
 
 export default function Campanhas() {
   const [instituicao, setInstituicao] = useState(false);
+  const [administrador, setAdministrador] = useState(false);
+  const [editandoCampanha, setEditandoCampanha] = useState(null);
+  const [confirmandoExclusao, setConfirmandoExclusao] = useState(null);
+  const [excluindoCampanha, setExcluindoCampanha] = useState(false);
+  const [erroExclusao, setErroExclusao] = useState('');
   const [campanhas, setCampanhas] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
@@ -76,12 +83,18 @@ export default function Campanhas() {
   }, [tentativa]);
 
   useEffect(() => {
+    const token = sessionStorage.getItem('token');
+    if (!token) return undefined;
     const controle = new AbortController();
-    api.get('/api/usuarios/me', {
-      headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` },
-      signal: controle.signal
-    }).then(resposta => {
-      if (!controle.signal.aborted) setInstituicao((resposta.data.usuario ?? resposta.data).tipo_usuario === 'instituicao');
+    const config = { headers: { Authorization: 'Bearer ' + token }, signal: controle.signal };
+    Promise.all([
+      api.get('/api/usuarios/me', config),
+      api.get('/api/admin/situacao', config).catch(() => ({ data: { administrador: false } }))
+    ]).then(([usuario, permissao]) => {
+      if (!controle.signal.aborted) {
+        setInstituicao((usuario.data.usuario ?? usuario.data).tipo_usuario === 'instituicao');
+        setAdministrador(Boolean(permissao.data?.administrador));
+      }
     }).catch(() => {});
     return () => controle.abort();
   }, []);
@@ -113,6 +126,29 @@ export default function Campanhas() {
     setCampanhaAberta(null);
   }
 
+  async function excluirCampanha() {
+    if (!confirmandoExclusao || excluindoCampanha) return;
+    setExcluindoCampanha(true);
+    setErroExclusao('');
+    try {
+      await api.delete('/api/campanhas/' + confirmandoExclusao.id_campanha, {
+        headers: { Authorization: 'Bearer ' + sessionStorage.getItem('token') }
+      });
+      setConfirmandoExclusao(null);
+      setTentativa(v => v + 1);
+    } catch (falha) {
+      setErroExclusao(falha.response?.data?.erro ||
+        'Não foi possível excluir. Verifique se há grupos ou participações vinculados.');
+    } finally {
+      setExcluindoCampanha(false);
+    }
+  }
+
+  function ativouAdministracao() {
+    setAdministrador(true);
+    setTentativa(v => v + 1);
+  }
+
   const cidades = [];
 
   for (const campanha of campanhas) {
@@ -139,6 +175,7 @@ export default function Campanhas() {
 
       <h1>CAMPANHAS</h1>
       {instituicao && <Link className="criar-campanha" to="/perfil?novaCampanha=1">Criar nova campanha</Link>}
+      <AcessoAdministrativo aoAtivar={ativouAdministracao} />
 
       <form className="pesquisa" onSubmit={pesquisar}>
 
@@ -251,12 +288,50 @@ export default function Campanhas() {
                 <button type="button" onClick={() => setCampanhaAberta(campanha)}>
                   Ver detalhes e participar
                 </button>
+                {administrador && <div className="acoes-admin-campanha">
+                  <button type="button" onClick={() => { setEditandoCampanha(campanha); setErroExclusao(''); }}>
+                    Editar campanha
+                  </button>
+                  <button type="button" className="botao-perigo" onClick={() => {
+                    setConfirmandoExclusao(campanha); setErroExclusao('');
+                  }}>Excluir campanha</button>
+                </div>}
+                {administrador && editandoCampanha?.id_campanha === campanha.id_campanha &&
+                  <div className="formulario-admin-campanha">
+                    <FormularioCampanha key={campanha.id_campanha}
+                      campanha={campanha}
+                      instituicao={{ id_hemocentro: campanha.id_hemocentro,
+                        nome_hemo: campanha.nome_hemo, endereco: campanha.endereco }}
+                      aoCancelar={() => setEditandoCampanha(null)}
+                      aoSalvar={() => { setEditandoCampanha(null); setTentativa(v => v + 1); }}
+                    />
+                  </div>}
               </article>
             ))}
           </>
         )}
 
       </section>
+
+      {confirmandoExclusao && administrador && (
+        <div className="fundo-confirmacao-admin-campanha" role="presentation">
+          <section role="dialog" aria-modal="true" aria-labelledby="titulo-confirmacao-admin-campanha"
+            className="caixa-confirmacao-admin-campanha">
+            <h2 id="titulo-confirmacao-admin-campanha">Excluir campanha?</h2>
+            <p>Deseja excluir permanentemente <strong>{confirmandoExclusao.nome_campanha}</strong>?
+              Campanhas com participações ou grupos vinculados não podem ser excluídas.</p>
+            {erroExclusao && <p role="alert">{erroExclusao}</p>}
+            <div className="acoes-admin-campanha">
+              <button type="button" disabled={excluindoCampanha}
+                onClick={() => setConfirmandoExclusao(null)}>Cancelar</button>
+              <button type="button" className="botao-perigo" disabled={excluindoCampanha}
+                onClick={excluirCampanha}>
+                {excluindoCampanha ? 'Excluindo...' : 'Confirmar exclusão'}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
 
       {campanhaAberta && (
         <ModalCampanha

@@ -118,6 +118,72 @@ test('MySQL isolado: preserva terceiros, bloqueia vínculos e só então permite
     await assert.rejects(
       () => excluirContaInstitucionalComPool(pool, titular), { status: 409 }
     );
+    // A permissão especial não é concedida apenas por nome ou CPF:
+    // exige token elevado e código de acesso configurado no servidor.
+    const operador = await cadastrar('Administrador', '98765432100', 'candidato');
+    process.env.ADMINISTRADOR_CPF = '98765432100';
+    process.env.ADMINISTRADOR_CODIGO_ACESSO = 'codigo-teste-ci-exclusivo-nao-utilizar-em-producao';
+    const { contaAdministradoraValida, codigoAdministrativoValido, possuiAdministracao } =
+      await import('../src/utils/adminProjeto.js');
+    const identidadeAdmin = { id_usuario: operador, tipo_usuario: 'candidato' };
+    assert.equal(await contaAdministradoraValida(identidadeAdmin), true);
+    assert.equal(await possuiAdministracao(identidadeAdmin), false,
+      'login comum não ativa o privilégio automaticamente');
+    assert.equal(await possuiAdministracao({ ...identidadeAdmin, administracao: true }), true);
+    assert.equal(await contaAdministradoraValida({ id_usuario: terceiro, tipo_usuario: 'candidato' }), false);
+    assert.equal(codigoAdministrativoValido('codigo-incorreto'), false);
+    assert.equal(codigoAdministrativoValido(process.env.ADMINISTRADOR_CODIGO_ACESSO), true);
+
+    const { listarTodosGruposAdmin } = await import('../src/repository/gruposRepository.js');
+    const gruposAdministrativos = await listarTodosGruposAdmin();
+    assert.equal(gruposAdministrativos.some(g => g.id_grupo === grupo.insertId), true,
+      'modo administrativo enxerga grupos privados sem revelar convites');
+    assert.equal(gruposAdministrativos.some(g => 'codigo_convite' in g), false);
+
+    const { somenteDonoCampanha, somenteCriadorGrupo } = await import('../src/utils/permissoes.js');
+    const verificarMiddleware = (middleware, id, usuario, corpo = {}) => new Promise(resolve => {
+      const req = { params: { id: String(id) }, user: usuario, body: corpo, method: 'PUT' };
+      const resp = { status(code) { this.code = code; return this; },
+        json(payload) { resolve({ permitido: false, status: this.code, payload }); } };
+      middleware(req, resp, () => resolve({ permitido: true, corpo: req.body }));
+    });
+    const semElevacao = await verificarMiddleware(
+      somenteDonoCampanha, campanha.insertId, identidadeAdmin);
+    assert.equal(semElevacao.status, 403, 'candidato comum não edita campanha de terceiros');
+    const comElevacao = await verificarMiddleware(
+      somenteDonoCampanha, campanha.insertId, { ...identidadeAdmin, administracao: true });
+    assert.equal(comElevacao.permitido, true);
+    assert.equal(comElevacao.corpo.id_hemocentro, h.insertId,
+      'edição administrativa preserva proprietário original');
+
+    const grupoSemElevacao = await verificarMiddleware(
+      somenteCriadorGrupo, grupo.insertId, identidadeAdmin);
+    assert.equal(grupoSemElevacao.status, 403);
+    const grupoComElevacao = await verificarMiddleware(
+      somenteCriadorGrupo, grupo.insertId, { ...identidadeAdmin, administracao: true });
+    assert.equal(grupoComElevacao.permitido, true);
+    assert.equal(grupoComElevacao.corpo.id_criador, titular,
+      'edição administrativa não altera o criador do grupo');
+
+    const [campanhaParaApagar] = await pool.execute(
+      "INSERT INTO campanhas (id_hemocentro, nome_campanha, data_inicio, data_fim, status_campanha) VALUES (?, ?, '2026-11-17', '2026-11-20', 'ativa')",
+      [h.insertId, 'Campanha Administrativa Teste']
+    );
+    const [grupoParaApagar] = await pool.execute(
+      "INSERT INTO grupos (nome_grupo, descricao, visibilidade, id_criador) VALUES (?, ?, 'privado', ?)",
+      ['Grupo Administrativo Teste', 'Grupo sem participantes', titular]
+    );
+    assert.equal((await verificarMiddleware(somenteDonoCampanha, campanhaParaApagar.insertId,
+      { ...identidadeAdmin, administracao: true })).permitido, true);
+    assert.equal((await verificarMiddleware(somenteCriadorGrupo, grupoParaApagar.insertId,
+      { ...identidadeAdmin, administracao: true })).permitido, true);
+    const { apagarCampanhaService } = await import('../src/service/campanhasService.js');
+    const { apagarGrupoService } = await import('../src/service/gruposService.js');
+    assert.equal(await apagarCampanhaService(campanhaParaApagar.insertId), 1);
+    assert.equal(await apagarGrupoService(grupoParaApagar.insertId), 1);
+    delete process.env.ADMINISTRADOR_CPF;
+    delete process.env.ADMINISTRADOR_CODIGO_ACESSO;
+
     await pool.execute('DELETE FROM grupos_campanhas WHERE id_grupo = ?', [grupoOutro.insertId]);
 
     // Também verifica que a consulta pública nunca expõe o grupo privado.

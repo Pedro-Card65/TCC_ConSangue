@@ -252,3 +252,45 @@
   &:hover { background: #901525; }
   &:focus-visible { outline: 3px solid #366aad; outline-offset: 3px; }
 }
+
+
+/* Gerenciamento de campanhas: disponível apenas para conta administrativa autorizada. */
+.pagina-campanhas {
+  .acoes-admin-campanha {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .65rem;
+    margin-top: .85rem;
+    button { min-height: 40px; padding: .5rem .85rem; border-radius: 7px; cursor: pointer; }
+    .botao-perigo { border: 1px solid #ac2730; color: #ac2730; background: #fff; }
+    .botao-perigo:hover { background: #fff1f2; }
+  }
+  .formulario-admin-campanha {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #fff8f8;
+    border: 1px solid #ead0d2;
+    border-radius: 9px;
+    form { display: flex; flex-direction: column; gap: .7rem; }
+    fieldset { border: 0; padding: 0; display: flex; flex-direction: column; gap: .8rem; }
+    label { display: flex; flex-direction: column; gap: .35rem; }
+    input, textarea, select { width: 100%; max-width: 100%; box-sizing: border-box; padding: .55rem; border: 1px solid #ba9296; border-radius: 6px; }
+    .campos-duplos { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: .7rem; }
+    .acoes { display: flex; flex-wrap: wrap; gap: .65rem; }
+  }
+}
+.fundo-confirmacao-admin-campanha {
+  position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,.55);
+  display: flex; justify-content: center; align-items: center; padding: 1rem;
+}
+.caixa-confirmacao-admin-campanha {
+  width: min(100%, 480px); max-height: 90vh; overflow-y: auto;
+  border-radius: 10px; padding: 1.5rem; background: #fff; box-sizing: border-box;
+  h2 { color: #9d2029; }
+  p { line-height: 1.5; }
+  p[role="alert"] { color: #9d2029; }
+  .acoes-admin-campanha { display: flex; gap: 1rem; justify-content: flex-end; flex-wrap: wrap; }
+  button { cursor: pointer; border-radius: 6px; padding: .65rem .9rem; }
+  button.botao-perigo { background: #a3262f; color: #fff; border: 1px solid #a3262f; }
+  button:disabled { opacity: .6; cursor: not-allowed; }
+}

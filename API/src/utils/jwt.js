@@ -24,6 +24,18 @@ export function generateToken(usuario) {
 }
 
 
+export function generateAdminToken(usuario) {
+    return jwt.sign(
+        {
+            id_usuario: usuario.id_usuario,
+            tipo_usuario: usuario.tipo_usuario,
+            administracao: true
+        },
+        KEY,
+        { expiresIn: '2h', algorithm: 'HS256' }
+    );
+}
+
 export function getTokenInfo(req) {
     try {
         const auth = req.headers.authorization;

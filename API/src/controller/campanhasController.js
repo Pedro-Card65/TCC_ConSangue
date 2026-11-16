@@ -56,7 +56,7 @@ endpoints.get('/campanhas/hemocentro/:id', async (req, resp) => {
     }
 });
 
-endpoints.put('/campanhas/:id/foto', getAuthentication(u => u.tipo_usuario === 'instituicao'), somenteDonoCampanha, async (req, resp) => {
+endpoints.put('/campanhas/:id/foto', getAuthentication(u => u.tipo_usuario === 'instituicao' || u.administracao === true), somenteDonoCampanha, async (req, resp) => {
     try {
         await service.atualizarFotoCampanhaService(req.params.id, req.body.foto_campanha);
         resp.send({ mensagem: 'Foto da campanha atualizada.' });
@@ -65,7 +65,7 @@ endpoints.put('/campanhas/:id/foto', getAuthentication(u => u.tipo_usuario === '
     }
 });
 
-endpoints.put('/campanhas/:id', getAuthentication(u => u.tipo_usuario === 'instituicao'), somenteDonoCampanha, async (req, resp) => {
+endpoints.put('/campanhas/:id', getAuthentication(u => u.tipo_usuario === 'instituicao' || u.administracao === true), somenteDonoCampanha, async (req, resp) => {
     try {
         let campanha = req.body;
         let id_campanha = req.params.id;
@@ -78,7 +78,7 @@ endpoints.put('/campanhas/:id', getAuthentication(u => u.tipo_usuario === 'insti
     }
 });
 
-endpoints.delete('/campanhas/:id', getAuthentication(u => u.tipo_usuario === 'instituicao'), somenteDonoCampanha, async (req, resp) => {
+endpoints.delete('/campanhas/:id', getAuthentication(u => u.tipo_usuario === 'instituicao' || u.administracao === true), somenteDonoCampanha, async (req, resp) => {
     try {
         let id_campanha = req.params.id;
 

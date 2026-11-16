@@ -7,6 +7,7 @@ import instituicoes from './controller/instituicoesController.js';
 import participacoes from './controller/participacoesController.js';
 import usuario from './controller/usuariosController.js'; // </3
 import campanhas from './controller/campanhasController.js';
+import administracao from './controller/adminController.js';
 
 
 export function addRoutes(api) {
@@ -18,6 +19,7 @@ export function addRoutes(api) {
         });
     });
 
+    api.use('/api', administracao);
     api.use('/api', grupos);
     api.use('/api', membros);
     api.use('/api', gruposCampanhas);

@@ -20,9 +20,8 @@ endpoints.post('/api/usuarios/cadastro', async (req, resp) => {
         let tipo_sangue = req.body.tipo_sangue;
         let tipo_usuario = req.body.tipo_usuario;
         let estado = req.body.estado;
-        let codigo_instituicao = req.body.codigo_instituicao;
 
-        const conta = await service.fazerCadastro(usuario, nascimento, cpf, telefone, email, senha, cidade, tipo_sangue, tipo_usuario, estado, codigo_instituicao);
+        const conta = await service.fazerCadastro(usuario, nascimento, cpf, telefone, email, senha, cidade, tipo_sangue, tipo_usuario, estado);
 
         resp.status(201).send({
             mensagem: 'Cadastro realizado com sucesso!',

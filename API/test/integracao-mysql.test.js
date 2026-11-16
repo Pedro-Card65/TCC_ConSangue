@@ -31,6 +31,20 @@ test('MySQL isolado: preserva terceiros, bloqueia vínculos e só então permite
       return r.insertId;
     };
 
+    // Regressão do cadastro: instituição pode se registrar sem convite.
+    const { fazerCadastro } = await import('../src/service/usuariosService.js');
+    const instituicaoSemConvite = await fazerCadastro(
+      'Instituição de Demonstração', '1998-01-20', '52998224725',
+      '11988888888', 'cadastro-institucional@example.test', 'SenhaDemo123',
+      'São Paulo', '', 'instituicao', 'SP'
+    );
+    const [instituicoesSemConvite] = await pool.execute(
+      'SELECT id_usuario, tipo_usuario FROM usuarios WHERE id_usuario = ?',
+      [instituicaoSemConvite]
+    );
+    assert.equal(instituicoesSemConvite[0]?.tipo_usuario, 'instituicao');
+    await pool.execute('DELETE FROM usuarios WHERE id_usuario = ?', [instituicaoSemConvite]);
+
     const titular = await cadastrar('Instituição Teste', '12345678901', 'instituicao');
     const terceiro = await cadastrar('Participante Teste', '10987654321', 'candidato');
     const [h] = await pool.execute(

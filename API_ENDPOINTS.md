@@ -159,7 +159,7 @@ Arquivo: `API/src/controller/participacoesController.js`. Os endpoints são do c
 - **Edição e exclusão de campanha:** a página institucional oferece essas ações; exclusão com participações ou grupos associados retorna 409 sem apagar a campanha.
 - **Exclusão de conta institucional:** o rollback protege contra exclusões parciais; vínculos de outras pessoas impedem a exclusão, que deverá ser tratada com suporte antes de prosseguir.
 - **Esquema:** use `Database/migracao_controlada.sql` com backup para bancos antigos; não executar ALTER dentro dos endpoints.
-- **Testes:** o GitHub Actions testa API (mocks e MySQL isolado descartável, com vínculos e rollback) e frontend antes do build. Não usa o banco de produção.
+- **Publicação:** o GitHub Actions valida a sintaxe da API e compila o frontend. A limpeza do banco é uma operação manual e independente do deploy.
 
 
 ## Administração de demonstração (conta Candidato)

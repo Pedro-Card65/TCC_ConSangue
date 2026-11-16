@@ -63,10 +63,10 @@ Os antigos utilitários de migração e rotação de códigos foram retirados do
 - npm start usa Node.js diretamente; npm run dev usa nodemon.
 - A lista pública de hemocentros não devolve id_usuario e a de grupos não devolve id_criador.
 
-## Cadastro institucional, conta e testes
+## Cadastro institucional e conta
 
 - Cadastros de candidato e de instituição são públicos e **não exigem código de convite**. Isso facilita a demonstração, mas **não verifica a identidade ou o credenciamento dos hemocentros**; sinalize instituições fictícias na apresentação.
 - `GET /api/usuarios/me` devolve os próprios dados, incluindo telefone. `PUT /api/usuarios/me` atualiza perfil com senha atual. `DELETE /api/usuarios/me/conta-institucional` exige senha e texto `EXCLUIR`.
 - A exclusão institucional ocorre numa transação e **bloqueia** a operação se houver membros, participações ou grupos de outras pessoas vinculados. Em falhas, faz rollback e não deve remover dados de terceiros. Validar com banco isolado antes de usar no ambiente real.
-- `npm test` na pasta `API` executa testes com `node --test` (municípios, cadastro institucional e transações). O GitHub Actions inicia um MySQL descartável e valida rollback, vínculos de terceiros e filtros de grupos com registros fictícios, sem acessar a produção. `npm test` na pasta `React` executa testes de referência de municípios. O CI executa os dois e o build. Esses testes **não substituem** testes de integração no MySQL e validação manual do site.
+- O GitHub Actions verifica a sintaxe da API e gera a compilação de produção do React. Os fluxos de negócio devem ser validados antes da publicação.
 - A base local de municípios permite validar estado/cidade sem dependência de chamadas externas ao IBGE durante o cadastro; fonte e licença em `LICENSE-municipios.txt`.

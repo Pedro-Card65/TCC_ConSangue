@@ -93,7 +93,7 @@ Arquivo: `API/src/controller/gruposController.js`. Montado com prefixo `/api`. V
 | GET | `/api/grupos` | Pública | — | — | `200 { grupos }` apenas de grupos públicos, com `visibilidade`; **sem** `codigo_convite` e `foto_grupo` | 200; 500 |
 | GET | `/api/grupos/:nome` | Pública | — | — | `200 { grupos }` apenas de grupos públicos filtrados por nome; **sem** `codigo_convite` e `foto_grupo` | 200; 500 |
 | PUT | `/api/grupo/:id` | JWT + criador (`somenteCriadorGrupo`) | Só o criador do grupo | `{ nome_grupo, descricao, foto_grupo?, visibilidade? }`. `foto_grupo` opcional: JPEG base64 validado ou `null` para remover. `id_criador` vem do JWT. | `200 { linhasAfetadas }` | 200; 400; 403; 404; 500 |
-| DELETE | `/api/grupo/:id` | JWT + criador | Só o criador do grupo | — | `200 { linhasAfetadas }` | 200; 403; 409 `"Desvincule as campanhas antes de excluir o grupo."` (verificar no código: `gruposRepository.js:106-114`); 500 |
+| DELETE | `/api/grupo/:id` | JWT + criador ou administrador de demonstração ativado | Somente criador do grupo ou administrador de demonstração com acesso validado | — | `200 { linhasAfetadas }` | 200; 401; 403; 404; 500. Exclui integrantes e vínculos com campanhas, mas preserva as participações individuais nas campanhas (sem vínculo ao grupo).
 
 ---
 
@@ -118,7 +118,7 @@ Arquivo: `API/src/controller/grupos_campanhasController.js`. Montado com prefixo
 
 | Método | Caminho | Auth | Perfil / permissão | Corpo | Resposta | Códigos |
 |---|---|---|---|---|---|---|
-| POST | `/api/grupoCampanhas` | JWT + administrador do grupo (`somenteAdminGrupo`, usa `id_grupo` do corpo) | Criador ou administrador do grupo | `{ id_grupo, id_campanha, meta_participacoes }` (verificar no código: `grupos_campanhasService.js:17-21`) | `201 { id }` | 201; 400 meta inválida; 401; 403; 404 `"Grupo ou campanha não encontrado."`; 409 `"Esse grupo já está vinculado à campanha."`; 500 |
+| POST | `/api/grupoCampanhas` | JWT + administrador do grupo (`somenteAdminGrupo`, usa `id_grupo` do corpo) | Somente criador ou integrante com papel `administrador` no grupo (membros comuns e administradores de outros grupos não podem) | `{ id_grupo, id_campanha, meta_participacoes }` (verificar no código: `grupos_campanhasService.js:17-21`) | `201 { id }` | 201; 400 meta inválida; 401; 403; 404 `"Grupo ou campanha não encontrado."`; 409 `"Esse grupo já está vinculado à campanha."`; 500 |
 | GET | `/api/gruposCampanhas` | Pública | — | — | `200 { grupos }` | 200; 500 |
 | GET | `/api/gruposCampanhas/:id` | Pública | — | — | `200 { grupo }` | 200; 404 (verificar no código: `grupos_campanhasService.js:29-36`); 500 |
 | PUT | `/api/grupoCampanhas/:id` | JWT + administrador do grupo (`somenteAdminDoGrupoCampanha`) | Criador ou administrador do grupo. Só a meta pode mudar; trocar o grupo retorna 403 (`permissoes.js:139-143`) | `{ meta_participacoes }` | `200 { linhasAfetadas }` | 200; 400; 403; 404; 500 |

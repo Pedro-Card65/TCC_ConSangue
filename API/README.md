@@ -48,6 +48,8 @@ A coluna de visibilidade foi confirmada no MySQL do Railway em 12/11/2026: um gr
 - Convites têm 8 caracteres. O ID numérico não é convite e não permite entrar em grupos privados.
 - A consulta pública de grupos lista apenas grupos `publico` e não expõe `foto_grupo` nem `codigo_convite`. Os membros acessam seus grupos privados pela rota autenticada `/api/grupos/usuario/:id_usuario`.
 - A lista de integrantes exige autenticação e vínculo com o grupo.
+- Apenas o criador ou integrante com papel `administrador` pode vincular campanhas ao grupo. Essa regra é verificada no servidor, não apenas na interface.
+- A exclusão de um grupo com campanha vinculada é permitida: remove os membros e vínculos do grupo em uma transação e mantém os registros de participação na campanha, desvinculando-os do grupo.
 - Para grupos públicos, há uma rota separada que exige autenticação e confirma `visibilidade = 'publico'` no banco.
 - Os convites expostos anteriormente foram rotacionados; os códigos antigos foram invalidados.
 

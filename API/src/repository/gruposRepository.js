@@ -158,21 +158,32 @@ export async function apagarGrupo(id) {
     try {
         await conexao.beginTransaction();
 
-        const [vinculos] = await conexao.execute(
-            `SELECT id_grupo_campanha
-             FROM grupos_campanhas
-             WHERE id_grupo = ?
-             LIMIT 1`,
+        // Bloqueia o grupo enquanto os vínculos são removidos para impedir
+        // novas associações durante esta exclusão.
+        const [grupos] = await conexao.execute(
+            'SELECT id_grupo FROM grupos WHERE id_grupo = ? FOR UPDATE',
+            [id]
+        );
+        if (!grupos.length) {
+            const erro = new Error('Grupo não encontrado.');
+            erro.status = 404;
+            throw erro;
+        }
+
+        // A participação continua pertencendo à campanha, mesmo após a
+        // exclusão do grupo; apenas a associação com o grupo é removida.
+        await conexao.execute(
+            `UPDATE participacoes p
+             JOIN grupos_campanhas gc ON gc.id_grupo_campanha = p.id_grupo_campanha
+             SET p.id_grupo_campanha = NULL
+             WHERE gc.id_grupo = ?`,
             [id]
         );
 
-        if (vinculos.length > 0) {
-            const erro = new Error(
-                'Desvincule as campanhas antes de excluir o grupo.'
-            );
-            erro.status = 409;
-            throw erro;
-        }
+        await conexao.execute(
+            'DELETE FROM grupos_campanhas WHERE id_grupo = ?',
+            [id]
+        );
 
         await conexao.execute(
             'DELETE FROM membros_grupo WHERE id_grupo = ?',

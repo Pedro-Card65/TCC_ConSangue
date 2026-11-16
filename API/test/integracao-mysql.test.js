@@ -195,6 +195,67 @@ test('MySQL isolado: preserva terceiros, bloqueia vínculos e só então permite
     const { apagarGrupoService } = await import('../src/service/gruposService.js');
     assert.equal(await apagarCampanhaService(campanhaParaApagar.insertId), 1);
     assert.equal(await apagarGrupoService(grupoParaApagar.insertId), 1);
+
+    // Apenas o criador ou um membro com papel "administrador" pode vincular
+    // uma campanha. Um membro comum recebe HTTP 403, inclusive via API.
+    const [grupoVinculado] = await pool.execute(
+      "INSERT INTO grupos (nome_grupo, descricao, visibilidade, id_criador) VALUES (?, ?, 'publico', ?)",
+      ['Grupo com campanha', 'Teste de exclusão sem perda de participação', titular]
+    );
+    await pool.execute(
+      "INSERT INTO membros_grupo (id_usuario, id_grupo, papel) VALUES (?, ?, 'membro')",
+      [terceiro, grupoVinculado.insertId]
+    );
+    const { somenteAdminGrupo, somenteAdminDoGrupoCampanha } =
+      await import('../src/utils/permissoes.js');
+    const verificarVinculo = (middleware, id, usuario) => new Promise(resolve => {
+      const req = {
+        params: { id: String(id) },
+        body: { id_grupo: grupoVinculado.insertId },
+        user: { id_usuario: usuario },
+        method: 'POST'
+      };
+      const resp = {
+        status(code) { this.code = code; return this; },
+        json(payload) { resolve({ permitido: false, status: this.code, payload }); }
+      };
+      middleware(req, resp, () => resolve({ permitido: true }));
+    });
+    assert.equal((await verificarVinculo(somenteAdminGrupo, grupoVinculado.insertId, terceiro)).status, 403);
+    assert.equal((await verificarVinculo(somenteAdminGrupo, grupoVinculado.insertId, titular)).permitido, true);
+
+    const [vinculoParaApagar] = await pool.execute(
+      'INSERT INTO grupos_campanhas (id_grupo, id_campanha, meta_participacoes) VALUES (?, ?, ?)',
+      [grupoVinculado.insertId, campanha.insertId, 5]
+    );
+    assert.equal((await verificarVinculo(somenteAdminDoGrupoCampanha, vinculoParaApagar.insertId, terceiro)).status, 403);
+
+    await pool.execute(
+      "UPDATE membros_grupo SET papel = 'administrador' WHERE id_usuario = ? AND id_grupo = ?",
+      [terceiro, grupoVinculado.insertId]
+    );
+    assert.equal((await verificarVinculo(somenteAdminGrupo, grupoVinculado.insertId, terceiro)).permitido, true);
+    assert.equal((await verificarVinculo(somenteAdminDoGrupoCampanha, vinculoParaApagar.insertId, terceiro)).permitido, true);
+
+    const [registro] = await pool.execute(
+      "INSERT INTO participacoes (id_usuario, id_campanha, id_grupo_campanha, status_participacao) VALUES (?, ?, ?, 'interessado')",
+      [terceiro, campanha.insertId, vinculoParaApagar.insertId]
+    );
+    assert.equal(await apagarGrupoService(grupoVinculado.insertId), 1,
+      'grupo ligado a campanha agora pode ser excluído');
+    const [[participacaoMantida]] = await pool.execute(
+      'SELECT id_campanha, id_grupo_campanha FROM participacoes WHERE id_registro = ?',
+      [registro.insertId]
+    );
+    assert.equal(participacaoMantida.id_campanha, campanha.insertId);
+    assert.equal(participacaoMantida.id_grupo_campanha, null,
+      'o histórico da campanha deve continuar sem vínculo com o grupo apagado');
+    const [[vinculosRestantes]] = await pool.execute(
+      'SELECT COUNT(*) AS quantidade FROM grupos_campanhas WHERE id_grupo = ?',
+      [grupoVinculado.insertId]
+    );
+    assert.equal(vinculosRestantes.quantidade, 0);
+    await pool.execute('DELETE FROM participacoes WHERE id_registro = ?', [registro.insertId]);
     delete process.env.ADMINISTRADOR_CPF;
     delete process.env.ADMINISTRADOR_CODIGO_ACESSO;
 
